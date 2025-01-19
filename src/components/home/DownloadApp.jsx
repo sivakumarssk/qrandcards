@@ -13,7 +13,7 @@ const DownloadApp = () => {
       </div>
       <div className="flex flex-wrap justify-center gap-8">
         <motion.a
-          href="https://play.google.com/store/apps/details?id=com.example.app" // Replace with your Play Store link
+          href="https://play.google.com/store/apps/details?id=com.onesquare.onesquare" // Replace with your Play Store link
           target="_blank"
           rel="noopener noreferrer"
           className="w-48 sm:w-60 md:w-72 h-14 bg-white flex items-center justify-center rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out"
@@ -30,7 +30,7 @@ const DownloadApp = () => {
         </motion.a>
 
         <motion.a
-          href="https://apps.apple.com/us/app/id1234567890" // Replace with your App Store link
+          href="https://apps.apple.com/in/app/onesquareuser/id6736521646" // Replace with your App Store link
           target="_blank"
           rel="noopener noreferrer"
           className="w-48 sm:w-60 md:w-72 bg-white flex items-center justify-center rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out"

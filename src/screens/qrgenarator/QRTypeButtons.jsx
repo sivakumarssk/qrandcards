@@ -14,6 +14,7 @@ const QRTypeButtons = ({ activeType, setActiveType }) => {
     "googleMaps",
     "appStore",
     "playStore",
+    "Wifi",
     "Image",
     "Pdf",
     "Audio",
@@ -21,7 +22,9 @@ const QRTypeButtons = ({ activeType, setActiveType }) => {
   ];
 
   return (
-    <div className="flex flex-wrap justify-center sm:justify-start sm:gap-4 sm:mt-6 items-center gap-4 mt-6">
+    <div className="flex justify-center">
+      <div className="flex flex-wrap justify-center items-center sm:max-w-[60%]  sm:justify-center sm:gap-4 sm:mt-6  gap-4 mt-6">
+
       {qrTypes.map((type) => (
         <button
           key={type}
@@ -35,6 +38,9 @@ const QRTypeButtons = ({ activeType, setActiveType }) => {
           {type.charAt(0).toUpperCase() + type.slice(1)}
         </button>
       ))}
+
+</div>
+
     </div>
   );
 };

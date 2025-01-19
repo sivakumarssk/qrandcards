@@ -4,10 +4,15 @@ import "aos/dist/aos.css";
 import qrScreen from '../../assets/corousel/qrScreen.png'
 
 function QrAbout() {
+
+    useEffect(() => {
+        AOS.init();
+      }, []);
+
     return (
         <>
-            <div className="container mx-auto py-16 px-4">
-                <div className="grid md:grid-cols-2 items-center gap-10">
+            <div className="container mx-auto pb-16 pt-4 px-4 overflow-hidden sm:pt-16">
+                <div className="grid md:grid-cols-2 items-center gap-10 overflow-hidden">
                     {/* Image Frames */}
                     <div data-aos="fade-right" className="flex space-x-4">
                         <img

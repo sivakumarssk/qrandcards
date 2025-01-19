@@ -4,10 +4,14 @@ import "aos/dist/aos.css";
 import about from '../../assets/corousel/about-us.jpg'
 
 const AboutHome = ()=>{
+  useEffect(() => {
+    AOS.init();
+  }, []);
+
     return(
         <>
-        <div className="container mx-auto py-16 px-4">
-        <div className="grid md:grid-cols-2 items-center gap-8">
+        <div className="container mx-auto py-16 px-4 overflow-hidden">
+        <div className="grid md:grid-cols-2 items-center gap-8 overflow-hidden">
           {/* Text Content */}
           <div data-aos="fade-right">
             <h2 className="text-3xl font-bold mb-4">About Our Platform</h2>

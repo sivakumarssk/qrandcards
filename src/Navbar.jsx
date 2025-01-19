@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import './Navbar.css'
+import './NavBar.css'
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -74,7 +74,7 @@ function Navbar() {
             data-aos="fade-down"
             data-aos-delay="600"
           >
-            Pricing
+            Plans
           </Link>
         </div>
 
@@ -96,13 +96,13 @@ function Navbar() {
           >
             Sign Up
           </Link>
-          <button
+          {/* <button
             className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-lg transition"
             data-aos="fade-down"
             data-aos-delay="900"
           >
             Logout
-          </button>
+          </button> */}
         </div>
 
         {/* Hamburger Menu */}
@@ -132,6 +132,7 @@ function Navbar() {
         <div className="md:hidden bg-blue-700 text-white">
           <Link
             to="/"
+            onClick={() => setIsMenuOpen(false)}
             className="block py-2 px-4 hover:bg-blue-500 transition"
             data-aos="fade-up"
           >
@@ -139,6 +140,7 @@ function Navbar() {
           </Link>
           <Link
             to="/about"
+            onClick={() => setIsMenuOpen(false)}
             className="block py-2 px-4 hover:bg-blue-500 transition"
             data-aos="fade-up"
             data-aos-delay="100"
@@ -147,6 +149,7 @@ function Navbar() {
           </Link>
           <Link
             to="/qr-generator"
+            onClick={() => setIsMenuOpen(false)}
             className="block py-2 px-4 hover:bg-blue-500 transition"
             data-aos="fade-up"
             data-aos-delay="200"
@@ -155,6 +158,7 @@ function Navbar() {
           </Link>
           <Link
             to="/visiting-cards"
+            onClick={() => setIsMenuOpen(false)}
             className="block py-2 px-4 hover:bg-blue-500 transition"
             data-aos="fade-up"
             data-aos-delay="300"
@@ -163,6 +167,7 @@ function Navbar() {
           </Link>
           <Link
             to="/pricing"
+            onClick={() => setIsMenuOpen(false)}
             className="block py-2 px-4 hover:bg-blue-500 transition"
             data-aos="fade-up"
             data-aos-delay="400"
@@ -171,6 +176,7 @@ function Navbar() {
           </Link>
           <Link
             to="/signin"
+            onClick={() => setIsMenuOpen(false)}
             className="block py-2 px-4 hover:bg-blue-500 transition"
             data-aos="fade-up"
             data-aos-delay="500"
@@ -179,6 +185,7 @@ function Navbar() {
           </Link>
           <Link
             to="/signup"
+            onClick={() => setIsMenuOpen(false)}
             className="block py-2 px-4 hover:bg-blue-500 transition"
             data-aos="fade-up"
             data-aos-delay="600"
@@ -189,6 +196,7 @@ function Navbar() {
             className="w-full py-2 px-4 text-left bg-red-500 hover:bg-red-600 text-white transition"
             data-aos="fade-up"
             data-aos-delay="700"
+            onClick={() => setIsMenuOpen(false)}
           >
             Logout
           </button>

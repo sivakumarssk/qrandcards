@@ -10,7 +10,7 @@ function About() {
     AOS.init({
       duration: 1000, // Animation duration
       easing: 'ease-in-out', // Easing for smooth transitions
-      once: true, // Animates only once when the element is in view
+      // once: true,
     });
   }, []);
 
