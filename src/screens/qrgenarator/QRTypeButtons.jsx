@@ -14,11 +14,11 @@ const QRTypeButtons = ({ activeType, setActiveType }) => {
     "googleMaps",
     "appStore",
     "playStore",
-    "Wifi",
-    "Image",
-    "Pdf",
-    "Audio",
-    "vedio",
+    "wifi",
+    "image",
+    "pdf",
+    "audio",
+    "video",
   ];
 
   return (

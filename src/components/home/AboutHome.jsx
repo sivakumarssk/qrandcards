@@ -16,7 +16,7 @@ const AboutHome = ()=>{
           <div data-aos="fade-right">
             <h2 className="text-3xl font-bold mb-4">About Our Platform</h2>
             <p className="text-gray-600 text-justify">
-            At [Your Platform Name], we believe in the power of personalization. 
+            At QR And Cards, we believe in the power of personalization. 
             Whether you're a small business owner, a freelancer, or someone looking to 
             make a professional impression, our platform offers the tools you need to 
             create unique, high-quality visiting cards and business cards that reflect 

@@ -70,7 +70,7 @@ const QRForm = ({ activeType, onSubmit }) => {
         else if (!/^https?:\/\/(www\.)?google\.com\/maps/.test(formData.location))
           newErrors.location = "Invalid Google Maps link.";
         break;
-      case "Wifi":
+      case "wifi":
         if (!formData.ssid) newErrors.ssid = "SSID is required.";
         if (!formData.password) newErrors.password = "Password is required.";
         break;
@@ -83,7 +83,7 @@ const QRForm = ({ activeType, onSubmit }) => {
       case "Audio":
         if (!formData.audio) newErrors.audio = "Audio URL is required.";
         break;
-      case "vedio":
+      case "video":
         if (!formData.video) newErrors.video = "Video URL is required.";
         break;
       default:
@@ -368,7 +368,7 @@ const QRForm = ({ activeType, onSubmit }) => {
           </div>
         );
   
-      case "Wifi":
+      case "wifi":
         return (
           <>
             <div className="mb-4">

@@ -1,113 +1,134 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import './NavBar.css'
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const location = useLocation(); // For checking the current route
 
   useEffect(() => {
     // Initialize AOS animations
     AOS.init({ duration: 1000 });
 
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 300); // Add the fixed navbar after 300px scroll
-    };
+    // Reinitialize AOS on route change
+    AOS.refresh();
+  }, [location.pathname]);
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const activeClassName = "text-blue-500 font-bold";
 
   return (
     <nav
-      className={`w-full z-50 transition-all duration-300 fixed top-0 left-0 bg-blue-600 shadow-lg"`}
+      className="w-full z-50 transition-all drop-shadow-lg duration-300 fixed top-0 left-0 bg-white shadow-lg"
     >
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         {/* Logo */}
         <div
-          className="text-2xl font-bold text-white"
+          className="text-2xl font-bold text-black"
           data-aos="fade-down"
           data-aos-delay="100"
         >
-          <Link to="/">QR & Cards</Link>
+          <NavLink to="/" exact>
+            QR and Cards
+          </NavLink>
         </div>
 
         {/* Menu Items */}
-        <div className="hidden md:flex space-x-6 text-white">
-          <Link
+        <div className="hidden md:flex space-x-6 text-black">
+          <NavLink
             to="/"
-            className="hover:text-blue-300 transition"
+            exact
+            className={({ isActive }) =>
+              isActive
+                ? `${activeClassName} hover:text-blue-300 transition`
+                : "hover:text-blue-300 transition"
+            }
             data-aos="fade-down"
             data-aos-delay="200"
           >
             Home
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/about"
-            className="hover:text-blue-300 transition"
+            className={({ isActive }) =>
+              isActive
+                ? `${activeClassName} hover:text-blue-300 transition`
+                : "hover:text-blue-300 transition"
+            }
             data-aos="fade-down"
             data-aos-delay="300"
           >
             About
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/qr-generator"
-            className="hover:text-blue-300 transition"
+            className={({ isActive }) =>
+              isActive
+                ? `${activeClassName} hover:text-blue-300 transition`
+                : "hover:text-blue-300 transition"
+            }
             data-aos="fade-down"
             data-aos-delay="400"
           >
             QR Generator
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/visiting-cards"
-            className="hover:text-blue-300 transition"
+            className={({ isActive }) =>
+              isActive
+                ? `${activeClassName} hover:text-blue-300 transition`
+                : "hover:text-blue-300 transition"
+            }
             data-aos="fade-down"
             data-aos-delay="500"
           >
             My Cards
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/pricing"
-            className="hover:text-blue-300 transition"
+            className={({ isActive }) =>
+              isActive
+                ? `${activeClassName} hover:text-blue-300 transition`
+                : "hover:text-blue-300 transition"
+            }
             data-aos="fade-down"
             data-aos-delay="600"
           >
             Plans
-          </Link>
+          </NavLink>
         </div>
 
         {/* Auth Buttons */}
-        <div className="hidden md:flex items-center space-x-4 text-white">
-          <Link
+        <div className="hidden md:flex items-center space-x-4 text-black">
+          <NavLink
             to="/signin"
-            className="hover:text-blue-300 transition"
+            className={({ isActive }) =>
+              isActive
+                ? `${activeClassName} hover:text-blue-300 transition`
+                : "hover:text-blue-300 transition"
+            }
             data-aos="fade-down"
             data-aos-delay="700"
           >
             Sign In
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/signup"
-            className="hover:text-blue-300 transition"
+            className={({ isActive }) =>
+              isActive
+                ? `${activeClassName} hover:text-blue-300 transition`
+                : "hover:text-blue-300 transition"
+            }
             data-aos="fade-down"
             data-aos-delay="800"
           >
             Sign Up
-          </Link>
-          {/* <button
-            className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-lg transition"
-            data-aos="fade-down"
-            data-aos-delay="900"
-          >
-            Logout
-          </button> */}
+          </NavLink>
         </div>
 
         {/* Hamburger Menu */}
         <button
-          className="md:hidden text-white focus:outline-none"
+          className="md:hidden text-black focus:outline-none"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           <svg
@@ -129,71 +150,99 @@ function Navbar() {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-blue-700 text-white">
-          <Link
+        <div className="md:hidden bg-white drop-shadow-lg text-black">
+          <NavLink
             to="/"
             onClick={() => setIsMenuOpen(false)}
-            className="block py-2 px-4 hover:bg-blue-500 transition"
+            className={({ isActive }) =>
+              isActive
+                ? `${activeClassName} hover:text-blue-300 transition block py-2 px-4`
+                : "hover:text-blue-300 transition block py-2 px-4"
+            }
             data-aos="fade-up"
           >
             Home
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/about"
             onClick={() => setIsMenuOpen(false)}
-            className="block py-2 px-4 hover:bg-blue-500 transition"
+            className={({ isActive }) =>
+              isActive
+                ? `${activeClassName} hover:text-blue-300 transition block py-2 px-4`
+                : "hover:text-blue-300 transition block py-2 px-4"
+            }
             data-aos="fade-up"
             data-aos-delay="100"
           >
             About
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/qr-generator"
             onClick={() => setIsMenuOpen(false)}
-            className="block py-2 px-4 hover:bg-blue-500 transition"
+            className={({ isActive }) =>
+              isActive
+                ? `${activeClassName} hover:text-blue-300 transition block py-2 px-4`
+                : "hover:text-blue-300 transition block py-2 px-4"
+            }
             data-aos="fade-up"
             data-aos-delay="200"
           >
             QR Generator
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/visiting-cards"
             onClick={() => setIsMenuOpen(false)}
-            className="block py-2 px-4 hover:bg-blue-500 transition"
+            className={({ isActive }) =>
+              isActive
+                ? `${activeClassName} hover:text-blue-300 transition block py-2 px-4`
+                : "hover:text-blue-300 transition block py-2 px-4"
+            }
             data-aos="fade-up"
             data-aos-delay="300"
           >
             Visiting Cards
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/pricing"
             onClick={() => setIsMenuOpen(false)}
-            className="block py-2 px-4 hover:bg-blue-500 transition"
+            className={({ isActive }) =>
+              isActive
+                ? `${activeClassName} hover:text-blue-300 transition block py-2 px-4`
+                : "hover:text-blue-300 transition block py-2 px-4"
+            }
             data-aos="fade-up"
             data-aos-delay="400"
           >
             Plans
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/signin"
             onClick={() => setIsMenuOpen(false)}
-            className="block py-2 px-4 hover:bg-blue-500 transition"
+            className={({ isActive }) =>
+              isActive
+                ? `${activeClassName} hover:text-blue-300 transition block py-2 px-4`
+                : "hover:text-blue-300 transition block py-2 px-4"
+            }
             data-aos="fade-up"
             data-aos-delay="500"
           >
             Sign In
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/signup"
             onClick={() => setIsMenuOpen(false)}
-            className="block py-2 px-4 hover:bg-blue-500 transition"
+            className={({ isActive }) =>
+              isActive
+                ? `${activeClassName} hover:text-blue-300 transition block py-2 px-4`
+                : "hover:text-blue-300 transition block py-2 px-4"
+            }
             data-aos="fade-up"
             data-aos-delay="600"
           >
             Sign Up
-          </Link>
+          </NavLink>
           <button
-            className="w-full py-2 px-4 text-left bg-red-500 hover:bg-red-600 text-white transition"
+            className="w-full py-2 px-4 text-left bg-red-500 hover:bg-red-600 text-black transition"
             data-aos="fade-up"
             data-aos-delay="700"
             onClick={() => setIsMenuOpen(false)}

@@ -1,18 +1,22 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import QRForm from "./QRForm";
 import QRTypeButtons from "./QRTypeButtons";
+import defaultLogos from "../../components/helper/defaultLogo";
 
 const QRGenerator = () => {
   const [activeType, setActiveType] = useState("text");
   const [qrCodeValue, setQrCodeValue] = useState("");
-  const [qrColor, setQrColor] = useState("#000000");
+  const [qrColor, setQrColor] = useState("#2463EB");
   const [bgColor, setBgColor] = useState("#ffffff");
   const [logoUrl, setLogoUrl] = useState("");
-  const [logoSize, setLogoSize] = useState(50);
-  const [logoMargin, setLogoMargin] = useState(10);
 
   const qrCodeRef = useRef(null);
+
+
+  useEffect(() => {
+    setLogoUrl(defaultLogos(activeType));
+  }, [activeType]);
 
   const handleFormSubmit = (data) => {
     let value;
@@ -55,7 +59,7 @@ const QRGenerator = () => {
       case "googleMaps":
         value = data.location || "";
         break;
-      case "Wifi":
+      case "wifi":
         value = `WIFI:S:${data.ssid};T:WPA;P:${data.password};;` || "";
         break;
       // case "Image":
@@ -82,14 +86,43 @@ const QRGenerator = () => {
 
   const handleLogoUpload = (e) => {
     const file = e.target.files[0];
+
+    if (file.size > 500 * 1024) {
+      alert("Please upload an image smaller than 500KB.");
+      return;
+    }
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        setLogoUrl(reader.result); // Set the uploaded logo as a data URL
+        const img = new Image();
+        img.src = reader.result;
+
+        img.onload = () => {
+          // Create a circular canvas
+          const canvas = document.createElement("canvas");
+          const size = Math.min(img.width, img.height);
+          canvas.width = size;
+          canvas.height = size;
+
+          const ctx = canvas.getContext("2d");
+
+          // Draw circular mask
+          ctx.beginPath();
+          ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+          ctx.closePath();
+          ctx.clip();
+
+          // Draw the image onto the canvas
+          ctx.drawImage(img, (img.width - size) / 2, (img.height - size) / 2, size, size, 0, 0, size, size);
+
+          // Set the circular image as the logo
+          setLogoUrl(canvas.toDataURL());
+        };
       };
       reader.readAsDataURL(file);
     }
   };
+
 
   const downloadQRCode = () => {
     const canvas = qrCodeRef.current.querySelector("canvas");
@@ -173,15 +206,15 @@ const QRGenerator = () => {
           <div className="text-center flex justify-center items-center" ref={qrCodeRef}>
             <QRCodeCanvas
               value={qrCodeValue}
-              size={300} // Increase the QR code size for better scannability
+              size={300}
               fgColor={qrColor}
               bgColor={bgColor}
               imageSettings={{
                 src: logoUrl,
                 x: undefined,
                 y: undefined,
-                height: 60, // Adjust to ensure it's small
-                width: 60,  // Adjust to ensure it's small
+                height: 45, // Adjust to ensure it's small
+                width: 45,
                 excavate: true, // Clear the area beneath the logo
               }}
             />
@@ -190,15 +223,27 @@ const QRGenerator = () => {
 
           {/* QR Customization */}
           <div className="mt-6">
-            <label className="block text-sm text-gray-500 mb-2">
-              Change QR Code Color:
-            </label>
-            <input
-              type="color"
-              value={qrColor}
-              onChange={(e) => setQrColor(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-2 mb-4"
-            />
+            <div className="mt-6">
+              <label className="block text-sm font-semibold text-gray-700 mb-4">
+                🎨 May QR color change as per your luck!:
+              </label>
+
+              {/* QR Code Color */}
+              <div className="flex items-center space-x-4 mb-6">
+                <div>
+                  <p className="text-sm text-gray-600 mb-2">QR Code Color:</p>
+                  <input
+                    type="color"
+                    value={qrColor}
+                    onChange={(e) => setQrColor(e.target.value)}
+                    className="w-16 h-10 border-none rounded-lg cursor-pointer shadow-md"
+                  />
+                </div>
+                {/* <div className="w-10 h-10 rounded-lg" style={{ backgroundColor: qrColor }}></div> */}
+              </div>
+
+            </div>
+
 
             <label className="block text-sm text-gray-500 mb-2">
               Upload Logo for QR Code:

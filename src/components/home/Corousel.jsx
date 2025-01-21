@@ -12,12 +12,14 @@ function Corousel (){
         <div className="relative text-white min-h-[80vh]">
         <Swiper
           modules={[Autoplay, Navigation]}
-          navigation
+          
           autoplay={{
             delay: 3000,
             disableOnInteraction: false,
           }}
           loop
+          slidesPerView={1} // Ensures one slide per view
+          spaceBetween={0}
           className="h-full"
         >
           {/* Carousel Slide 1 */}
