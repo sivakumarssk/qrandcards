@@ -1,0 +1,13 @@
+.no-screenshot-blur {
+    filter: blur(10px);
+  }
+  
+  .watermark {
+    position: absolute;
+    text-align: center;
+    font-size: 14px;
+    opacity: 0.5;
+    user-select: none;
+    pointer-events: none;
+  }
+  

@@ -3,6 +3,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import QRForm from "./QRForm";
 import QRTypeButtons from "./QRTypeButtons";
 import defaultLogos from "../../components/helper/defaultLogo";
+import './QRgenarator.css'
 
 const QRGenerator = () => {
   const [activeType, setActiveType] = useState("text");
@@ -13,10 +14,36 @@ const QRGenerator = () => {
 
   const qrCodeRef = useRef(null);
 
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        document.body.classList.add("no-screenshot-blur");
+      } else {
+        document.body.classList.remove("no-screenshot-blur");
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []);
+
 
   useEffect(() => {
     setLogoUrl(defaultLogos(activeType));
   }, [activeType]);
+
+  useEffect(() => {
+    // Disable PrintScreen key and common shortcuts
+    const handleKeydown = (e) => {
+      if (e.key === "PrintScreen" || (e.ctrlKey && (e.key === "s" || e.key === "p"))) {
+        e.preventDefault();
+        alert("Screenshots and saving this content are disabled.");
+      }
+    };
+
+    document.addEventListener("keydown", handleKeydown);
+    return () => document.removeEventListener("keydown", handleKeydown);
+  }, []);
 
   const handleFormSubmit = (data) => {
     let value;
@@ -62,12 +89,11 @@ const QRGenerator = () => {
       case "wifi":
         value = `WIFI:S:${data.ssid};T:WPA;P:${data.password};;` || "";
         break;
-        case "app":
-          value = `
-          Play Store: ${data.playStore || "Not provided"}\n
-          App Store: ${data.appStore || "Not provided"}
+      case "app":
+        value = `
+        https://qrandcards.com/redirect?appStore=${data.playStore}&playStore=${data.appStore}
           `;
-          break;
+        break;
       // case "Image":
       //   value =  data.image || "";
       // case "Pdf":
@@ -209,7 +235,8 @@ const QRGenerator = () => {
           <h3 className="text-lg font-bold text-center text-gray-700 mb-4">
             Your QR Code
           </h3>
-          <div className="text-center flex justify-center items-center" ref={qrCodeRef}>
+          <div className="relative text-center flex justify-center items-center no-screenshot" ref={qrCodeRef}>
+            {/* QR Code Canvas */}
             <QRCodeCanvas
               value={qrCodeValue}
               size={300}
@@ -219,13 +246,50 @@ const QRGenerator = () => {
                 src: logoUrl,
                 x: undefined,
                 y: undefined,
-                height: 45, // Adjust to ensure it's small
-                width: 45,
-                excavate: true, // Clear the area beneath the logo
+                height: 35,
+                width: 35,
+                excavate: true,
               }}
             />
 
+            {/* Repeating Watermark Overlay */}
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                display: "grid",
+                placeItems: "center",
+                backgroundImage: `repeating-linear-gradient(
+        45deg,
+        rgba(0, 0, 0, 0.1) 0,
+        rgba(0, 0, 0, 0.1) 25px,
+        transparent 25px,
+        transparent 50px
+      )`,
+                color: "rgba(0, 0, 0, 0.1)",
+                fontSize: "18px",
+                fontWeight: "bold",
+                zIndex: 1,
+              }}
+            >
+              <div style={{ transform: "rotate(-45deg)", lineHeight: "1.5em" }}>
+                <p>QR and Code</p>
+                <p>QR and Code</p>
+                <p>QR and Code</p>
+                <p>QR and Code</p>
+                <p>QR and Code</p>
+                <p>QR and Code</p>
+                <p>QR and Code</p>
+                <p>QR and Code</p>
+                <p>QR and Code</p>
+                <p>QR and Code</p>
+                <p>QR and Code</p>
+              </div>
+              
+              
+            </div>
           </div>
+
+
 
           {/* QR Customization */}
           <div className="mt-6">
