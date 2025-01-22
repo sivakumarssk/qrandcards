@@ -337,22 +337,6 @@ const QRForm = ({ activeType, onSubmit }) => {
       case "app":
         return (
           <>
-          <div className="mb-4">
-              <label className="block text-gray-700 font-medium mb-1">
-                App Store App Link
-              </label>
-              <input
-                type="url"
-                name="appappStore"
-                value={formData.appappStore || ""}
-                placeholder="Enter App Store app link..."
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
-                onChange={handleChange}
-              />
-              {errors.appappStore && (
-                <p className="text-red-500 text-sm mt-1">{errors.appappStore}</p>
-              )}
-            </div>
             <div className="mb-4">
               <label className="block text-gray-700 font-medium mb-1">
                 Play Store App Link
@@ -369,7 +353,22 @@ const QRForm = ({ activeType, onSubmit }) => {
                 <p className="text-red-500 text-sm mt-1">{errors.appplayStore}</p>
               )}
             </div>
-            
+            <div className="mb-4">
+              <label className="block text-gray-700 font-medium mb-1">
+                App Store App Link
+              </label>
+              <input
+                type="url"
+                name="appappStore"
+                value={formData.appappStore || ""}
+                placeholder="Enter App Store app link..."
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
+                onChange={handleChange}
+              />
+              {errors.appappStore && (
+                <p className="text-red-500 text-sm mt-1">{errors.appappStore}</p>
+              )}
+            </div>
           </>
         );
       case "whatsapp":
