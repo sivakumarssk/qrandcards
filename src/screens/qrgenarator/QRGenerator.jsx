@@ -63,8 +63,9 @@ const QRGenerator = () => {
         value = `WIFI:S:${data.ssid};T:WPA;P:${data.password};;` || "";
         break;
         case "app":
-          value = `${data.appStore || "Not provided"}\n
-          ${data.playStore || "Not provided"}
+          value = `
+          App Store: ${data.appStore || "Not provided"}\n
+          Play Store: ${data.playStore || "Not provided"}
           `;
           break;
       // case "Image":
@@ -195,7 +196,7 @@ const QRGenerator = () => {
       </p>
 
       {/* Button Component */}
-      <QRTypeButtons activeType={activeType} setActiveType={setActiveType} />
+      <QRTypeButtons activeType={activeType} setActiveType={setActiveType}  setQrCodeValue={setQrCodeValue}/>
 
       {/* Form Component */}
       <div className="mt-10 max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
