@@ -11,6 +11,7 @@ const QRTypeButtons = ({ activeType, setActiveType }) => {
     "facebook",
     "instagram",
     "whatsapp",
+    "app",
     "googleMaps",
     "appStore",
     "playStore",

@@ -54,7 +54,7 @@ const QRGenerator = () => {
         value = data.appStore || "";
         break;
       case "whatsapp":
-        value = `https://wa.me/${data.whatsapp}${data?.message ? `?text=${encodeURIComponent(data.message)}` : ""}` || "";
+        value = `https://wa.me/+91${data.whatsapp}${data?.message ? `?text=${encodeURIComponent(data.message)}` : ""}` || "";
         break;
       case "googleMaps":
         value = data.location || "";
@@ -62,6 +62,12 @@ const QRGenerator = () => {
       case "wifi":
         value = `WIFI:S:${data.ssid};T:WPA;P:${data.password};;` || "";
         break;
+        case "app":
+          value = `
+          Play Store: ${data.playStore || "Not provided"}\n
+          App Store: ${data.appStore || "Not provided"}
+          `;
+          break;
       // case "Image":
       //   value =  data.image || "";
       // case "Pdf":

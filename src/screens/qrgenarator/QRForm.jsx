@@ -33,7 +33,6 @@ const QRForm = ({ activeType, onSubmit }) => {
           !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email)
         )
           newErrors.email = "Invalid email address.";
-        if (!formData.subject) newErrors.subject = "Subject is required.";
         break;
       case "upi":
         if (!formData.upi) newErrors.upi = "UPI ID is required.";
@@ -70,6 +69,10 @@ const QRForm = ({ activeType, onSubmit }) => {
         else if (!/^https?:\/\/(www\.)?google\.com\/maps/.test(formData.location))
           newErrors.location = "Invalid Google Maps link.";
         break;
+        case "app":
+          if (!formData.playStore) newErrors.playStore = "Play Store link is required.";
+          if (!formData.appStore) newErrors.appStore = "App Store link is required.";
+          break;
       case "wifi":
         if (!formData.ssid) newErrors.ssid = "SSID is required.";
         if (!formData.password) newErrors.password = "Password is required.";
@@ -175,7 +178,7 @@ const QRForm = ({ activeType, onSubmit }) => {
             </div>
             <div className="mb-4">
               <label className="block text-gray-700 font-medium mb-1">
-                Subject
+                Subject (Optional)
               </label>
               <input
                 type="text"
@@ -190,7 +193,7 @@ const QRForm = ({ activeType, onSubmit }) => {
             </div>
             <div className="mb-4">
               <label className="block text-gray-700 font-medium mb-1">
-                Message
+                Message (Optional)
               </label>
               <textarea
                 name="message"
@@ -316,6 +319,41 @@ const QRForm = ({ activeType, onSubmit }) => {
               )}
             </div>
           );
+          case "app":
+        return (
+          <>
+            <div className="mb-4">
+              <label className="block text-gray-700 font-medium mb-1">
+                Play Store App Link
+              </label>
+              <input
+                type="url"
+                name="playStore"
+                placeholder="Enter Play Store app link..."
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
+                onChange={handleChange}
+              />
+              {errors.playStore && (
+                <p className="text-red-500 text-sm mt-1">{errors.playStore}</p>
+              )}
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 font-medium mb-1">
+                App Store App Link
+              </label>
+              <input
+                type="url"
+                name="appStore"
+                placeholder="Enter App Store app link..."
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
+                onChange={handleChange}
+              />
+              {errors.appStore && (
+                <p className="text-red-500 text-sm mt-1">{errors.appStore}</p>
+              )}
+            </div>
+          </>
+        );
           case "whatsapp":
       return (
         <>
