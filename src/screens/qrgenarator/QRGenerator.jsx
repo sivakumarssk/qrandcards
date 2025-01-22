@@ -62,12 +62,9 @@ const QRGenerator = () => {
       case "wifi":
         value = `WIFI:S:${data.ssid};T:WPA;P:${data.password};;` || "";
         break;
-        case "app":
-          value = `
-          App Store: ${data.appStore || "Not provided"}\n
-          Play Store: ${data.playStore || "Not provided"}
-          `;
-          break;
+       case "app":
+        value = `https://admin.qrandcards.com?ios=${(data.appappStore || "#")}&android=${(data.appplayStore || "#")}`;
+        break
       // case "Image":
       //   value =  data.image || "";
       // case "Pdf":

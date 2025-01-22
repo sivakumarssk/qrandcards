@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const QRForm = ({ activeType, onSubmit }) => {
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
 
-  console.log(activeType,'act');
-  
+  useEffect(() => {
+    setFormData({});
+    setErrors({});
+  }, [activeType]);
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -66,13 +69,13 @@ const QRForm = ({ activeType, onSubmit }) => {
       case "googleMaps":
         if (!formData.location)
           newErrors.location = "Google Maps link is required.";
-        else if (!/^https?:\/\/(www\.)?google\.com\/maps/.test(formData.location))
+        else if (!/^https?:\/\/(www\.)?google\.com\/maps|^https?:\/\/maps\.app\.goo\.gl/.test(formData.location))
           newErrors.location = "Invalid Google Maps link.";
         break;
-        case "app":
-          if (!formData.playStore) newErrors.playStore = "Play Store link is required.";
-          if (!formData.appStore) newErrors.appStore = "App Store link is required.";
-          break;
+      case "app":
+        if (!formData.appplayStore) newErrors.appplayStore = "Play Store link is required.";
+        if (!formData.appappStore) newErrors.appappStore = "App Store link is required.";
+        break;
       case "wifi":
         if (!formData.ssid) newErrors.ssid = "SSID is required.";
         if (!formData.password) newErrors.password = "Password is required.";
@@ -112,6 +115,7 @@ const QRForm = ({ activeType, onSubmit }) => {
             <input
               type="text"
               name="text"
+              value={formData.text || ""}
               placeholder="Enter text..."
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
               onChange={handleChange}
@@ -121,7 +125,7 @@ const QRForm = ({ activeType, onSubmit }) => {
             )}
           </div>
         );
-  
+
       case "url":
         return (
           <div className="mb-4">
@@ -129,6 +133,7 @@ const QRForm = ({ activeType, onSubmit }) => {
             <input
               type="url"
               name="url"
+              value={formData.url || ""}
               placeholder="Enter URL..."
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
               onChange={handleChange}
@@ -138,7 +143,7 @@ const QRForm = ({ activeType, onSubmit }) => {
             )}
           </div>
         );
-  
+
       case "phone":
         return (
           <div className="mb-4">
@@ -148,6 +153,7 @@ const QRForm = ({ activeType, onSubmit }) => {
             <input
               type="tel"
               name="phone"
+              value={formData.phone || ""}
               placeholder="Enter phone number..."
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
               onChange={handleChange}
@@ -157,7 +163,7 @@ const QRForm = ({ activeType, onSubmit }) => {
             )}
           </div>
         );
-  
+
       case "email":
         return (
           <>
@@ -168,6 +174,7 @@ const QRForm = ({ activeType, onSubmit }) => {
               <input
                 type="email"
                 name="email"
+                value={formData.email || ""}
                 placeholder="Enter email..."
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
                 onChange={handleChange}
@@ -183,6 +190,7 @@ const QRForm = ({ activeType, onSubmit }) => {
               <input
                 type="text"
                 name="subject"
+                value={formData.subject || ""}
                 placeholder="Enter subject..."
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
                 onChange={handleChange}
@@ -200,6 +208,7 @@ const QRForm = ({ activeType, onSubmit }) => {
                 placeholder="Enter message..."
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
                 rows="4"
+                value={formData.message || ""}
                 onChange={handleChange}
               />
               {errors.message && (
@@ -208,7 +217,7 @@ const QRForm = ({ activeType, onSubmit }) => {
             </div>
           </>
         );
-  
+
       case "upi":
         return (
           <div className="mb-4">
@@ -216,6 +225,7 @@ const QRForm = ({ activeType, onSubmit }) => {
             <input
               type="text"
               name="upi"
+              value={formData.upi || ""}
               placeholder="Enter UPI ID..."
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
               onChange={handleChange}
@@ -225,7 +235,7 @@ const QRForm = ({ activeType, onSubmit }) => {
             )}
           </div>
         );
-  
+
       case "youtube":
         return (
           <div className="mb-4">
@@ -235,6 +245,7 @@ const QRForm = ({ activeType, onSubmit }) => {
             <input
               type="url"
               name="youtube"
+              value={formData.youtube || ""}
               placeholder="Enter YouTube URL..."
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
               onChange={handleChange}
@@ -244,7 +255,7 @@ const QRForm = ({ activeType, onSubmit }) => {
             )}
           </div>
         );
-  
+
       case "facebook":
         return (
           <div className="mb-4">
@@ -254,6 +265,7 @@ const QRForm = ({ activeType, onSubmit }) => {
             <input
               type="url"
               name="facebook"
+              value={formData.facebook || ""}
               placeholder="Enter Facebook URL..."
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
               onChange={handleChange}
@@ -263,7 +275,7 @@ const QRForm = ({ activeType, onSubmit }) => {
             )}
           </div>
         );
-  
+
       case "instagram":
         return (
           <div className="mb-4">
@@ -273,6 +285,7 @@ const QRForm = ({ activeType, onSubmit }) => {
             <input
               type="url"
               name="instagram"
+              value={formData.instagram || ""}
               placeholder="Enter Instagram URL..."
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
               onChange={handleChange}
@@ -282,111 +295,118 @@ const QRForm = ({ activeType, onSubmit }) => {
             )}
           </div>
         );
-        case "playStore":
-          return (
+      case "playStore":
+        return (
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-1">
+              Play Store App Link
+            </label>
+            <input
+              type="url"
+              name="playStore"
+              value={formData.playStore || ""}
+              placeholder="Enter Play Store app link..."
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
+              onChange={handleChange}
+            />
+            {errors.playStore && (
+              <p className="text-red-500 text-sm mt-1">{errors.playStore}</p>
+            )}
+          </div>
+        );
+
+      case "appStore":
+        return (
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-1">
+              App Store App Link
+            </label>
+            <input
+              type="url"
+              name="appStore"
+              value={formData.appStore || ""}
+              placeholder="Enter App Store app link..."
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
+              onChange={handleChange}
+            />
+            {errors.appStore && (
+              <p className="text-red-500 text-sm mt-1">{errors.appStore}</p>
+            )}
+          </div>
+        );
+      case "app":
+        return (
+          <>
+          <div className="mb-4">
+              <label className="block text-gray-700 font-medium mb-1">
+                App Store App Link
+              </label>
+              <input
+                type="url"
+                name="appappStore"
+                value={formData.appappStore || ""}
+                placeholder="Enter App Store app link..."
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
+                onChange={handleChange}
+              />
+              {errors.appappStore && (
+                <p className="text-red-500 text-sm mt-1">{errors.appappStore}</p>
+              )}
+            </div>
             <div className="mb-4">
               <label className="block text-gray-700 font-medium mb-1">
                 Play Store App Link
               </label>
               <input
                 type="url"
-                name="playStore"
+                name="appplayStore"
+                value={formData.appplayStore || ""}
                 placeholder="Enter Play Store app link..."
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
                 onChange={handleChange}
               />
-              {errors.playStore && (
-                <p className="text-red-500 text-sm mt-1">{errors.playStore}</p>
+              {errors.appplayStore && (
+                <p className="text-red-500 text-sm mt-1">{errors.appplayStore}</p>
               )}
             </div>
-          );
-    
-        case "appStore":
-          return (
-            <div className="mb-4">
-              <label className="block text-gray-700 font-medium mb-1">
-                App Store App Link
-              </label>
-              <input
-                type="url"
-                name="appStore"
-                placeholder="Enter App Store app link..."
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
-                onChange={handleChange}
-              />
-              {errors.appStore && (
-                <p className="text-red-500 text-sm mt-1">{errors.appStore}</p>
-              )}
-            </div>
-          );
-          case "app":
+            
+          </>
+        );
+      case "whatsapp":
         return (
           <>
             <div className="mb-4">
               <label className="block text-gray-700 font-medium mb-1">
-                Play Store App Link
+                WhatsApp Number
               </label>
               <input
-                type="url"
-                name="playStore"
-                placeholder="Enter Play Store app link..."
+                type="tel"
+                name="whatsapp"
+                value={formData.whatsapp || ""}
+                placeholder="Enter WhatsApp number..."
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
                 onChange={handleChange}
               />
-              {errors.playStore && (
-                <p className="text-red-500 text-sm mt-1">{errors.playStore}</p>
+              {errors.whatsapp && (
+                <p className="text-red-500 text-sm mt-1">{errors.whatsapp}</p>
               )}
             </div>
             <div className="mb-4">
               <label className="block text-gray-700 font-medium mb-1">
-                App Store App Link
+                Message (Optional)
               </label>
-              <input
-                type="url"
-                name="appStore"
-                placeholder="Enter App Store app link..."
+              <textarea
+                name="whatappmessage"
+                value={formData.whatappmessage || ""}
+                placeholder="Enter optional message..."
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
+                rows="4"
                 onChange={handleChange}
               />
-              {errors.appStore && (
-                <p className="text-red-500 text-sm mt-1">{errors.appStore}</p>
-              )}
             </div>
           </>
         );
-          case "whatsapp":
-      return (
-        <>
-          <div className="mb-4">
-            <label className="block text-gray-700 font-medium mb-1">
-              WhatsApp Number
-            </label>
-            <input
-              type="tel"
-              name="whatsapp"
-              placeholder="Enter WhatsApp number..."
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
-              onChange={handleChange}
-            />
-            {errors.whatsapp && (
-              <p className="text-red-500 text-sm mt-1">{errors.whatsapp}</p>
-            )}
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 font-medium mb-1">
-              Message (Optional)
-            </label>
-            <textarea
-              name="message"
-              placeholder="Enter optional message..."
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
-              rows="4"
-              onChange={handleChange}
-            />
-          </div>
-        </>
-      );
-  
+
       case "googleMaps":
         return (
           <div className="mb-4">
@@ -396,6 +416,7 @@ const QRForm = ({ activeType, onSubmit }) => {
             <input
               type="url"
               name="location"
+              value={formData.location || ""}
               placeholder="Enter Google Maps link..."
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
               onChange={handleChange}
@@ -405,7 +426,7 @@ const QRForm = ({ activeType, onSubmit }) => {
             )}
           </div>
         );
-  
+
       case "wifi":
         return (
           <>
@@ -414,6 +435,7 @@ const QRForm = ({ activeType, onSubmit }) => {
               <input
                 type="text"
                 name="ssid"
+                value={formData.ssid || ""}
                 placeholder="Enter WiFi SSID..."
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
                 onChange={handleChange}
@@ -429,6 +451,7 @@ const QRForm = ({ activeType, onSubmit }) => {
               <input
                 type="password"
                 name="password"
+                value={formData.password || ""}
                 placeholder="Enter WiFi password..."
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-purple-400"
                 onChange={handleChange}
@@ -439,12 +462,12 @@ const QRForm = ({ activeType, onSubmit }) => {
             </div>
           </>
         );
-  
+
       default:
         return <p className="text-gray-500">Select a Plan to Proceed..</p>;
     }
   };
-  
+
 
   return (
     <form onSubmit={handleSubmit}>
