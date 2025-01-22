@@ -29,7 +29,7 @@ function Navbar() {
           data-aos-delay="100"
         >
           <NavLink to="/" exact>
-            QR and Cards
+            QR AND CARDS
           </NavLink>
         </div>
 
