@@ -97,7 +97,7 @@ function About() {
         </p>
         <div className="mt-4">
           <a
-            href="/signup"
+            href="/qr-generator"
             className="bg-white text-blue-600 py-2 px-6 rounded-lg font-bold hover:bg-blue-100 transition"
           >
             Get Started

@@ -28,7 +28,7 @@ function Corousel (){
               className="h-[80vh] flex items-start justify-center bg-cover bg-center mt-[4%]"
               style={{ backgroundImage: `url(${c1})` }} // Correct way to set background image
             >
-              <h1 className="text-5xl font-bold bg-black bg-opacity-0 px-4 py-2 my-10 rounded">
+               <h1 className="text-5xl font-bold text-white bg-opacity-50 bg-white/10 px-6 py-4 my-10 rounded-xl backdrop-blur-md shadow-lg">
                 Create Amazing QR Codes
               </h1>
             </div>
@@ -52,8 +52,8 @@ function Corousel (){
               className="h-[80vh] flex items-start justify-center bg-cover bg-center mt-[4%]"
               style={{ backgroundImage: `url(${c2})` }} // Correct way to set background image
             >
-              <h1 className="text-5xl font-bold bg-black bg-opacity-0 px-4 py-2 my-10 rounded">
-              Design Professional Visiting Cards
+               <h1 className="text-5xl font-bold text-white bg-opacity-50 bg-white/10 px-6 py-4 my-10 rounded-xl backdrop-blur-md shadow-lg">
+                Design Professional Visiting Cards
               </h1>
             </div>
           </SwiperSlide>

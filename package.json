@@ -13,6 +13,7 @@
     "@heroicons/react": "^2.2.0",
     "aos": "^2.3.4",
     "autoprefixer": "^10.4.20",
+    "axios": "^1.7.9",
     "formik": "^2.4.6",
     "framer-motion": "^11.18.0",
     "postcss": "^8.4.49",

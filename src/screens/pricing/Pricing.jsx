@@ -20,7 +20,7 @@ function Pricing() {
           <div className="bg-white p-6 rounded-lg shadow-lg text-center">
             <h3 className="text-xl font-bold text-blue-600">Basic</h3>
             <p className="mt-4 text-gray-600">For personal use and small projects.</p>
-            <div className="mt-6 text-4xl font-bold">$9</div>
+            <div className="mt-6 text-4xl font-bold">₹29</div>
             <p className="text-gray-500">per month</p>
             <ul className="mt-4 text-gray-600">
               <li>✓ Create unlimited QR Codes</li>
@@ -36,7 +36,7 @@ function Pricing() {
           <div className="bg-white p-6 rounded-lg shadow-lg text-center border-4 border-blue-600">
             <h3 className="text-xl font-bold text-blue-600">Pro</h3>
             <p className="mt-4 text-gray-600">Ideal for businesses and professionals.</p>
-            <div className="mt-6 text-4xl font-bold">$29</div>
+            <div className="mt-6 text-4xl font-bold">₹59</div>
             <p className="text-gray-500">per month</p>
             <ul className="mt-4 text-gray-600">
               <li>✓ All features in Basic</li>
@@ -52,7 +52,7 @@ function Pricing() {
           <div className="bg-white p-6 rounded-lg shadow-lg text-center">
             <h3 className="text-xl font-bold text-blue-600">Enterprise</h3>
             <p className="mt-4 text-gray-600">For organizations with advanced needs.</p>
-            <div className="mt-6 text-4xl font-bold">$99</div>
+            <div className="mt-6 text-4xl font-bold">₹99</div>
             <p className="text-gray-500">per month</p>
             <ul className="mt-4 text-gray-600">
               <li>✓ All features in Pro</li>

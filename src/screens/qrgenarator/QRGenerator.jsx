@@ -7,12 +7,13 @@ import defaultLogos from "../../components/helper/defaultLogo";
 const QRGenerator = () => {
   const [activeType, setActiveType] = useState("text");
   const [qrCodeValue, setQrCodeValue] = useState("");
-  const [qrColor, setQrColor] = useState("#2463EB");
+  const [qrColor, setQrColor] = useState("#000000");
   const [bgColor, setBgColor] = useState("#ffffff");
   const [logoUrl, setLogoUrl] = useState("");
+  const [showWatermark, setShowWatermark] = useState(true);
+  const [isPaymentComplete, setIsPaymentComplete] = useState(false);
 
   const qrCodeRef = useRef(null);
-
 
   useEffect(() => {
     setLogoUrl(defaultLogos(activeType));
@@ -20,7 +21,6 @@ const QRGenerator = () => {
 
   const handleFormSubmit = (data) => {
     let value;
-
 
     switch (activeType) {
       case "text":
@@ -62,26 +62,15 @@ const QRGenerator = () => {
       case "wifi":
         value = `WIFI:S:${data.ssid};T:WPA;P:${data.password};;` || "";
         break;
-       case "app":
-        value = `https://admin.qrandcards.com?ios=${(data.appappStore || "#")}&android=${(data.appplayStore || "#")}`;
-        break
-      // case "Image":
-      //   value =  data.image || "";
-      // case "Pdf":
-      //   value =  data.pdf || "";
-      // case "Audio":
-      //   value =  data.audio || "";
-      // case "video":
-      //   value =  data.video || "";
+      case "app":
+        value = `https://admin.qrandcards.com?ios=${data.appappStore || "#"}&android=${data.appplayStore || "#"}`;
+        break;
       default:
         value = "";
     }
 
-
-    // Set the QR code value
     setQrCodeValue(value);
 
-    // Optional: Update additional customizations if needed
     if (data.color) setQrColor(data.color);
     if (data.bgColor) setBgColor(data.bgColor);
     if (data.logo) setLogoUrl(data.logo);
@@ -101,7 +90,6 @@ const QRGenerator = () => {
         img.src = reader.result;
 
         img.onload = () => {
-          // Create a circular canvas
           const canvas = document.createElement("canvas");
           const size = Math.min(img.width, img.height);
           canvas.width = size;
@@ -109,23 +97,19 @@ const QRGenerator = () => {
 
           const ctx = canvas.getContext("2d");
 
-          // Draw circular mask
           ctx.beginPath();
           ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
           ctx.closePath();
           ctx.clip();
 
-          // Draw the image onto the canvas
           ctx.drawImage(img, (img.width - size) / 2, (img.height - size) / 2, size, size, 0, 0, size, size);
 
-          // Set the circular image as the logo
           setLogoUrl(canvas.toDataURL());
         };
       };
       reader.readAsDataURL(file);
     }
   };
-
 
   const downloadQRCode = () => {
     const canvas = qrCodeRef.current.querySelector("canvas");
@@ -183,6 +167,49 @@ const QRGenerator = () => {
     }, 100);
   };
 
+  const handlePayment = () => {
+    const options = {
+      key: "rzp_test_k08nI1XM4ua61t",
+      razorpay_secret: "cm2v1OSggPZ5vVHX5rl3jrq4",
+      amount: 10 * 100, // Convert to smallest currency unit (paise)
+      currency: "INR",
+      name: "QR Code Generator",
+      description: "Remove Watermark",
+      handler: function (response) {
+        // Payment was successful
+        setShowWatermark(false);
+        setIsPaymentComplete(true);
+        alert("Payment successful! Watermark removed.");
+      },
+      modal: {
+        ondismiss: function () {
+          // This function is called when the user closes the Razorpay payment popup.
+          alert("Payment cancelled.");
+        },
+      },
+      prefill: {
+        name: "John Doe",
+        email: "johndoe@example.com",
+        contact: "9876543210",
+      },
+      theme: {
+        color: "#3399cc",
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+
+    // Handle Razorpay instance errors
+    rzp.on("payment.failed", function (response) {
+      alert("Payment failed. Please try again.");
+      console.error(response.error);
+    });
+
+    // Open the Razorpay payment window
+    rzp.open();
+  };
+
+
   return (
     <div className="py-8 px-4 mt-[4%] bg-gray-100 min-h-screen">
       <h1 className="text-4xl pt-10 font-bold text-center text-purple-600">
@@ -193,7 +220,7 @@ const QRGenerator = () => {
       </p>
 
       {/* Button Component */}
-      <QRTypeButtons activeType={activeType} setActiveType={setActiveType}  setQrCodeValue={setQrCodeValue}/>
+      <QRTypeButtons activeType={activeType} setActiveType={setActiveType} setQrCodeValue={setQrCodeValue} />
 
       {/* Form Component */}
       <div className="mt-10 max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
@@ -206,7 +233,7 @@ const QRGenerator = () => {
           <h3 className="text-lg font-bold text-center text-gray-700 mb-4">
             Your QR Code
           </h3>
-          <div className="text-center flex justify-center items-center" ref={qrCodeRef}>
+          <div className="relative text-center flex justify-center items-center" ref={qrCodeRef}>
             <QRCodeCanvas
               value={qrCodeValue}
               size={300}
@@ -216,22 +243,31 @@ const QRGenerator = () => {
                 src: logoUrl,
                 x: undefined,
                 y: undefined,
-                height: 45, // Adjust to ensure it's small
+                height: 45,
                 width: 45,
-                excavate: true, // Clear the area beneath the logo
+                excavate: true,
               }}
             />
-
+            {showWatermark && (
+              <div
+                className="absolute inset-0 flex items-center justify-center bg-gray-200 bg-opacity-75"
+                style={{
+                  zIndex: 1,
+                  pointerEvents: "none",
+                }}
+              >
+                <p className="text-gray-800 font-bold opacity-70 text-2xl">WATERMARK</p>
+              </div>
+            )}
           </div>
 
           {/* QR Customization */}
           <div className="mt-6">
             <div className="mt-6">
               <label className="block text-sm font-semibold text-gray-700 mb-4">
-                🎨 May QR color change as per your luck!:
+                🎨 Customize QR Code Color:
               </label>
 
-              {/* QR Code Color */}
               <div className="flex items-center space-x-4 mb-6">
                 <div>
                   <p className="text-sm text-gray-600 mb-2">QR Code Color:</p>
@@ -242,15 +278,10 @@ const QRGenerator = () => {
                     className="w-16 h-10 border-none rounded-lg cursor-pointer shadow-md"
                   />
                 </div>
-                {/* <div className="w-10 h-10 rounded-lg" style={{ backgroundColor: qrColor }}></div> */}
               </div>
-
             </div>
 
-
-            <label className="block text-sm text-gray-500 mb-2">
-              Upload Logo for QR Code:
-            </label>
+            <label className="block text-sm text-gray-500 mb-2">Upload Logo for QR Code:</label>
             <input
               type="file"
               accept="image/*"
@@ -259,16 +290,32 @@ const QRGenerator = () => {
             />
           </div>
 
+          {!isPaymentComplete && (
+            <div className="text-center mt-6">
+              <p className="text-red-500 font-semibold">
+                This QR Code has a watermark. Make a payment to remove it.
+              </p>
+              <button
+                className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition"
+                onClick={handlePayment}
+              >
+                Pay ₹10 to Remove Watermark
+              </button>
+            </div>
+          )}
+
           <div className="mt-6 flex justify-center space-x-4">
             <button
               className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition"
               onClick={downloadQRCode}
+              disabled={showWatermark}
             >
               Download QR Code
             </button>
             <button
               className="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition"
               onClick={printQRCode}
+              disabled={showWatermark}
             >
               Print QR Code
             </button>

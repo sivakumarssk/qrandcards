@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import logo from './assets/qrimages/logo.jpg'
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation(); // For checking the current route
+  const token = localStorage.getItem('token')
+  const navigate = useNavigate()
 
   useEffect(() => {
     // Initialize AOS animations
@@ -14,6 +17,12 @@ function Navbar() {
     // Reinitialize AOS on route change
     AOS.refresh();
   }, [location.pathname]);
+
+  const handleLogOut = () => {
+    setIsMenuOpen(false)
+    localStorage.removeItem('token')
+    navigate('/signin')
+  }
 
   const activeClassName = "text-blue-500 font-bold";
 
@@ -28,9 +37,17 @@ function Navbar() {
           data-aos="fade-down"
           data-aos-delay="100"
         >
-          <NavLink to="/" exact>
-            QR AND CARDS
+          <NavLink to="/" exact className='flex'>
+            {/* <img
+              src={logo}
+              alt="logo"
+              className="w-12 h-12 sm:w-16 sm:h-16 object-contain mx-auto"
+            /> */}
+            <span className="text-lg sm:text-xl font-bold text-center block mt-2">
+              QR AND CARDS
+            </span>
           </NavLink>
+
         </div>
 
         {/* Menu Items */}
@@ -99,7 +116,7 @@ function Navbar() {
         </div>
 
         {/* Auth Buttons */}
-        <div className="hidden md:flex items-center space-x-4 text-black">
+        {!token && <div className="hidden md:flex items-center space-x-4 text-black">
           <NavLink
             to="/signin"
             className={({ isActive }) =>
@@ -124,7 +141,16 @@ function Navbar() {
           >
             Sign Up
           </NavLink>
-        </div>
+        </div>}
+
+        {token && <button
+          className="w-20 py-2 px-4 text-left text-[white] rounded bg-red-500 hover:bg-red-600 text-black transition"
+          data-aos="fade-up"
+          data-aos-delay="700"
+          onClick={handleLogOut}
+        >
+          Logout
+        </button>}
 
         {/* Hamburger Menu */}
         <button
@@ -215,40 +241,45 @@ function Navbar() {
           >
             Plans
           </NavLink>
-          <NavLink
-            to="/signin"
-            onClick={() => setIsMenuOpen(false)}
-            className={({ isActive }) =>
-              isActive
-                ? `${activeClassName} hover:text-blue-300 transition block py-2 px-4`
-                : "hover:text-blue-300 transition block py-2 px-4"
-            }
-            data-aos="fade-up"
-            data-aos-delay="500"
-          >
-            Sign In
-          </NavLink>
-          <NavLink
-            to="/signup"
-            onClick={() => setIsMenuOpen(false)}
-            className={({ isActive }) =>
-              isActive
-                ? `${activeClassName} hover:text-blue-300 transition block py-2 px-4`
-                : "hover:text-blue-300 transition block py-2 px-4"
-            }
-            data-aos="fade-up"
-            data-aos-delay="600"
-          >
-            Sign Up
-          </NavLink>
-          <button
+          {!token && (
+            <>
+              <NavLink
+                to="/signin"
+                onClick={() => setIsMenuOpen(false)}
+                className={({ isActive }) =>
+                  isActive
+                    ? `${activeClassName} hover:text-blue-300 transition block py-2 px-4`
+                    : "hover:text-blue-300 transition block py-2 px-4"
+                }
+                data-aos="fade-up"
+                data-aos-delay="500"
+              >
+                Sign In
+              </NavLink>
+              <NavLink
+                to="/signup"
+                onClick={() => setIsMenuOpen(false)}
+                className={({ isActive }) =>
+                  isActive
+                    ? `${activeClassName} hover:text-blue-300 transition block py-2 px-4`
+                    : "hover:text-blue-300 transition block py-2 px-4"
+                }
+                data-aos="fade-up"
+                data-aos-delay="600"
+              >
+                Sign Up
+              </NavLink>
+            </>
+          )}
+
+          {token && <button
             className="w-full py-2 px-4 text-left bg-red-500 hover:bg-red-600 text-black transition"
             data-aos="fade-up"
             data-aos-delay="700"
-            onClick={() => setIsMenuOpen(false)}
+            onClick={handleLogOut}
           >
             Logout
-          </button>
+          </button>}
         </div>
       )}
     </nav>
