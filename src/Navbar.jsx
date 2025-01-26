@@ -89,18 +89,38 @@ function Navbar() {
           >
             QR Generator
           </NavLink>
-          <NavLink
-            to="/visiting-cards"
-            className={({ isActive }) =>
-              isActive
-                ? `${activeClassName} hover:text-blue-300 transition`
-                : "hover:text-blue-300 transition"
-            }
-            data-aos="fade-down"
-            data-aos-delay="500"
-          >
-            My Cards
-          </NavLink>
+          <div className="relative group" data-aos="fade-down"
+            data-aos-delay="400">
+            {/* Main Menu Item */}
+            <NavLink
+              to="#"
+              className="hover:text-blue-300 transition flex items-center space-x-2"
+              onClick={(e) => e.preventDefault()}
+            >
+              My Cards
+              <span className="text-lg">&#9662;</span>
+            </NavLink>
+
+            {/* Submenu */}
+            <ul className="absolute hidden w-[150px] group-hover:flex flex-col bg-white shadow-lg rounded-lg py-2 top-full left-0">
+              <li>
+                <NavLink
+                  to="/mycards/pricing"
+                  className="block px-4 py-2 text-sm hover:bg-blue-100 transition"
+                >
+                  Personal Cards
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/visiting-cards/business"
+                  className="block px-4 py-2 text-sm hover:bg-blue-100 transition"
+                >
+                  Business Cards
+                </NavLink>
+              </li>
+            </ul>
+          </div>
           <NavLink
             to="/pricing"
             className={({ isActive }) =>
@@ -215,19 +235,37 @@ function Navbar() {
           >
             QR Generator
           </NavLink>
-          <NavLink
-            to="/visiting-cards"
-            onClick={() => setIsMenuOpen(false)}
-            className={({ isActive }) =>
-              isActive
-                ? `${activeClassName} hover:text-blue-300 transition block py-2 px-4`
-                : "hover:text-blue-300 transition block py-2 px-4"
-            }
-            data-aos="fade-up"
-            data-aos-delay="300"
-          >
-            Visiting Cards
-          </NavLink>
+
+          <div className="relative" data-aos="fade-up"
+            data-aos-delay="400">
+            <button
+              className="w-full text-left px-4 py-2 hover:bg-blue-100"
+              onClick={(e) => e.preventDefault()}
+            >
+              My Cards
+            </button>
+            <ul className="pl-4">
+              <li>
+                <NavLink
+                  to="/mycards/pricing"
+                  className="block py-2 px-4 text-sm hover:bg-blue-100 transition"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Personal Cards
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/visiting-cards/business"
+                  className="block py-2 px-4 text-sm hover:bg-blue-100 transition"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Business Cards
+                </NavLink>
+              </li>
+            </ul>
+          </div>
+          
           <NavLink
             to="/pricing"
             onClick={() => setIsMenuOpen(false)}
