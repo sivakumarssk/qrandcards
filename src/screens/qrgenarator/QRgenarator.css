@@ -1,13 +1,16 @@
-.no-screenshot-blur {
-    filter: blur(10px);
+.qr-code-container {
+  margin: 0 auto;
+}
+
+.qr-code-container canvas {
+  width: 100% !important; /* Make the canvas responsive */
+  height: 100% !important; /* Maintain aspect ratio */
+}
+
+@media (max-width: 768px) {
+  /* For screens smaller than 768px */
+  .qr-code-container {
+    width: 260px; /* Adjust the width for mobile */
+    height: 260px; /* Maintain square dimensions */
   }
-  
-  .watermark {
-    position: absolute;
-    text-align: center;
-    font-size: 14px;
-    opacity: 0.5;
-    user-select: none;
-    pointer-events: none;
-  }
-  
+}

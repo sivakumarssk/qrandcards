@@ -144,7 +144,7 @@ function Navbar() {
         </div>}
 
         {token && <button
-          className="w-20 py-2 px-4 text-left text-[white] rounded bg-red-500 hover:bg-red-600 text-black transition"
+          className="hidden md:flex w-20 py-2 px-4 text-left text-white rounded bg-red-500 hover:bg-red-600 text-black transition"
           data-aos="fade-up"
           data-aos-delay="700"
           onClick={handleLogOut}
@@ -273,7 +273,7 @@ function Navbar() {
           )}
 
           {token && <button
-            className="w-full py-2 px-4 text-left bg-red-500 hover:bg-red-600 text-black transition"
+            className="w-full py-2 px-4 text-left text-white bg-red-500 hover:bg-red-600 text-black transition"
             data-aos="fade-up"
             data-aos-delay="700"
             onClick={handleLogOut}

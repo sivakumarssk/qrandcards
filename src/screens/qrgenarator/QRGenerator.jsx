@@ -3,6 +3,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import QRForm from "./QRForm";
 import QRTypeButtons from "./QRTypeButtons";
 import defaultLogos from "../../components/helper/defaultLogo";
+import './QRgenarator.css'
 
 const QRGenerator = () => {
   const [activeType, setActiveType] = useState("text");
@@ -220,7 +221,7 @@ const QRGenerator = () => {
       </p>
 
       {/* Button Component */}
-      <QRTypeButtons activeType={activeType} setActiveType={setActiveType} setQrCodeValue={setQrCodeValue} />
+      <QRTypeButtons activeType={activeType} setActiveType={setActiveType} setIsPaymentComplete={setIsPaymentComplete} setShowWatermark={setShowWatermark} setQrCodeValue={setQrCodeValue} />
 
       {/* Form Component */}
       <div className="mt-10 max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
@@ -233,7 +234,7 @@ const QRGenerator = () => {
           <h3 className="text-lg font-bold text-center text-gray-700 mb-4">
             Your QR Code
           </h3>
-          <div className="relative text-center flex justify-center items-center" ref={qrCodeRef}>
+          <div className="relative text-center flex justify-center p-2 items-center qr-code-container" ref={qrCodeRef}>
             <QRCodeCanvas
               value={qrCodeValue}
               size={300}
@@ -250,16 +251,21 @@ const QRGenerator = () => {
             />
             {showWatermark && (
               <div
-                className="absolute inset-0 flex items-center justify-center bg-gray-200 bg-opacity-75"
+                className="absolute inset-0 flex items-center justify-center bg-gray-300 backdrop-blur-sm bg-opacity-75"
                 style={{
-                  zIndex: 1,
-                  pointerEvents: "none",
+                  zIndex: 4,
+                  pointerEvents: "none", // Prevent interaction
                 }}
               >
-                <p className="text-gray-800 font-bold opacity-70 text-2xl">WATERMARK</p>
+                <p
+                  className="text-black font-bold opacity-70 text-2xl"
+                >
+                  QR AND CARDS WATERMARK
+                </p>
               </div>
             )}
           </div>
+
 
           {/* QR Customization */}
           <div className="mt-6">

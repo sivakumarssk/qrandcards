@@ -1,6 +1,6 @@
 import React from "react";
 
-const QRTypeButtons = ({ activeType, setActiveType,setQrCodeValue }) => {
+const QRTypeButtons = ({ activeType, setActiveType,setQrCodeValue,setShowWatermark,setIsPaymentComplete }) => {
   const qrTypes = [
     "text",
     "url",
@@ -29,7 +29,7 @@ const QRTypeButtons = ({ activeType, setActiveType,setQrCodeValue }) => {
       {qrTypes.map((type) => (
         <button
           key={type}
-          onClick={() =>{ setActiveType(type);setQrCodeValue('')}}
+          onClick={() =>{ setActiveType(type);setQrCodeValue('');setShowWatermark(true);setIsPaymentComplete(false)}}
           className={`px-4 py-2 rounded-lg text-sm font-medium shadow-md ${
             activeType === type
               ? "bg-purple-600 text-white"

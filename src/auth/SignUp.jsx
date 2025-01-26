@@ -38,7 +38,7 @@ function SignUp() {
 
     try {
       // Call /register API
-      const response = await axios.post("http://localhost:5000/api/register", {
+      const response = await axios.post("https://admin.qrandcards.com/api/register", {
         username: formData.name,
         email: formData.email,
         password: formData.password,
