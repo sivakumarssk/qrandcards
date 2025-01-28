@@ -8,6 +8,9 @@ import SignIn from './auth/SignIn'
 import SignUp from './auth/SignUp'
 import Pricing from './screens/pricing/Pricing'
 import PersonalCards from './screens/mycards/personalcards/PersonalCards'
+import TermsAndConditions from './policy/TermsandConditions'
+import PrivacyPolicy from './policy/PrivacyPolicy'
+import RefundPolicy from './policy/RefundPolicy'
 
 function App() {
 
@@ -23,6 +26,9 @@ function App() {
       <Route path='/signup' element={<SignUp/>}/>
       <Route path='/pricing' element={<Pricing/>}/>
       <Route path='/mycards/personal' element={<PersonalCards/>}/>
+      <Route path='/policy/termsandconditions' element={<TermsAndConditions/>}/>
+      <Route path='/policy/privacy' element={<PrivacyPolicy/>}/>
+      <Route path='/policy/refund' element={<RefundPolicy/>}/>
     </Routes>
     </>
   )

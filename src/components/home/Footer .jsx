@@ -1,5 +1,6 @@
 // File: src/components/Footer.jsx
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -13,15 +14,24 @@ const Footer = () => {
             </p>
           </div>
           <div className="flex space-x-6">
-            <a href="#" className="text-gray-400 hover:text-white">
+            <Link
+              to="/policy/privacy"
+              className="text-gray-400 hover:text-white"
+            >
               Privacy Policy
-            </a>
-            <a href="#" className="text-gray-400 hover:text-white">
+            </Link>
+            <Link
+              to="/policy/termsandconditions"
+              className="text-gray-400 hover:text-white"
+            >
               Terms of Service
-            </a>
-            <a href="#" className="text-gray-400 hover:text-white">
-              Contact Us
-            </a>
+            </Link>
+            <Link
+              to="/policy/refund"
+              className="text-gray-400 hover:text-white"
+            >
+              Refund Policy
+            </Link>
           </div>
         </div>
         <div className="mt-6 border-t border-gray-700 pt-4 text-center text-sm text-gray-400">
