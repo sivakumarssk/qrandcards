@@ -124,7 +124,8 @@ function PersonalCards() {
 
   const handlePDFPayment = () => {
     const options = {
-      key: "rzp_test_k08nI1XM4ua61t", // Replace with your Razorpay API key
+      key: "rzp_live_HJLLQQPlyQFOGr",
+      razorpay_secret: "cm2v1OSggPZ5vVHX5rl3jrq4",
       amount: 185 * 100, // Discounted price in paise
       currency: "INR",
       name: "Personal Visiting Card",
@@ -360,7 +361,7 @@ function PersonalCards() {
 
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen mt-[5%]">
+    <div className="p-6 bg-gray-100 min-h-screen mt-[6%]">
       <h1 className="text-3xl font-bold mb-6">Create Personal Visiting Card</h1>
       <form
         className="bg-white p-6 rounded-lg shadow-md"
