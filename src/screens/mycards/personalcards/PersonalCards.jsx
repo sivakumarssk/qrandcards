@@ -9,8 +9,6 @@ import AddressIcon from "../../../assets/socialmedia/instagram.png";
 import PaytmIcon from "../../../assets/socialmedia/instagram.png";
 import GooglePayIcon from "../../../assets/socialmedia/instagram.png";
 
-
-
 function PersonalCards() {
   const [formData, setFormData] = useState({
     name: "",
@@ -54,6 +52,61 @@ function PersonalCards() {
     setPreviewMode(true);
   };
 
+
+  const handleDownloadPDF = async () => {
+    const previewElement = document.getElementById("preview-content");
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+    let currentY = 10; // Start content 10mm from the top
+
+    // Function to add a section to the PDF
+    const addSectionToPDF = async (sectionId) => {
+      const sectionElement = document.getElementById(sectionId);
+      if (!sectionElement) return;
+
+      const canvas = await html2canvas(sectionElement, { useCORS: true, scale: 2 });
+      const imgData = canvas.toDataURL("image/png");
+
+      const sectionHeight = (canvas.height / canvas.width) * pdfWidth;
+
+      // If the section doesn't fit on the current page, add a new page
+      if (currentY + sectionHeight > pdfHeight) {
+        pdf.addPage();
+        currentY = 10; // Reset Y position for the new page
+      }
+
+      pdf.addImage(imgData, "PNG", 10, currentY, pdfWidth - 20, sectionHeight);
+      currentY += sectionHeight + 10; // Update Y position for the next section
+    };
+
+    // Render each section individually
+    const sections = [
+      "profile-section",
+      "about-section",
+      "contact-section",
+      "social-links-section",
+      "upi-links-section",
+      "products-section",
+      "gallery-section",
+    ];
+
+    for (const sectionId of sections) {
+      await addSectionToPDF(sectionId);
+    }
+
+    console.log(formData.name, "name");
+
+
+    const fileName = formData.name
+      ? `${formData.name.replace(/\s+/g, "_")}_E-Visiting_Card.pdf`
+      : "E-Visiting_Card.pdf";
+    pdf.save(fileName);
+  };
+
+  console.log(formData.name, "nameout");
+
   const socialIcons = {
     Facebook: FacebookIcon,
     Instagram: InstagramIcon,
@@ -64,79 +117,44 @@ function PersonalCards() {
     "Google Pay": GooglePayIcon,
   };
 
-  const handleDownloadPDF = async () => {
-    try {
-      const previewElement = document.getElementById("preview-content");
-  
-      // Render the preview element to a canvas
-      const canvas = await html2canvas(previewElement, { useCORS: true, scale: 2 });
-  
-      const imgData = canvas.toDataURL("image/jpeg");
-      const pdf = new jsPDF("p", "mm", "a4");
-  
-      // PDF dimensions
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-  
-      // Canvas dimensions
-      const canvasWidth = canvas.width;
-      const canvasHeight = canvas.height;
-  
-      // Scale ratio
-      const scaleRatio = pdfWidth / canvasWidth;
-  
-      // Scaled height of the full canvas content in the PDF
-      const scaledHeight = canvasHeight * scaleRatio;
-  
-      let currentHeight = 0;
-  
-      while (currentHeight < canvasHeight) {
-        if (currentHeight > 0) pdf.addPage();
-  
-        // Extract the visible portion of the canvas for the current page
-        const canvasPage = document.createElement("canvas");
-        canvasPage.width = canvas.width;
-        canvasPage.height = Math.min(canvasHeight - currentHeight, pdfHeight / scaleRatio);
-  
-        const context = canvasPage.getContext("2d");
-        context.drawImage(
-          canvas,
-          0,
-          currentHeight,
-          canvas.width,
-          canvasPage.height,
-          0,
-          0,
-          canvas.width,
-          canvasPage.height
-        );
-  
-        const pageImgData = canvasPage.toDataURL("image/jpeg");
-        pdf.addImage(
-          pageImgData,
-          "JPEG",
-          0,
-          0,
-          pdfWidth,
-          (canvasPage.height * pdfWidth) / canvas.width
-        );
-  
-        currentHeight += canvasPage.height;
-      }
-  
-      const fileName = formData.name
-        ? `${formData.name}-E-Visiting-Card.pdf`
-        : "E-Visiting-Card.pdf";
-      pdf.save(fileName);
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      alert("An error occurred while generating the PDF. Please try again.");
-    }
+  const handlePDFPayment = () => {
+    const options = {
+      key: "rzp_test_k08nI1XM4ua61t", // Replace with your Razorpay API key
+      amount: 185 * 100, // Discounted price in paise
+      currency: "INR",
+      name: "Personal Visiting Card",
+      description: "Download PDF",
+      handler: function (response) {
+        // Payment successful
+        handleDownloadPDF(); // Trigger PDF download after payment
+        alert("Payment successful! Your PDF will be downloaded.");
+      },
+      modal: {
+        ondismiss: function () {
+          // Payment popup closed by the user
+          alert("Payment cancelled.");
+        },
+      },
+      prefill: {
+        name: "John Doe",
+        email: "johndoe@example.com",
+        contact: "9876543210",
+      },
+      theme: {
+        color: "#3399cc",
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+
+    rzp.on("payment.failed", function (response) {
+      // Handle payment failure
+      alert("Payment failed. Please try again.");
+      console.error(response.error);
+    });
+
+    rzp.open(); // Open Razorpay payment popup
   };
-  
-  
-
-
 
 
   if (previewMode) {
@@ -147,20 +165,23 @@ function PersonalCards() {
           className="bg-white p-6 rounded-lg shadow-md max-w-3xl w-full"
         >
           {/* Profile Image */}
-          {formData.profileImage && (
-            <div className="flex justify-center mb-4">
-              <img
-                src={URL.createObjectURL(formData.profileImage)}
-                alt="Profile"
-                className="w-24 h-24 rounded-full border-4 border-gray-300"
-              />
-            </div>
-          )}
-          <h2 className="text-xl font-bold text-center mb-2">{formData.hashtag}</h2>
-          <p className="text-center text-gray-700 mb-4">{formData.description}</p>
+          <div id="profile-section">
+            {formData.profileImage && (
+              <div className="flex justify-center mb-4"  >
+                <img
+                  src={URL.createObjectURL(formData.profileImage)}
+                  alt="Profile"
+                  className="w-24 h-24 rounded-full border-4 border-gray-300"
+                />
+              </div>
+            )}
+            <h2 className="text-xl font-bold text-center mb-2">{formData.name}</h2>
+            <h2 className="text-xl font-bold text-center mb-2">{formData.hashtag}</h2>
+            <p className="text-center text-gray-700 mb-4">{formData.description}</p>
+          </div>
 
           {/* About Section */}
-          <div className="mb-6">
+          <div className="mb-6" id="about-section">
             <h3 className="bg-blue-500 text-white py-2 px-4 rounded-t-lg">
               About Me
             </h3>
@@ -168,7 +189,7 @@ function PersonalCards() {
           </div>
 
           {/* Contact Details */}
-          <div className="mb-6">
+          <div className="mb-6" id="contact-section" >
             <h3 className="bg-blue-500 text-white py-2 px-4 rounded-t-lg">
               Contact Details
             </h3>
@@ -200,7 +221,7 @@ function PersonalCards() {
 
           {/* Social Links */}
           {formData.socialLinks.some((link) => link.link) && (
-            <div className="mb-6">
+            <div className="mb-6" id="social-links-section">
               <h3 className="bg-blue-500 text-white py-2 px-4 rounded-t-lg">
                 Social Media Links
               </h3>
@@ -231,7 +252,7 @@ function PersonalCards() {
 
           {/* UPI Links */}
           {formData.upiLinks.some((link) => link.link) && (
-            <div className="mb-6">
+            <div className="mb-6" id="upi-links-section">
               <h3 className="bg-blue-500 text-white py-2 px-4 rounded-t-lg">
                 UPI Links
               </h3>
@@ -262,9 +283,10 @@ function PersonalCards() {
 
           {/* Product Images */}
           {formData.productImages.length > 0 && (
-            <div className="mb-6">
+            <div className="mb-6" id="products-section">
               <h3 className="bg-blue-500 text-white py-2 px-4 rounded-t-lg">
-                Products
+                {/* Products */}
+                My Images
               </h3>
               <div className="border p-4 rounded-b-lg grid grid-cols-4 gap-4 justify-items-center">
                 {formData.productImages.map((file, index) => (
@@ -281,8 +303,8 @@ function PersonalCards() {
 
           {/* Gallery */}
           {formData.gallery.length > 0 && (
-            <div className="mb-6">
-              <h3 className="bg-blue-500 text-white py-2 px-4 rounded-t-lg">
+            <div className="mb-6" id="gallery-section">
+              <h3 className="bg-blue-500 text-white py-2 px-4 rounded-t-lg" id="gallery-section">
                 Gallery
               </h3>
               <div className="border p-4 rounded-b-lg grid grid-cols-4 gap-4 justify-items-center">
@@ -298,6 +320,7 @@ function PersonalCards() {
             </div>
           )}
         </div>
+
         <div className="flex justify-center items-center">
 
           <button
@@ -306,12 +329,20 @@ function PersonalCards() {
           >
             Edit Details
           </button>
-          <button
-            className="bg-green-500 text-white mt-4 py-2 px-4 rounded ml-4"
-            onClick={handleDownloadPDF}
-          >
-            Download PDF
-          </button>
+          <div className="flex justify-center items-center mt-6">
+            <div className="text-center">
+              <p className="text-gray-500 line-through">₹500</p>
+              <p className="text-green-600 font-bold text-xl">₹185</p>
+              <p className="text-blue-500 text-sm">(63% Off)</p>
+            </div>
+            <button
+              className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition ml-4"
+              onClick={handlePDFPayment}
+            >
+              Pay ₹185 to Download PDF
+            </button>
+          </div>
+
         </div>
       </div>
     );
@@ -337,6 +368,17 @@ function PersonalCards() {
             onChange={(e) => handleFileChange(e, "profileImage")}
           />
         </div>
+        <div className="mb-4">
+          <label className="block mb-2">Name</label>
+          <input
+            type="text"
+            name="name" // Ensure this matches the key in formData
+            value={formData.name}
+            onChange={handleInputChange}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+
         <div className="mb-4">
           <label className="block mb-2">Hashtag</label>
           <input

@@ -170,9 +170,9 @@ const QRGenerator = () => {
 
   const handlePayment = () => {
     const options = {
-      key: "rzp_test_k08nI1XM4ua61t",
+      key: "rzp_live_HJLLQQPlyQFOGr",
       razorpay_secret: "cm2v1OSggPZ5vVHX5rl3jrq4",
-      amount: 10 * 100, // Convert to smallest currency unit (paise)
+      amount: 37 * 100, // Convert to smallest currency unit (paise)
       currency: "INR",
       name: "QR Code Generator",
       description: "Remove Watermark",
@@ -298,15 +298,23 @@ const QRGenerator = () => {
 
           {!isPaymentComplete && (
             <div className="text-center mt-6">
-              <p className="text-red-500 font-semibold">
-                This QR Code has a watermark. Make a payment to remove it.
-              </p>
-              <button
-                className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition"
-                onClick={handlePayment}
-              >
-                Pay ₹10 to Remove Watermark
-              </button>
+              <div className="text-center mt-6">
+                <p className="text-red-500 font-semibold mb-4">
+                  This QR Code has a watermark. Make a payment to remove it.
+                </p>
+                <div className="flex flex-col items-center mb-4">
+                  <p className="text-gray-500 line-through text-sm">₹100</p>
+                  <p className="text-green-600 font-bold text-lg">₹37</p>
+                  <p className="text-blue-500 text-sm">(63% Off)</p>
+                </div>
+                <button
+                  className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition"
+                  onClick={handlePayment}
+                >
+                  Pay ₹37 to Remove Watermark
+                </button>
+              </div>
+
             </div>
           )}
 

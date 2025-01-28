@@ -111,14 +111,14 @@ function Navbar() {
                   Personal Cards
                 </NavLink>
               </li>
-              <li>
+              {/* <li>
                 <NavLink
                   to="/visiting-cards/business"
                   className="block px-4 py-2 text-sm hover:bg-blue-100 transition"
                 >
                   Business Cards
                 </NavLink>
-              </li>
+              </li> */}
             </ul>
           </div>
           <NavLink
