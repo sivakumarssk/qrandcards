@@ -27,7 +27,7 @@ function FeaturesSection() {
           data-aos="fade-up"
           data-aos-delay="100"
         >
-          <h3 className="text-xl font-bold">Visiting Card Creator</h3>
+          <h3 className="text-xl font-bold">E - Visiting Card Creator</h3>
           <p className="mt-2 text-gray-600">
             Design professional cards with customizable templates.
           </p>

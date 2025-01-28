@@ -54,34 +54,41 @@ function PersonalCards() {
 
 
   const handleDownloadPDF = async () => {
-    const previewElement = document.getElementById("preview-content");
     const pdf = new jsPDF("p", "mm", "a4");
-
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
-    let currentY = 10; // Start content 10mm from the top
+    let currentY = 10; // Starting position on the page
 
-    // Function to add a section to the PDF
+    // Function to add sections to the PDF with high-quality rendering
     const addSectionToPDF = async (sectionId) => {
       const sectionElement = document.getElementById(sectionId);
       if (!sectionElement) return;
 
-      const canvas = await html2canvas(sectionElement, { useCORS: true, scale: 2 });
+      const canvas = await html2canvas(sectionElement, { useCORS: true, scale: 3 });
       const imgData = canvas.toDataURL("image/png");
-
       const sectionHeight = (canvas.height / canvas.width) * pdfWidth;
 
-      // If the section doesn't fit on the current page, add a new page
       if (currentY + sectionHeight > pdfHeight) {
         pdf.addPage();
-        currentY = 10; // Reset Y position for the new page
+        currentY = 10;
       }
 
       pdf.addImage(imgData, "PNG", 10, currentY, pdfWidth - 20, sectionHeight);
-      currentY += sectionHeight + 10; // Update Y position for the next section
+      currentY += sectionHeight + 10;
+
+      // Add clickable links for sections with links
+      if (sectionId === "social-links-section" || sectionId === "upi-links-section") {
+        const links = formData[sectionId === "social-links-section" ? "socialLinks" : "upiLinks"];
+        links.forEach((link, index) => {
+          if (link.link) {
+            const linkY = currentY - sectionHeight + 20 + index * 10;
+            pdf.link(20, linkY, pdfWidth - 40, 5, { url: link.link });
+          }
+        });
+      }
     };
 
-    // Render each section individually
+    // Render each section
     const sections = [
       "profile-section",
       "about-section",
@@ -96,9 +103,7 @@ function PersonalCards() {
       await addSectionToPDF(sectionId);
     }
 
-    console.log(formData.name, "name");
-
-
+    // Save the PDF
     const fileName = formData.name
       ? `${formData.name.replace(/\s+/g, "_")}_E-Visiting_Card.pdf`
       : "E-Visiting_Card.pdf";
@@ -113,7 +118,7 @@ function PersonalCards() {
   };
 
   const upiIcons = {
-    PhonePay: PhonePayIcon,
+    "Phone Pay": PhonePayIcon,
     "Google Pay": GooglePayIcon,
   };
 
@@ -177,7 +182,7 @@ function PersonalCards() {
             )}
             <h2 className="text-xl font-bold text-center mb-2">{formData.name}</h2>
             <h2 className="text-xl font-bold text-center mb-2">{formData.hashtag}</h2>
-            <p className="text-center text-gray-700 mb-4">{formData.description}</p>
+            <p className="text-center text-gray-700 mb-4 pb-4">{formData.description}</p>
           </div>
 
           {/* About Section */}

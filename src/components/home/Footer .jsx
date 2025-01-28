@@ -12,6 +12,7 @@ const Footer = () => {
             <p className="text-sm text-gray-400">
             simplify your QR and e-visiting cards creation, with our advance tools
             </p>
+            <p>Email: <a href="mailto:atozkeysolution@gmail.com">atozkeysolution@gmail.com</a></p>
           </div>
           <div className="flex space-x-6">
             <Link

@@ -1,28 +1,35 @@
 import React, { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css"; // Import AOS CSS
-import t1 from '../../assets/corousel/t1.jpg'
-import t2 from '../../assets/corousel/t2.jpeg'
-import t3 from '../../assets/corousel/t3.jpg'
+import t1 from '../../assets/socialmedia/onesquare.jpeg'
+import t2 from '../../assets/socialmedia/onesquare.jpeg'
+import t3 from '../../assets/socialmedia/pixelmind.png'
+import t4 from '../../assets/socialmedia/zodiac.jpeg'
 
 const testimonials = [
   {
-    name: "John Doe",
-    role: "CEO, Example Co.",
+    name: "1square",
+    role: "Bussiness Listing App",
     image: t1,
     review: "This service is amazing! It has streamlined my business processes and saved us hours of work.",
   },
   {
-    name: "Jane Smith",
-    role: "Marketing Manager, Another Co.",
+    name: "1square",
+    role: "Bussiness Listing App",
     image: t2,
     review: "I couldn't be happier with the results. The QR generator is simple, fast, and effective.",
   },
   {
-    name: "Mike Johnson",
-    role: "Product Manager, Tech Co.",
+    name: "Pixel Mind",
+    role: " Where Innovation Meets Creativity",
     image: t3,
-    review: "A game-changer for our team. The features and ease of use are unmatched.",
+    review: "We craft cutting-edge applications, deliver impactful digital marketing solutions, and offer a wide range of innovative advertisement services to help businesses thrive in the digital landscape.",
+  },
+  {
+    name: "ZODIAC TALK",
+    role: "",
+    image: t4,
+    review: "Comming Soon",
   },
 ];
 
