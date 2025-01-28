@@ -292,7 +292,7 @@ function PersonalCards() {
             <div className="mb-6" id="products-section">
               <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
                 {/* Products */}
-                My Images
+                My Achievements
               </h3>
               <div className="border p-4 rounded-b-lg grid grid-cols-4 gap-4 justify-items-center">
                 {formData.productImages.map((file, index) => (
@@ -418,7 +418,7 @@ function PersonalCards() {
           ></textarea>
         </div>
         <div className="mb-4">
-          <label className="block mb-2">Phone Number</label>
+          <label className="block mb-2">Whatsapp Number</label>
           <input
             type="text"
             name="phone"
