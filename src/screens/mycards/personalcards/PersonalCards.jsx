@@ -6,7 +6,7 @@ import InstagramIcon from "../../../assets/socialmedia/instagram.png";
 import PhoneIcon from "../../../assets/socialmedia/instagram.png";
 import EmailIcon from "../../../assets/socialmedia/instagram.png";
 import AddressIcon from "../../../assets/socialmedia/instagram.png";
-import PaytmIcon from "../../../assets/socialmedia/instagram.png";
+import PhonePayIcon from "../../../assets/socialmedia/instagram.png";
 import GooglePayIcon from "../../../assets/socialmedia/instagram.png";
 
 function PersonalCards() {
@@ -24,7 +24,7 @@ function PersonalCards() {
       { platform: "Instagram", link: "" },
     ],
     upiLinks: [
-      { platform: "Paytm", link: "" },
+      { platform: "Phone Pay", link: "" },
       { platform: "Google Pay", link: "" },
     ],
     productImages: [],
@@ -113,7 +113,7 @@ function PersonalCards() {
   };
 
   const upiIcons = {
-    Paytm: PaytmIcon,
+    PhonePay: PhonePayIcon,
     "Google Pay": GooglePayIcon,
   };
 
@@ -380,7 +380,7 @@ function PersonalCards() {
         </div>
 
         <div className="mb-4">
-          <label className="block mb-2">Hashtag</label>
+          <label className="block mb-2">Profession</label>
           <input
             type="text"
             name="hashtag"
@@ -399,7 +399,7 @@ function PersonalCards() {
           ></textarea>
         </div>
         <div className="mb-4">
-          <label className="block mb-2">About</label>
+          <label className="block mb-2">About Yourself</label>
           <textarea
             name="about"
             value={formData.about}
@@ -408,7 +408,7 @@ function PersonalCards() {
           ></textarea>
         </div>
         <div className="mb-4">
-          <label className="block mb-2">Phone</label>
+          <label className="block mb-2">Phone Number</label>
           <input
             type="text"
             name="phone"
@@ -418,7 +418,7 @@ function PersonalCards() {
           />
         </div>
         <div className="mb-4">
-          <label className="block mb-2">Email</label>
+          <label className="block mb-2">Email Address</label>
           <input
             type="email"
             name="email"
@@ -428,7 +428,7 @@ function PersonalCards() {
           />
         </div>
         <div className="mb-4">
-          <label className="block mb-2">Address</label>
+          <label className="block mb-2">Residential Address</label>
           <input
             type="text"
             name="address"
@@ -482,7 +482,7 @@ function PersonalCards() {
           ))}
         </div>
         <div className="mb-4">
-          <label className="block mb-2">Product Images</label>
+          <label className="block mb-2">Achievement/Awards Images</label>
           <input
             type="file"
             accept="image/*"
@@ -491,7 +491,7 @@ function PersonalCards() {
           />
         </div>
         <div className="mb-4">
-          <label className="block mb-2">Gallery Images</label>
+          <label className="block mb-2">Images/Friends</label>
           <input
             type="file"
             accept="image/*"

@@ -15,6 +15,7 @@ import Testimonials from "../../components/home/Testimonials";
 import Footer from "../../components/home/Footer ";
 import DownloadApp from "../../components/home/DownloadApp";
 import AboutHome from "../../components/home/AboutHome";
+import CardsAbout from "../../components/home/CardsAbout";
 
 function Home() {
   React.useEffect(() => {
@@ -36,6 +37,8 @@ function Home() {
       <QrAbout/>
 
       <QRTypeSection/>
+
+      <CardsAbout/>
 
       <Testimonials/>
 

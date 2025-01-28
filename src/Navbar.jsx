@@ -105,7 +105,7 @@ function Navbar() {
             <ul className="absolute hidden w-[150px] group-hover:flex flex-col bg-white shadow-lg rounded-lg py-2 top-full left-0">
               <li>
                 <NavLink
-                  to="/mycards/pricing"
+                  to="/mycards/personal"
                   className="block px-4 py-2 text-sm hover:bg-blue-100 transition"
                 >
                   Personal Cards
