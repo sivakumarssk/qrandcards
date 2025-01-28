@@ -44,7 +44,7 @@ function FeaturesSection() {
           </p>
         </div>
 
-        <div
+        {/* <div
           className="bg-white p-6 rounded-lg shadow-lg text-center"
           data-aos="fade-up"
           data-aos-delay="300"
@@ -53,9 +53,9 @@ function FeaturesSection() {
           <p className="mt-2 text-gray-600">
             Create and customize QR codes to match your brand colors & logo.
           </p>
-        </div>
+        </div> */}
 
-        <div
+        {/* <div
           className="bg-white p-6 rounded-lg shadow-lg text-center"
           data-aos="fade-up"
           data-aos-delay="400"
@@ -64,9 +64,9 @@ function FeaturesSection() {
           <p className="mt-2 text-gray-600">
             Select from ready-made card templates to get started.
           </p>
-        </div>
+        </div> */}
 
-        <div
+        {/* <div
           className="bg-white p-6 rounded-lg shadow-lg text-center"
           data-aos="fade-up"
           data-aos-delay="500"
@@ -75,7 +75,7 @@ function FeaturesSection() {
           <p className="mt-2 text-gray-600">
             Easily categorize and manage your QR codes and short links.
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
   );

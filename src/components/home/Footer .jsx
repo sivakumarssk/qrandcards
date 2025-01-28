@@ -8,9 +8,9 @@ const Footer = () => {
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           <div className="text-center md:text-left">
-            <h3 className="text-lg font-bold">QR Generator</h3>
+            <h3 className="text-lg font-bold">QR AND CARDS GENERATOR</h3>
             <p className="text-sm text-gray-400">
-              Simplify your QR code creation with our advanced tools.
+            simplify your QR and e-visiting cards creation, with our advance tools
             </p>
           </div>
           <div className="flex space-x-6">
@@ -35,7 +35,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="mt-6 border-t border-gray-700 pt-4 text-center text-sm text-gray-400">
-          © 2025 QR Generator. All rights reserved.
+          © 2025 AtoZ key Solutions. All rights reserved.
         </div>
       </div>
     </footer>

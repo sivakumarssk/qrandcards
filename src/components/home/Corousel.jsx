@@ -53,7 +53,7 @@ function Corousel (){
               style={{ backgroundImage: `url(${c2})` }} // Correct way to set background image
             >
                <h1 className="text-5xl font-bold text-white bg-opacity-50 bg-white/10 px-6 py-4 my-10 rounded-xl backdrop-blur-md shadow-lg">
-                Design Professional Visiting Cards
+                Create Professional E-Visiting Cards
               </h1>
             </div>
           </SwiperSlide>

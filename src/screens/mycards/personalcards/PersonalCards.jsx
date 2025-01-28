@@ -3,11 +3,11 @@ import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import FacebookIcon from "../../../assets/socialmedia/facebook.png";
 import InstagramIcon from "../../../assets/socialmedia/instagram.png";
-import PhoneIcon from "../../../assets/socialmedia/instagram.png";
-import EmailIcon from "../../../assets/socialmedia/instagram.png";
-import AddressIcon from "../../../assets/socialmedia/instagram.png";
-import PhonePayIcon from "../../../assets/socialmedia/instagram.png";
-import GooglePayIcon from "../../../assets/socialmedia/instagram.png";
+import PhoneIcon from "../../../assets/socialmedia/phone.png";
+import EmailIcon from "../../../assets/socialmedia/email.png";
+import AddressIcon from "../../../assets/socialmedia/address.png";
+import PhonePayIcon from "../../../assets/socialmedia/phonepay.png";
+import GooglePayIcon from "../../../assets/socialmedia/gpay.png";
 
 function PersonalCards() {
   const [formData, setFormData] = useState({
@@ -182,7 +182,7 @@ function PersonalCards() {
 
           {/* About Section */}
           <div className="mb-6" id="about-section">
-            <h3 className="bg-blue-500 text-white py-2 px-4 rounded-t-lg">
+            <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
               About Me
             </h3>
             <p className="border p-4 rounded-b-lg">{formData.about}</p>
@@ -190,7 +190,7 @@ function PersonalCards() {
 
           {/* Contact Details */}
           <div className="mb-6" id="contact-section" >
-            <h3 className="bg-blue-500 text-white py-2 px-4 rounded-t-lg">
+            <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
               Contact Details
             </h3>
             <ul className="border p-4 rounded-b-lg space-y-2">
@@ -222,7 +222,7 @@ function PersonalCards() {
           {/* Social Links */}
           {formData.socialLinks.some((link) => link.link) && (
             <div className="mb-6" id="social-links-section">
-              <h3 className="bg-blue-500 text-white py-2 px-4 rounded-t-lg">
+              <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
                 Social Media Links
               </h3>
               <ul className="border p-4 rounded-b-lg space-y-2">
@@ -253,7 +253,7 @@ function PersonalCards() {
           {/* UPI Links */}
           {formData.upiLinks.some((link) => link.link) && (
             <div className="mb-6" id="upi-links-section">
-              <h3 className="bg-blue-500 text-white py-2 px-4 rounded-t-lg">
+              <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
                 UPI Links
               </h3>
               <ul className="border p-4 rounded-b-lg space-y-2">
@@ -284,7 +284,7 @@ function PersonalCards() {
           {/* Product Images */}
           {formData.productImages.length > 0 && (
             <div className="mb-6" id="products-section">
-              <h3 className="bg-blue-500 text-white py-2 px-4 rounded-t-lg">
+              <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
                 {/* Products */}
                 My Images
               </h3>
@@ -304,7 +304,7 @@ function PersonalCards() {
           {/* Gallery */}
           {formData.gallery.length > 0 && (
             <div className="mb-6" id="gallery-section">
-              <h3 className="bg-blue-500 text-white py-2 px-4 rounded-t-lg" id="gallery-section">
+              <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg" id="gallery-section">
                 Gallery
               </h3>
               <div className="border p-4 rounded-b-lg grid grid-cols-4 gap-4 justify-items-center">
@@ -343,6 +343,10 @@ function PersonalCards() {
             </button>
           </div>
 
+        </div>
+
+        <div className="mt-4 mb-4">
+          <p className="text-center"><span className="font-semibold">Note</span> -you can convert your pdf to QR</p>
         </div>
       </div>
     );

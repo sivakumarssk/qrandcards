@@ -111,14 +111,31 @@ function Navbar() {
                   Personal Cards
                 </NavLink>
               </li>
-              {/* <li>
+              
+              <li>
                 <NavLink
                   to="/visiting-cards/business"
                   className="block px-4 py-2 text-sm hover:bg-blue-100 transition"
                 >
-                  Business Cards
+                  Business Cards (comming soon)
                 </NavLink>
-              </li> */}
+              </li>
+              <li>
+                <NavLink
+                  to="/visiting-cards/business"
+                  className="block px-4 py-2 text-sm hover:bg-blue-100 transition"
+                >
+                  Resume (comming soon)
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/visiting-cards/business"
+                  className="block px-4 py-2 text-sm hover:bg-blue-100 transition"
+                >
+                  Bio Data (comming soon)
+                </NavLink>
+              </li>
             </ul>
           </div>
           <NavLink
@@ -247,7 +264,7 @@ function Navbar() {
             <ul className="pl-4">
               <li>
                 <NavLink
-                  to="/mycards/pricing"
+                  to="/mycards/personal"
                   className="block py-2 px-4 text-sm hover:bg-blue-100 transition"
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -256,11 +273,29 @@ function Navbar() {
               </li>
               <li>
                 <NavLink
-                  to="/visiting-cards/business"
+                  to="#"
                   className="block py-2 px-4 text-sm hover:bg-blue-100 transition"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Business Cards
+                  Business Cards (comming soon)
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="#"
+                  className="block py-2 px-4 text-sm hover:bg-blue-100 transition"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Resume (comming soon)
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="#"
+                  className="block py-2 px-4 text-sm hover:bg-blue-100 transition"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Bio Data (comming soon)
                 </NavLink>
               </li>
             </ul>
