@@ -276,7 +276,7 @@ const QRGenerator = () => {
 
               <div className="flex items-center space-x-4 mb-6">
                 <div>
-                  <p className="text-sm text-gray-600 mb-2">QR Code Color:</p>
+                  <p className="text-sm text-gray-600 mb-2">May Color of QR change your Luck:</p>
                   <input
                     type="color"
                     value={qrColor}
@@ -287,7 +287,7 @@ const QRGenerator = () => {
               </div>
             </div>
 
-            <label className="block text-sm text-gray-500 mb-2">Upload Logo for QR Code:</label>
+            <label className="block text-sm text-gray-500 mb-2">Upload Logo/Image/Zodiac sign/Lucky No. for QR Code:</label>
             <input
               type="file"
               accept="image/*"

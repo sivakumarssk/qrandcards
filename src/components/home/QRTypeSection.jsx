@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css"; // Import AOS CSS
+import whatapp from '../../assets/qrimages/whatsapp.png'
+import instagram from '../../assets/qrimages/instagram.png'
 
 const QRTypeSection = () => {
   const navigate = useNavigate();
@@ -15,12 +17,11 @@ const QRTypeSection = () => {
     { label: "Maps", icon: "🗺️", route: "/qr-generator?type=maps" },
     { label: "Wi-Fi", icon: "📶", route: "/qr-generator?type=wifi" },
     { label: "Audio", icon: "🎵", route: "/qr-generator?type=audio" },
-    { label: "WhatsApp", icon: "📱", route: "/qr-generator?type=whatsapp" },
+    { label: "WhatsApp", img: whatapp, route: "/qr-generator?type=whatsapp" },
     { label: "YouTube", icon: "🎥", route: "/qr-generator?type=youtube" },
-    { label: "Instagram", icon: "📸", route: "/qr-generator?type=instagram" },
+    { label: "Instagram", img: instagram, route: "/qr-generator?type=instagram" },
     { label: "Facebook", icon: "📘", route: "/qr-generator?type=facebook" },
     { label: "E-mail", icon: "📧", route: "/qr-generator?type=email" },
-    { label: "TikTok", icon: "🎵", route: "/qr-generator?type=tiktok" },
     { label: "Phone Call", icon: "📞", route: "/qr-generator?type=phone" },
   ];
 
@@ -43,7 +44,8 @@ const QRTypeSection = () => {
             onClick={() => handleNavigation(type.route)}
             data-aos={index % 2 === 0 ? "fade-up" : "fade-down"} // Add AOS animation
           >
-            <div className="text-3xl mb-2">{type.icon}</div>
+            {type.icon ? <div className="text-3xl mb-2">{type.icon}</div> : 
+            <img width={'35px'} className="mb-2" src={type.img}/>}
             <p className="text-sm font-medium">{type.label}</p>
           </div>
         ))}

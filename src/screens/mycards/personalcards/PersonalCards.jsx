@@ -361,7 +361,7 @@ function PersonalCards() {
 
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen mt-[6%]">
+    <div className="p-6 bg-gray-100 min-h-screen mt-[14%] lg:mt-[4%]">
       <h1 className="text-3xl font-bold mb-6">Create Personal Visiting Card</h1>
       <form
         className="bg-white p-6 rounded-lg shadow-md"
