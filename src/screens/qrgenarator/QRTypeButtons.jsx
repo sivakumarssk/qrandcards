@@ -17,9 +17,7 @@ const QRTypeButtons = ({ activeType, setActiveType,setQrCodeValue,setShowWaterma
     "playStore",
     "wifi",
     "image",
-    "pdf",
-    "audio",
-    "video",
+    "pdf"
   ];
 
   return (

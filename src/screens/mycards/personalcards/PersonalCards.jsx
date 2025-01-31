@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
+import getCroppedImg from "./cropImage.js";
 import FacebookIcon from "../../../assets/socialmedia/facebook.png";
 import InstagramIcon from "../../../assets/socialmedia/instagram.png";
 import PhoneIcon from "../../../assets/socialmedia/phone.png";
@@ -8,11 +9,13 @@ import EmailIcon from "../../../assets/socialmedia/email.png";
 import AddressIcon from "../../../assets/socialmedia/address.png";
 import PhonePayIcon from "../../../assets/socialmedia/phonepay.png";
 import GooglePayIcon from "../../../assets/socialmedia/gpay.png";
+import Cropper from "react-easy-crop";
 
 function PersonalCards() {
   const [formData, setFormData] = useState({
     name: "",
     profileImage: null,
+    croppedProfileImage: null,
     hashtag: "",
     description: "",
     phone: "",
@@ -32,15 +35,42 @@ function PersonalCards() {
   });
 
   const [previewMode, setPreviewMode] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [imageSrc, setImageSrc] = useState(null);
+  const [showCropModal, setShowCropModal] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleFileChange = (e, key) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
-    setFormData({ ...formData, [key]: file });
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImageSrc(reader.result);
+      setShowCropModal(true);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
+
+  const handleCrop = async () => {
+
+    try {
+      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
+      setFormData({ ...formData, croppedProfileImage: croppedImage });
+      setShowCropModal(false);
+    } catch (error) {
+      console.error("Cropping error:", error);
+    }
   };
 
   const handleMultipleFileChange = (e, key) => {
@@ -172,15 +202,24 @@ function PersonalCards() {
         >
           {/* Profile Image */}
           <div id="profile-section">
-            {formData.profileImage && (
-              <div className="flex justify-center mb-4"  >
-                <img
-                  src={URL.createObjectURL(formData.profileImage)}
-                  alt="Profile"
-                  className="w-24 h-24 rounded-full border-4 border-gray-300"
-                />
-              </div>
+          <div className="flex justify-center mb-4"  >
+            {formData.croppedProfileImage ? (
+              <img
+                src={formData.croppedProfileImage}
+                alt="Profile"
+                className="w-24 h-24 rounded-full border-4 border-gray-300"
+              />
+            ) : formData.profileImage ? (
+              <img
+                src={URL.createObjectURL(formData.profileImage)}
+                alt="Profile"
+                className="w-24 h-24 rounded-full border-4 border-gray-300"
+              />
+            ) : (
+              <p>No Image Selected</p>
             )}
+          </div>
+
             <h2 className="text-xl font-bold text-center mb-2">{formData.name}</h2>
             <h2 className="text-xl font-bold text-center mb-2">{formData.hashtag}</h2>
             <p className="text-center text-gray-700 mb-4 pb-4">{formData.description}</p>
@@ -343,7 +382,7 @@ function PersonalCards() {
             </div>
             <button
               className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition ml-4"
-              onClick={handlePDFPayment}
+              onClick={handleDownloadPDF}
             >
               Pay ₹185 to Download PDF
             </button>
@@ -372,12 +411,18 @@ function PersonalCards() {
       >
         <div className="mb-4">
           <label className="block mb-2">Profile Image</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => handleFileChange(e, "profileImage")}
-          />
+          <input type="file" accept="image/*" onChange={handleFileChange} />
+          {formData.croppedProfileImage && (
+            <div className="mt-4">
+              <img
+                src={formData.croppedProfileImage}
+                alt="Profile"
+                className="w-24 h-24 rounded-full border-4 border-gray-300"
+              />
+            </div>
+          )}
         </div>
+
         <div className="mb-4">
           <label className="block mb-2">Name</label>
           <input
@@ -516,6 +561,41 @@ function PersonalCards() {
           Preview
         </button>
       </form>
+
+      {/* Cropper Modal */}
+      {showCropModal && (
+          <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+            <div className="bg-white p-4 rounded-lg shadow-lg">
+              <h3 className="text-lg font-bold mb-2">Crop Your Image</h3>
+              <div className="relative w-[300px] h-[300px]">
+                <Cropper
+                  image={imageSrc}
+                  crop={crop}
+                  zoom={zoom}
+                  aspect={1}
+                  onCropChange={setCrop}
+                  onZoomChange={setZoom}
+                  onCropComplete={onCropComplete}
+                />
+              </div>
+              <div className="mt-4 flex justify-between">
+                <button
+                  className="bg-red-500 text-white px-4 py-2 rounded"
+                  onClick={() => setShowCropModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="bg-green-500 text-white px-4 py-2 rounded"
+                  onClick={handleCrop}
+                >
+                  Crop & Save
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
     </div>
   );
 }

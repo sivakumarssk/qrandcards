@@ -88,12 +88,6 @@ const QRForm = ({ activeType, onSubmit }) => {
       case "Pdf":
         if (!formData.pdf) newErrors.pdf = "PDF URL is required.";
         break;
-      case "Audio":
-        if (!formData.audio) newErrors.audio = "Audio URL is required.";
-        break;
-      case "video":
-        if (!formData.video) newErrors.video = "Video URL is required.";
-        break;
       default:
         break;
     }
