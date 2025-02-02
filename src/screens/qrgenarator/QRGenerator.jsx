@@ -66,6 +66,12 @@ const QRGenerator = () => {
       case "app":
         value = `https://admin.qrandcards.com?ios=${data.appappStore || "#"}&android=${data.appplayStore || "#"}`;
         break;
+      case "image":
+        value = `https://admin.qrandcards.com${data.url}`;
+        break;
+      case "pdf":
+        value = `https://admin.qrandcards.com${data.url}`;
+        break;
       default:
         value = "";
     }

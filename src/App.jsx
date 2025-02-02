@@ -11,6 +11,9 @@ import PersonalCards from './screens/mycards/personalcards/PersonalCards'
 import TermsAndConditions from './policy/TermsandConditions'
 import PrivacyPolicy from './policy/PrivacyPolicy'
 import RefundPolicy from './policy/RefundPolicy'
+import BusinessCards from './screens/mycards/businesscards/BusinessCards'
+import Resume from './screens/mycards/resume/Resume'
+import BioData from './screens/mycards/bioData/BioData'
 
 function App() {
 
@@ -26,6 +29,9 @@ function App() {
       <Route path='/signup' element={<SignUp/>}/>
       <Route path='/pricing' element={<Pricing/>}/>
       <Route path='/mycards/personal' element={<PersonalCards/>}/>
+      <Route path='/mycards/business' element={<BusinessCards/>}/>
+      <Route path='/mycards/resume' element={<Resume/>}/>
+      <Route path='/mycards/bioData' element={<BioData/>}/>
       <Route path='/policy/termsandconditions' element={<TermsAndConditions/>}/>
       <Route path='/policy/privacy' element={<PrivacyPolicy/>}/>
       <Route path='/policy/refund' element={<RefundPolicy/>}/>

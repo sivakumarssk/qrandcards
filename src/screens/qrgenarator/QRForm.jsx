@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const QRForm = ({ activeType, onSubmit }) => {
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
+  const [imageFile, setImageFile] = useState(null);
+  const [pdfFile, setPdfFile] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,6 +17,44 @@ const QRForm = ({ activeType, onSubmit }) => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleImageChange = (e) => {
+    setImageFile(e.target.files[0]);
+  };
+
+  const handlePdfChange = (e) => {
+    setPdfFile(e.target.files[0]);
+  };
+
+  const handleFileUpload = async (file, type) => {
+    if (!file) {
+      alert(`Please select a ${type} file to upload.`);
+      return;
+    }
+
+    const formData = new FormData();
+    if (imageFile) {
+
+      formData.append("image", file);
+    }
+    if (pdfFile) {
+      formData.append("pdf", file);
+    }
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/qrfiles", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      if (response) {
+        alert(`${type} uploaded successfully`);
+        setFormData((prev) => ({ ...prev, url: response?.data?.url }))
+        console.log(response.data);
+      }
+    } catch (error) {
+      console.error("Upload failed", error);
+      alert(`${type} upload failed`);
+    }
   };
 
   const validateForm = () => {
@@ -83,10 +124,10 @@ const QRForm = ({ activeType, onSubmit }) => {
         if (!formData.password) newErrors.password = "Password is required.";
         break;
       case "Image":
-        if (!formData.image) newErrors.image = "Image URL is required.";
+        if (!formData.image) newErrors.image = "Image is required.";
         break;
       case "Pdf":
-        if (!formData.pdf) newErrors.pdf = "PDF URL is required.";
+        if (!formData.pdf) newErrors.pdf = "PDF is required.";
         break;
       default:
         break;
@@ -105,6 +146,9 @@ const QRForm = ({ activeType, onSubmit }) => {
     }
 
     if (validateForm()) {
+      if (imageFile) {
+
+      }
       onSubmit(formData);
     }
   };
@@ -464,6 +508,40 @@ const QRForm = ({ activeType, onSubmit }) => {
             </div>
           </>
         );
+
+      case "image":
+        return (
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-1">Upload Image</label>
+            <input type="file" onChange={handleImageChange} accept="image/*" 
+            className="mb-2 max-w-[180px]" /><br/>
+            <button
+              type="button"
+              onClick={() => handleFileUpload(imageFile, "Image")}
+              className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-blue-500 transition"
+            >
+              Upload Image
+            </button>
+            {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
+          </div>
+        )
+
+      case "pdf":
+        return (
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-1">Upload PDF</label>
+            <input type="file" onChange={handlePdfChange} accept="application/pdf" 
+            className="mb-2 max-w-[180px]" /><br/>
+            <button
+              type="button"
+              onClick={() => handleFileUpload(pdfFile, "PDF")}
+              className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-500 transition"
+            >
+              Upload PDF
+            </button>
+            {errors.pdf && <p className="text-red-500 text-sm mt-1">{errors.pdf}</p>}
+          </div>
+        )
 
       default:
         return <p className="text-gray-500">Select a Plan to Proceed..</p>;

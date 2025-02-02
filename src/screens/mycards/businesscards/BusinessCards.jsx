@@ -9,20 +9,25 @@ import EmailIcon from "../../../assets/socialmedia/email.png";
 import AddressIcon from "../../../assets/socialmedia/address.png";
 import PhonePayIcon from "../../../assets/socialmedia/phonepay.png";
 import GooglePayIcon from "../../../assets/socialmedia/gpay.png";
+import websiteIcon from "../../../assets/socialmedia/website.png";
 import Cropper from "react-easy-crop";
 
-function PersonalCards() {
+function BusinessCards() {
   const [formData, setFormData] = useState({
     name: "",
     profileImage: null,
     croppedProfileImage: null,
     hashtag: "",
+    designation:"",
     description: "",
     phone: "",
     email: "",
     address: "",
     about: "",
+    gstno:"",
+    bussinestimings:"",
     socialLinks: [
+      { platform: "Website", link: "" },
       { platform: "Facebook", link: "" },
       { platform: "Instagram", link: "" },
     ],
@@ -125,6 +130,7 @@ function PersonalCards() {
       "contact-section",
       "social-links-section",
       "upi-links-section",
+      "bussines-section",
       "products-section",
       "gallery-section",
     ];
@@ -135,14 +141,15 @@ function PersonalCards() {
 
     // Save the PDF
     const fileName = formData.name
-      ? `${formData.name.replace(/\s+/g, "_")}_E-Visiting_Card.pdf`
-      : "E-Visiting_Card.pdf";
+      ? `${formData.name.replace(/\s+/g, "_")}_E-Business_Card.pdf`
+      : "E-Business_Card.pdf";
     pdf.save(fileName);
   };
 
   console.log(formData.name, "nameout");
 
   const socialIcons = {
+    Website: websiteIcon,
     Facebook: FacebookIcon,
     Instagram: InstagramIcon,
   };
@@ -151,7 +158,7 @@ function PersonalCards() {
     "Phone Pay": PhonePayIcon,
     "Google Pay": GooglePayIcon,
   };
-1
+
   const handlePDFPayment = () => {
     const options = {
       key: "rzp_live_HJLLQQPlyQFOGr",
@@ -221,17 +228,21 @@ function PersonalCards() {
           </div>
 
             <h2 className="text-xl font-bold text-center mb-2">{formData.name}</h2>
-            <h2 className="text-xl font-bold text-center mb-2">{formData.hashtag}</h2>
             <p className="text-center text-gray-700 mb-4 pb-4">{formData.description}</p>
           </div>
 
           {/* About Section */}
           <div className="mb-6" id="about-section">
             <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
-              About Me
+             About us
             </h3>
-            <p className="border p-4 rounded-b-lg">{formData.about}</p>
+            
+            <p className="border p-4 rounded-b-lg">
+            {formData.hashtag && <h4><span className="text-md font-bold mb-1">My Name:</span> {formData.hashtag}</h4>}<br/>
+            {formData.designation && <h4><span className="text-md font-bold mb-1">My Designation:</span> {formData.designation}</h4>}<br/>
+            {formData.about}</p>
           </div>
+
 
           {/* Contact Details */}
           <div className="mb-6" id="contact-section" >
@@ -326,12 +337,24 @@ function PersonalCards() {
             </div>
           )}
 
+          {/* Bussines Timings */}
+          <div className="mb-6" id="bussines-section">
+            <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
+             Bussines Info
+            </h3>
+            
+            <p className="border p-4 rounded-b-lg">
+            {formData.gstno && <p><span className="text-md font-bold mb-1">GST No:</span> {formData.gstno}</p>}<br/>
+            {formData.bussinestimings && <p><span className="text-md font-bold mb-1">Bussines Timings:</span> {formData.bussinestimings}</p>}<br/>
+            </p>
+          </div>
+
           {/* Product Images */}
           {formData.productImages.length > 0 && (
             <div className="mb-6" id="products-section">
               <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
                 {/* Products */}
-                My Achievements
+                Product Images
               </h3>
               <div className="border p-4 rounded-b-lg grid grid-cols-4 gap-4 justify-items-center">
                 {formData.productImages.map((file, index) => (
@@ -350,7 +373,7 @@ function PersonalCards() {
           {formData.gallery.length > 0 && (
             <div className="mb-6" id="gallery-section">
               <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg" id="gallery-section">
-                Gallery
+              Other Business Images
               </h3>
               <div className="border p-4 rounded-b-lg grid grid-cols-4 gap-4 justify-items-center">
                 {formData.gallery.map((file, index) => (
@@ -401,7 +424,7 @@ function PersonalCards() {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen mt-[14%] lg:mt-[4%]">
-      <h1 className="text-3xl font-bold mb-6">Create Personal Visiting Card</h1>
+      <h1 className="text-3xl font-bold mb-6">Create Business Visiting Card</h1>
       <form
         className="bg-white p-6 rounded-lg shadow-md"
         onSubmit={(e) => {
@@ -410,7 +433,7 @@ function PersonalCards() {
         }}
       >
         <div className="mb-4">
-          <label className="block mb-2">Profile Image</label>
+          <label className="block mb-2">Logo Image</label>
           <input type="file" accept="image/*" onChange={handleFileChange} />
           {formData.croppedProfileImage && (
             <div className="mt-4">
@@ -424,7 +447,7 @@ function PersonalCards() {
         </div>
 
         <div className="mb-4">
-          <label className="block mb-2">Name</label>
+          <label className="block mb-2">Bussines name</label>
           <input
             type="text"
             name="name" // Ensure this matches the key in formData
@@ -435,7 +458,7 @@ function PersonalCards() {
         </div>
 
         <div className="mb-4">
-          <label className="block mb-2">Profession</label>
+          <label className="block mb-2">Your name</label>
           <input
             type="text"
             name="hashtag"
@@ -444,6 +467,18 @@ function PersonalCards() {
             className="w-full border p-2 rounded"
           />
         </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Designation</label>
+          <input
+            type="text"
+            name="designation"
+            value={formData.designation}
+            onChange={handleInputChange}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+
         <div className="mb-4">
           <label className="block mb-2">Description</label>
           <textarea
@@ -454,7 +489,7 @@ function PersonalCards() {
           ></textarea>
         </div>
         <div className="mb-4">
-          <label className="block mb-2">About Yourself</label>
+          <label className="block mb-2">About Us</label>
           <textarea
             name="about"
             value={formData.about}
@@ -483,7 +518,7 @@ function PersonalCards() {
           />
         </div>
         <div className="mb-4">
-          <label className="block mb-2">Residential Address</label>
+          <label className="block mb-2">Location</label>
           <input
             type="text"
             name="address"
@@ -537,7 +572,29 @@ function PersonalCards() {
           ))}
         </div>
         <div className="mb-4">
-          <label className="block mb-2">Achievement/Awards Images</label>
+          <label className="block mb-2">GST No</label>
+          <input
+            type="text"
+            name="gstno"
+            value={formData.gstno}
+            onChange={handleInputChange}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Bussines Timings</label>
+          <input
+            type="text"
+            name="bussinestimings"
+            value={formData.bussinestimings}
+            onChange={handleInputChange}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Product Images</label>
           <input
             type="file"
             accept="image/*"
@@ -546,7 +603,7 @@ function PersonalCards() {
           />
         </div>
         <div className="mb-4">
-          <label className="block mb-2">Images/Friends</label>
+          <label className="block mb-2">Your Other Business Images</label>
           <input
             type="file"
             accept="image/*"
@@ -600,4 +657,4 @@ function PersonalCards() {
   );
 }
 
-export default PersonalCards;
+export default BusinessCards;

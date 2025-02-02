@@ -114,31 +114,31 @@ function Navbar() {
               
               <li>
                 <NavLink
-                  to="/visiting-cards/business"
+                  to="/mycards/business"
                   className="block px-4 py-2 text-sm hover:bg-blue-100 transition"
                 >
-                  Business Cards (comming soon)
+                  Business Cards
                 </NavLink>
               </li>
               <li>
                 <NavLink
-                  to="/visiting-cards/business"
+                  to="/mycards/resume"
                   className="block px-4 py-2 text-sm hover:bg-blue-100 transition"
                 >
-                  Resume (comming soon)
+                  Resume
                 </NavLink>
               </li>
               <li>
                 <NavLink
-                  to="/visiting-cards/business"
+                  to="/mycards/bioData"
                   className="block px-4 py-2 text-sm hover:bg-blue-100 transition"
                 >
-                  Bio Data (comming soon)
+                  Bio Data
                 </NavLink>
               </li>
             </ul>
           </div>
-          <NavLink
+          {/* <NavLink
             to="/pricing"
             className={({ isActive }) =>
               isActive
@@ -149,7 +149,7 @@ function Navbar() {
             data-aos-delay="600"
           >
             Plans
-          </NavLink>
+          </NavLink> */}
         </div>
 
         {/* Auth Buttons */}
@@ -273,35 +273,35 @@ function Navbar() {
               </li>
               <li>
                 <NavLink
-                  to="#"
+                  to="/mycards/business"
                   className="block py-2 px-4 text-sm hover:bg-blue-100 transition"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Business Cards (comming soon)
+                  Business Cards
                 </NavLink>
               </li>
               <li>
                 <NavLink
-                  to="#"
+                  to="/mycards/resume"
                   className="block py-2 px-4 text-sm hover:bg-blue-100 transition"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Resume (comming soon)
+                  Resume
                 </NavLink>
               </li>
               <li>
                 <NavLink
-                  to="#"
+                  to="/mycards/bioData"
                   className="block py-2 px-4 text-sm hover:bg-blue-100 transition"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Bio Data (comming soon)
+                  Bio Data
                 </NavLink>
               </li>
             </ul>
           </div>
           
-          <NavLink
+          {/* <NavLink
             to="/pricing"
             onClick={() => setIsMenuOpen(false)}
             className={({ isActive }) =>
@@ -313,7 +313,7 @@ function Navbar() {
             data-aos-delay="400"
           >
             Plans
-          </NavLink>
+          </NavLink> */}
           {!token && (
             <>
               <NavLink

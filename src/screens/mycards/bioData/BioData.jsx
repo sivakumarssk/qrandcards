@@ -7,30 +7,28 @@ import InstagramIcon from "../../../assets/socialmedia/instagram.png";
 import PhoneIcon from "../../../assets/socialmedia/phone.png";
 import EmailIcon from "../../../assets/socialmedia/email.png";
 import AddressIcon from "../../../assets/socialmedia/address.png";
-import PhonePayIcon from "../../../assets/socialmedia/phonepay.png";
-import GooglePayIcon from "../../../assets/socialmedia/gpay.png";
 import Cropper from "react-easy-crop";
 
-function PersonalCards() {
+function BioData() {
   const [formData, setFormData] = useState({
     name: "",
     profileImage: null,
     croppedProfileImage: null,
-    hashtag: "",
-    description: "",
+    education: "",
+    profession:"",
+    dob: "",
+    height:"",
+    nativeplace: "",
+    caste:"",
+    familydetails:"",
+    hobbies:"",
     phone: "",
     email: "",
     address: "",
-    about: "",
     socialLinks: [
       { platform: "Facebook", link: "" },
       { platform: "Instagram", link: "" },
     ],
-    upiLinks: [
-      { platform: "Phone Pay", link: "" },
-      { platform: "Google Pay", link: "" },
-    ],
-    productImages: [],
     gallery: [],
   });
 
@@ -121,11 +119,12 @@ function PersonalCards() {
     // Render each section
     const sections = [
       "profile-section",
+      "education-section",
       "about-section",
+      "family-section",
+      "hobbies-section",
       "contact-section",
       "social-links-section",
-      "upi-links-section",
-      "products-section",
       "gallery-section",
     ];
 
@@ -135,8 +134,8 @@ function PersonalCards() {
 
     // Save the PDF
     const fileName = formData.name
-      ? `${formData.name.replace(/\s+/g, "_")}_E-Visiting_Card.pdf`
-      : "E-Visiting_Card.pdf";
+      ? `${formData.name.replace(/\s+/g, "_")}_E-Business_Card.pdf`
+      : "E-Business_Card.pdf";
     pdf.save(fileName);
   };
 
@@ -147,11 +146,7 @@ function PersonalCards() {
     Instagram: InstagramIcon,
   };
 
-  const upiIcons = {
-    "Phone Pay": PhonePayIcon,
-    "Google Pay": GooglePayIcon,
-  };
-1
+
   const handlePDFPayment = () => {
     const options = {
       key: "rzp_live_HJLLQQPlyQFOGr",
@@ -220,17 +215,52 @@ function PersonalCards() {
             )}
           </div>
 
-            <h2 className="text-xl font-bold text-center mb-2">{formData.name}</h2>
-            <h2 className="text-xl font-bold text-center mb-2">{formData.hashtag}</h2>
-            <p className="text-center text-gray-700 mb-4 pb-4">{formData.description}</p>
+            <h2 className="text-xl font-bold text-center mb-2 pb-4">{formData.name}</h2>
           </div>
 
+          {/* Education Section */}
+          <div className="mb-6" id="education-section">
+            <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
+            Education
+            </h3>
+            
+            <p className="border p-4 rounded-b-lg">
+            {formData.education}</p>
+          </div>
+           
           {/* About Section */}
           <div className="mb-6" id="about-section">
             <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
-              About Me
+             About me
             </h3>
-            <p className="border p-4 rounded-b-lg">{formData.about}</p>
+            
+            <p className="border p-4 rounded-b-lg">
+            {formData.profession && <h4><span className="text-md font-bold mb-1">Profession: </span> {formData.profession}</h4>}<br/>
+            {formData.dob && <h4><span className="text-md font-bold mb-1">Date, time, place of birth: </span> {formData.dob}</h4>}<br/>
+            {formData.height && <h4><span className="text-md font-bold mb-1">Height: </span> {formData.height}</h4>}<br/>
+            {formData.nativeplace && <h4><span className="text-md font-bold mb-1">Native place: </span> {formData.nativeplace}</h4>}<br/>
+            {formData.caste && <h4><span className="text-md font-bold mb-1">Caste / sub caste: </span> {formData.caste}</h4>}<br/>
+            </p>
+          </div>
+
+        {/* Family details Section */}
+          <div className="mb-6" id="family-section">
+            <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
+            Family details
+            </h3>
+            
+            <p className="border p-4 rounded-b-lg">
+            {formData.familydetails}</p>
+          </div>
+
+           {/* Activities/ hobbies Section */}
+           <div className="mb-6" id="hobbies-section">
+            <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
+            Activities/ hobbies
+            </h3>
+            
+            <p className="border p-4 rounded-b-lg">
+            {formData.hobbies}</p>
           </div>
 
           {/* Contact Details */}
@@ -295,62 +325,11 @@ function PersonalCards() {
             </div>
           )}
 
-          {/* UPI Links */}
-          {formData.upiLinks.some((link) => link.link) && (
-            <div className="mb-6" id="upi-links-section">
-              <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
-                UPI Links
-              </h3>
-              <ul className="border p-4 rounded-b-lg space-y-2">
-                {formData.upiLinks.map(
-                  (link, index) =>
-                    link.link && (
-                      <li key={index}>
-                        <img
-                          src={upiIcons[link.platform]}
-                          alt={link.platform}
-                          className="inline w-5 h-5 mr-2"
-                        />
-                        <a
-                          href={link.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-500 underline"
-                        >
-                          {link.link}
-                        </a>
-                      </li>
-                    )
-                )}
-              </ul>
-            </div>
-          )}
-
-          {/* Product Images */}
-          {formData.productImages.length > 0 && (
-            <div className="mb-6" id="products-section">
-              <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
-                {/* Products */}
-                My Achievements
-              </h3>
-              <div className="border p-4 rounded-b-lg grid grid-cols-4 gap-4 justify-items-center">
-                {formData.productImages.map((file, index) => (
-                  <img
-                    key={index}
-                    src={URL.createObjectURL(file)}
-                    alt="Product"
-                    className="w-24 h-24 object-cover rounded-lg"
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* Gallery */}
           {formData.gallery.length > 0 && (
             <div className="mb-6" id="gallery-section">
-              <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg" id="gallery-section">
-                Gallery
+              <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
+              YOUR IMAGES
               </h3>
               <div className="border p-4 rounded-b-lg grid grid-cols-4 gap-4 justify-items-center">
                 {formData.gallery.map((file, index) => (
@@ -401,7 +380,7 @@ function PersonalCards() {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen mt-[14%] lg:mt-[4%]">
-      <h1 className="text-3xl font-bold mb-6">Create Personal Visiting Card</h1>
+      <h1 className="text-3xl font-bold mb-6">Create Bio Data</h1>
       <form
         className="bg-white p-6 rounded-lg shadow-md"
         onSubmit={(e) => {
@@ -410,7 +389,7 @@ function PersonalCards() {
         }}
       >
         <div className="mb-4">
-          <label className="block mb-2">Profile Image</label>
+          <label className="block mb-2">Image</label>
           <input type="file" accept="image/*" onChange={handleFileChange} />
           {formData.croppedProfileImage && (
             <div className="mt-4">
@@ -435,29 +414,86 @@ function PersonalCards() {
         </div>
 
         <div className="mb-4">
-          <label className="block mb-2">Profession</label>
-          <input
-            type="text"
-            name="hashtag"
-            value={formData.hashtag}
-            onChange={handleInputChange}
-            className="w-full border p-2 rounded"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block mb-2">Description</label>
+          <label className="block mb-2">Education</label>
           <textarea
-            name="description"
-            value={formData.description}
+            name="education"
+            value={formData.education}
             onChange={handleInputChange}
             className="w-full border p-2 rounded"
           ></textarea>
         </div>
+
         <div className="mb-4">
-          <label className="block mb-2">About Yourself</label>
+          <label className="block mb-2">Profession</label>
+          <input
+            type="text"
+            name="profession"
+            value={formData.profession}
+            onChange={handleInputChange}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+
+           <div className="mb-4">
+          <label className="block mb-2">Date, time, place of birth</label>
+          <input
+            type="text"
+            name="dob"
+            value={formData.dob}
+            onChange={handleInputChange}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+
+
+        <div className="mb-4">
+          <label className="block mb-2">Height</label>
+          <input
+            type="text"
+            name="height"
+            value={formData.height }
+            onChange={handleInputChange}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Native Place</label>
+          <input
+            type="text"
+            name="nativeplace"
+            value={formData.nativeplace}
+            onChange={handleInputChange}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Caste / Sub Caste</label>
+          <input
+            type="text"
+            name="caste"
+            value={formData.caste}
+            onChange={handleInputChange}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Family Details</label>
           <textarea
-            name="about"
-            value={formData.about}
+            name="familydetails"
+            value={formData.familydetails}
+            onChange={handleInputChange}
+            className="w-full border p-2 rounded"
+          ></textarea>
+        </div>
+        
+        <div className="mb-4">
+          <label className="block mb-2">Activities/ hobbies</label>
+          <textarea
+            name="hobbies"
+            value={formData.hobbies}
             onChange={handleInputChange}
             className="w-full border p-2 rounded"
           ></textarea>
@@ -483,7 +519,7 @@ function PersonalCards() {
           />
         </div>
         <div className="mb-4">
-          <label className="block mb-2">Residential Address</label>
+          <label className="block mb-2">Location</label>
           <input
             type="text"
             name="address"
@@ -514,39 +550,9 @@ function PersonalCards() {
             </div>
           ))}
         </div>
+
         <div className="mb-4">
-          <label className="block mb-2">UPI Links</label>
-          {formData.upiLinks.map((link, index) => (
-            <div key={index} className="flex mb-2">
-              <span className="w-1/3">{link.platform}</span>
-              <input
-                type="text"
-                placeholder="Link"
-                value={link.link}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    upiLinks: formData.upiLinks.map((l, i) =>
-                      i === index ? { ...l, link: e.target.value } : l
-                    ),
-                  })
-                }
-                className="w-2/3 border p-2 rounded"
-              />
-            </div>
-          ))}
-        </div>
-        <div className="mb-4">
-          <label className="block mb-2">Achievement/Awards Images</label>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => handleMultipleFileChange(e, "productImages")}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block mb-2">Images/Friends</label>
+          <label className="block mb-2">YOUR IMAGES</label>
           <input
             type="file"
             accept="image/*"
@@ -600,4 +606,4 @@ function PersonalCards() {
   );
 }
 
-export default PersonalCards;
+export default BioData;
