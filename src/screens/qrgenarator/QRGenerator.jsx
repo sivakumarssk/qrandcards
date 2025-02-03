@@ -64,13 +64,13 @@ const QRGenerator = () => {
         value = `WIFI:S:${data.ssid};T:WPA;P:${data.password};;` || "";
         break;
       case "app":
-        value = `https://admin.qrandcards.com?ios=${data.appappStore || "#"}&android=${data.appplayStore || "#"}`;
+        value = `https://admin.qrandcards.com/api?ios=${data.appappStore || "#"}&android=${data.appplayStore || "#"}`;
         break;
       case "image":
-        value = `https://admin.qrandcards.com${data.url}`;
+        value = `https://admin.qrandcards.com/api${data.url}`;
         break;
       case "pdf":
-        value = `https://admin.qrandcards.com${data.url}`;
+        value = `https://admin.qrandcards.com/api${data.url}`;
         break;
       default:
         value = "";

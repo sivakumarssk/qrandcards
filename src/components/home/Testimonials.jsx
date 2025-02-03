@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css"; // Import AOS CSS
 import t1 from "../../assets/socialmedia/onesquare.jpeg";
 import t2 from "../../assets/socialmedia/onesquare.jpeg";
 import t3 from "../../assets/socialmedia/pixelmind.png";
 import t4 from "../../assets/socialmedia/zodiac.jpeg";
+import axios from "axios";
 
 // Testimonials Data
 const testimonials = [
@@ -38,8 +39,24 @@ const testimonials = [
 ];
 
 const Testimonials = () => {
+
   useEffect(() => {
     AOS.init({ duration: 1000 });
+  }, []);
+
+  const [testimonials,setTestimonials] =useState([]) 
+
+  const fetchTestimonials = async () => {
+    try {
+      const response = await axios.get("https://admin.qrandcards.com/api/testimonials");
+      setTestimonials(response.data);
+    } catch (error) {
+      console.error("Error fetching testimonials:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTestimonials();
   }, []);
 
   return (
@@ -55,9 +72,10 @@ const Testimonials = () => {
           >
             <div className="flex items-center space-x-6 mb-6">
               <img
-                src={testimonial.image}
+                src={`https://admin.qrandcards.com${testimonial.image}`}
                 alt={testimonial.name}
-                className="w-16 h-16 rounded-full border-4 border-gold-500 object-cover"
+                className="w-16 h-16 rounded-full border-4 border-gold-500 object-fit"
+                style={{resizeTo:'st'}}
               />
               <div>
                 <h4 className="text-xl font-semibold text-gray-800">{testimonial.name}</h4>

@@ -16,6 +16,9 @@ import Footer from "../../components/home/Footer ";
 import DownloadApp from "../../components/home/DownloadApp";
 import AboutHome from "../../components/home/AboutHome";
 import CardsAbout from "../../components/home/CardsAbout";
+import BussinessCards from "../../components/home/BussinessCards";
+import Resume from "../../components/home/Resume";
+import BioData from "../../components/home/BioData";
 
 function Home() {
   React.useEffect(() => {
@@ -39,6 +42,11 @@ function Home() {
       <QRTypeSection/>
 
       <CardsAbout/>
+
+      <BussinessCards/>
+
+      <Resume/>
+      <BioData/>
 
       <Testimonials/>
 

@@ -36,7 +36,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="mt-6 border-t border-gray-700 pt-4 text-center text-sm text-gray-400">
-          © 2025 AtoZ key Solutions. All rights reserved.
+          © 2025 atozkeysolution. All rights reserved.
         </div>
       </div>
     </footer>
