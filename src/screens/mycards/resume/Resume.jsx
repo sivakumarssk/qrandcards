@@ -10,6 +10,7 @@ import AddressIcon from "../../../assets/socialmedia/address.png";
 import PhonePayIcon from "../../../assets/socialmedia/phonepay.png";
 import GooglePayIcon from "../../../assets/socialmedia/gpay.png";
 import Cropper from "react-easy-crop";
+import axios from "axios";
 
 function Resume() {
   const [formData, setFormData] = useState({
@@ -127,6 +128,23 @@ function Resume() {
     pdf.save(fileName);
   };
 
+  const updateResumeCount = async () => {
+    try {
+      await axios.post("https://admin.qrandcards.com/api/incrementCount", {
+        type: "totalResume",
+        value: 1
+      });
+
+      await axios.post("https://admin.qrandcards.com/api/incrementCount", {
+        type: "dailyResume",
+        value: 1
+      });
+
+      console.log("QR code count updated successfully!");
+    } catch (error) {
+      console.error("Error updating QR code count:", error);
+    }
+  };
 
   const handlePDFPayment = () => {
     const options = {
@@ -139,6 +157,7 @@ function Resume() {
       handler: function (response) {
         // Payment successful
         handleDownloadPDF(); // Trigger PDF download after payment
+        updateResumeCount();
         alert("Payment successful! Your PDF will be downloaded.");
       },
       modal: {

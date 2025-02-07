@@ -8,6 +8,7 @@ import PhoneIcon from "../../../assets/socialmedia/phone.png";
 import EmailIcon from "../../../assets/socialmedia/email.png";
 import AddressIcon from "../../../assets/socialmedia/address.png";
 import Cropper from "react-easy-crop";
+import axios from "axios";
 
 function BioData() {
   const [formData, setFormData] = useState({
@@ -137,6 +138,7 @@ function BioData() {
       ? `${formData.name.replace(/\s+/g, "_")}_E-Business_Card.pdf`
       : "E-Business_Card.pdf";
     pdf.save(fileName);
+    updateBioDataCount()
   };
 
   console.log(formData.name, "nameout");
@@ -146,6 +148,23 @@ function BioData() {
     Instagram: InstagramIcon,
   };
 
+  const updateBioDataCount = async () => {
+    try {
+      await axios.post("https://admin.qrandcards.com/api/incrementCount", {
+        type: "totalBio",
+        value: 1
+      });
+
+      await axios.post("https://admin.qrandcards.com/api/incrementCount", {
+        type: "dailyBio",
+        value: 1
+      });
+
+      console.log("QR code count updated successfully!");
+    } catch (error) {
+      console.error("Error updating QR code count:", error);
+    }
+  };
 
   const handlePDFPayment = () => {
     const options = {
@@ -157,7 +176,8 @@ function BioData() {
       description: "Download PDF",
       handler: function (response) {
         // Payment successful
-        handleDownloadPDF(); // Trigger PDF download after payment
+        handleDownloadPDF();
+        updateBioDataCount();
         alert("Payment successful! Your PDF will be downloaded.");
       },
       modal: {
@@ -361,7 +381,7 @@ function BioData() {
             </div>
             <button
               className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition ml-4"
-              onClick={handlePDFPayment}
+              onClick={handleDownloadPDF}
             >
               Pay ₹185 to Download PDF
             </button>

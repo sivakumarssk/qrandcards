@@ -4,6 +4,7 @@ import QRForm from "./QRForm";
 import QRTypeButtons from "./QRTypeButtons";
 import defaultLogos from "../../components/helper/defaultLogo";
 import './QRgenarator.css'
+import axios from "axios";
 
 const QRGenerator = () => {
   const [activeType, setActiveType] = useState("text");
@@ -64,7 +65,7 @@ const QRGenerator = () => {
         value = `WIFI:S:${data.ssid};T:WPA;P:${data.password};;` || "";
         break;
       case "app":
-        value = `https://admin.qrandcards.com/api?ios=${data.appappStore || "#"}&android=${data.appplayStore || "#"}`;
+        value = `https://admin.qrandcards.com/api/app?ios=${data.appappStore || "#"}&android=${data.appplayStore || "#"}`;
         break;
       case "image":
         value = `https://admin.qrandcards.com/api${data.url}`;
@@ -174,6 +175,24 @@ const QRGenerator = () => {
     }, 100);
   };
 
+  const updateQRCodeCount = async () => {
+    try {
+      await axios.post("https://admin.qrandcards.com/api/incrementCount", {
+        type: "totalQR",
+        value: 1
+      });
+
+      await axios.post("https://admin.qrandcards.com/api/incrementCount", {
+        type: "dailyQR",
+        value: 1
+      });
+
+      console.log("QR code count updated successfully!");
+    } catch (error) {
+      console.error("Error updating QR code count:", error);
+    }
+  };
+
   const handlePayment = () => {
     const options = {
       key: "rzp_live_HJLLQQPlyQFOGr",
@@ -187,6 +206,7 @@ const QRGenerator = () => {
         setShowWatermark(false);
         setIsPaymentComplete(true);
         alert("Payment successful! Watermark removed.");
+        updateQRCodeCount();
       },
       modal: {
         ondismiss: function () {

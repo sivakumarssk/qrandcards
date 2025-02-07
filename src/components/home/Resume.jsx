@@ -46,10 +46,10 @@ function Resume() {
         {/* Navigation Button */}
         <div className="flex justify-center mt-10">
           <button
-            onClick={() => navigate("/mycards/personal")}
+            onClick={() => navigate("/mycards/resume")}
             className="bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold py-3 px-8 rounded-lg shadow-lg transition duration-200"
           >
-            Go to Personal Cards
+            Go to Resume
           </button>
         </div>
       </div>

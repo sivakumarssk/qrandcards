@@ -11,6 +11,7 @@ import PhonePayIcon from "../../../assets/socialmedia/phonepay.png";
 import GooglePayIcon from "../../../assets/socialmedia/gpay.png";
 import websiteIcon from "../../../assets/socialmedia/website.png";
 import Cropper from "react-easy-crop";
+import axios from "axios";
 
 function BusinessCards() {
   const [formData, setFormData] = useState({
@@ -159,6 +160,24 @@ function BusinessCards() {
     "Google Pay": GooglePayIcon,
   };
 
+  const updateBusinessCount = async () => {
+    try {
+      await axios.post("https://admin.qrandcards.com/api/incrementCount", {
+        type: "totalBusiness",
+        value: 1
+      });
+
+      await axios.post("https://admin.qrandcards.com/api/incrementCount", {
+        type: "dailyBusiness",
+        value: 1
+      });
+
+      console.log("QR code count updated successfully!");
+    } catch (error) {
+      console.error("Error updating QR code count:", error);
+    }
+  };
+
   const handlePDFPayment = () => {
     const options = {
       key: "rzp_live_HJLLQQPlyQFOGr",
@@ -169,7 +188,8 @@ function BusinessCards() {
       description: "Download PDF",
       handler: function (response) {
         // Payment successful
-        handleDownloadPDF(); // Trigger PDF download after payment
+        handleDownloadPDF();
+        updateBusinessCount();
         alert("Payment successful! Your PDF will be downloaded.");
       },
       modal: {

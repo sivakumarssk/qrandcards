@@ -10,6 +10,7 @@ import AddressIcon from "../../../assets/socialmedia/address.png";
 import PhonePayIcon from "../../../assets/socialmedia/phonepay.png";
 import GooglePayIcon from "../../../assets/socialmedia/gpay.png";
 import Cropper from "react-easy-crop";
+import axios from "axios";
 
 function PersonalCards() {
   const [formData, setFormData] = useState({
@@ -151,7 +152,25 @@ function PersonalCards() {
     "Phone Pay": PhonePayIcon,
     "Google Pay": GooglePayIcon,
   };
-1
+
+  const updatePersonalCount = async () => {
+    try {
+      await axios.post("https://admin.qrandcards.com/api/incrementCount", {
+        type: "totalPersonal",
+        value: 1
+      });
+
+      await axios.post("https://admin.qrandcards.com/api/incrementCount", {
+        type: "dailyPersonal",
+        value: 1
+      });
+
+      console.log("QR code count updated successfully!");
+    } catch (error) {
+      console.error("Error updating QR code count:", error);
+    }
+  };
+
   const handlePDFPayment = () => {
     const options = {
       key: "rzp_live_HJLLQQPlyQFOGr",
@@ -162,7 +181,8 @@ function PersonalCards() {
       description: "Download PDF",
       handler: function (response) {
         // Payment successful
-        handleDownloadPDF(); // Trigger PDF download after payment
+        handleDownloadPDF();
+        updatePersonalCount();
         alert("Payment successful! Your PDF will be downloaded.");
       },
       modal: {
@@ -202,23 +222,23 @@ function PersonalCards() {
         >
           {/* Profile Image */}
           <div id="profile-section">
-          <div className="flex justify-center mb-4"  >
-            {formData.croppedProfileImage ? (
-              <img
-                src={formData.croppedProfileImage}
-                alt="Profile"
-                className="w-24 h-24 rounded-full border-4 border-gray-300"
-              />
-            ) : formData.profileImage ? (
-              <img
-                src={URL.createObjectURL(formData.profileImage)}
-                alt="Profile"
-                className="w-24 h-24 rounded-full border-4 border-gray-300"
-              />
-            ) : (
-              <p>No Image Selected</p>
-            )}
-          </div>
+            <div className="flex justify-center mb-4"  >
+              {formData.croppedProfileImage ? (
+                <img
+                  src={formData.croppedProfileImage}
+                  alt="Profile"
+                  className="w-24 h-24 rounded-full border-4 border-gray-300"
+                />
+              ) : formData.profileImage ? (
+                <img
+                  src={URL.createObjectURL(formData.profileImage)}
+                  alt="Profile"
+                  className="w-24 h-24 rounded-full border-4 border-gray-300"
+                />
+              ) : (
+                <p>No Image Selected</p>
+              )}
+            </div>
 
             <h2 className="text-xl font-bold text-center mb-2">{formData.name}</h2>
             <h2 className="text-xl font-bold text-center mb-2">{formData.hashtag}</h2>
@@ -242,22 +262,24 @@ function PersonalCards() {
               {formData.phone && (
                 <li>
                   <img src={PhoneIcon} alt="Phone" className="inline w-5 h-5 mr-2" />
-                  {formData.phone}
+                  {/* Wrap phone number with a tel: link */}
+                  <a href={`tel:${formData.phone}`} className="text-blue-500 underline">
+                    {formData.phone}
+                  </a>
                 </li>
               )}
               {formData.email && (
                 <li>
                   <img src={EmailIcon} alt="Email" className="inline w-5 h-5 mr-2" />
-                  {formData.email}
+                  {/* Wrap email with a mailto: link */}
+                  <a href={`mailto:${formData.email}`} className="text-blue-500 underline">
+                    {formData.email}
+                  </a>
                 </li>
               )}
               {formData.address && (
                 <li>
-                  <img
-                    src={AddressIcon}
-                    alt="Address"
-                    className="inline w-5 h-5 mr-2"
-                  />
+                  <img src={AddressIcon} alt="Address" className="inline w-5 h-5 mr-2" />
                   {formData.address}
                 </li>
               )}
@@ -564,37 +586,37 @@ function PersonalCards() {
 
       {/* Cropper Modal */}
       {showCropModal && (
-          <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
-            <div className="bg-white p-4 rounded-lg shadow-lg">
-              <h3 className="text-lg font-bold mb-2">Crop Your Image</h3>
-              <div className="relative w-[300px] h-[300px]">
-                <Cropper
-                  image={imageSrc}
-                  crop={crop}
-                  zoom={zoom}
-                  aspect={1}
-                  onCropChange={setCrop}
-                  onZoomChange={setZoom}
-                  onCropComplete={onCropComplete}
-                />
-              </div>
-              <div className="mt-4 flex justify-between">
-                <button
-                  className="bg-red-500 text-white px-4 py-2 rounded"
-                  onClick={() => setShowCropModal(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="bg-green-500 text-white px-4 py-2 rounded"
-                  onClick={handleCrop}
-                >
-                  Crop & Save
-                </button>
-              </div>
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-4 rounded-lg shadow-lg">
+            <h3 className="text-lg font-bold mb-2">Crop Your Image</h3>
+            <div className="relative w-[300px] h-[300px]">
+              <Cropper
+                image={imageSrc}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={onCropComplete}
+              />
+            </div>
+            <div className="mt-4 flex justify-between">
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded"
+                onClick={() => setShowCropModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-green-500 text-white px-4 py-2 rounded"
+                onClick={handleCrop}
+              >
+                Crop & Save
+              </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
     </div>
   );
