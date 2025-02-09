@@ -14,8 +14,32 @@ const QRGenerator = () => {
   const [logoUrl, setLogoUrl] = useState("");
   const [showWatermark, setShowWatermark] = useState(true);
   const [isPaymentComplete, setIsPaymentComplete] = useState(false);
+  const [prices, setPrices] = useState(null);
 
   const qrCodeRef = useRef(null);
+
+  const fetchPrices = async () => {
+    try {
+      const response = await axios.get("https://admin.qrandcards.com/api/getPrice");
+      if (response.data) {
+        const {
+          totalpriceQR,
+          dicountpriceQR
+        } = response.data;
+
+        setPrices({
+          totalpriceQR,
+          dicountpriceQR
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching price data:", error);
+    }
+  };
+
+  useEffect(()=>{
+    fetchPrices()
+  },[])
 
   useEffect(() => {
     setLogoUrl(defaultLogos(activeType));
@@ -197,7 +221,7 @@ const QRGenerator = () => {
     const options = {
       key: "rzp_live_HJLLQQPlyQFOGr",
       razorpay_secret: "cm2v1OSggPZ5vVHX5rl3jrq4",
-      amount: 37 * 100, // Convert to smallest currency unit (paise)
+      amount: (prices?.dicountpriceQR || 37) * 100, // Convert to smallest currency unit (paise)
       currency: "INR",
       name: "QR Code Generator",
       description: "Remove Watermark",
@@ -329,15 +353,15 @@ const QRGenerator = () => {
                   This QR Code has a watermark. Make a payment to remove it.
                 </p>
                 <div className="flex flex-col items-center mb-4">
-                  <p className="text-gray-500 line-through text-sm">₹100</p>
-                  <p className="text-green-600 font-bold text-lg">₹37</p>
-                  <p className="text-blue-500 text-sm">(63% Off)</p>
+                  <p className="text-gray-500 line-through text-sm">₹{prices?.totalpriceQR || 100}</p>
+                  <p className="text-green-600 font-bold text-lg">₹{prices?.dicountpriceQR || 37}</p>
+                  <p className="text-blue-500 text-sm">(Offer price)</p>
                 </div>
                 <button
                   className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition"
                   onClick={handlePayment}
                 >
-                  Pay ₹37 to Remove Watermark
+                  Pay ₹{prices?.dicountpriceQR || 37} to Remove Watermark
                 </button>
               </div>
 

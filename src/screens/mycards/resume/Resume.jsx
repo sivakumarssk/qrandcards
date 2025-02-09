@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import getCroppedImg from "./cropImage.js";
@@ -24,6 +24,7 @@ function Resume() {
     phone: "",
     email: "",
     address: "",
+    referal:"",
     certificates: [],
     gallery: [],
   });
@@ -34,11 +35,67 @@ function Resume() {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [imageSrc, setImageSrc] = useState(null);
   const [showCropModal, setShowCropModal] = useState(false);
+  const [prices, setPrices] = useState(null);
+  const [backgrounds, setBackgrounds] = useState([]);
+  const [selectedBackground, setSelectedBackground] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
+
+  const fetchPrices = async () => {
+    try {
+      const response = await axios.get("https://admin.qrandcards.com/api/getPrice");
+      if (response.data) {
+        const {
+          totalpriceResume,
+          dicountpriceResume
+        } = response.data;
+
+        setPrices({
+          totalpriceResume,
+          dicountpriceResume
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching price data:", error);
+    }
+  };
+
+  const fetchCardsBackground = async () => {
+    try {
+      const response = await axios.get("https://admin.qrandcards.com/api/cardsBackground");
+      if (response.status === 200) {
+        setBackgrounds(response?.data?.image);
+      }
+    } catch (error) {
+      console.error("Error fetching cards background:", error);
+    }
+  };
+
+  const handleReferal = async () => {
+    if (formData.referal && formData.referal.trim() !== "") {
+      const userEmail = localStorage.getItem("email");
+      if (userEmail) {
+        try {
+          await axios.post("https://admin.qrandcards.com/api/addreferals", {
+            user: userEmail,
+            referal: formData.referal,
+            type: "Resume",
+          });
+          console.log("Referral posted successfully.");
+        } catch (error) {
+          console.error("Error posting referral:", error);
+        }
+      }
+    }
+  };
+
+  useEffect(()=>{
+    fetchPrices()
+    fetchCardsBackground();
+  },[])
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -69,30 +126,58 @@ function Resume() {
     const files = Array.from(e.target.files);
     setFormData({ ...formData, [key]: [...formData[key], ...files] });
   };
+
+  
   const handleDownloadPDF = async () => {
     const pdf = new jsPDF("p", "mm", "a4");
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
-    let currentY = 10; // Starting position on the page
-
-    // Function to add sections to the PDF with high-quality rendering
+    let currentY = 10; // Start position for content
+  
+    // 🖼️ Load and apply background image (if selected)
+    let bgImage = null;
+    if (selectedBackground) {
+      bgImage = new Image();
+      bgImage.src = selectedBackground;
+      await new Promise((resolve) => {
+        bgImage.onload = resolve;
+      });
+    }
+  
+    // 🟢 Apply background to the first page
+    if (bgImage) {
+      pdf.addImage(bgImage, "PNG", 0, 0, pdfWidth, pdfHeight);
+    }
+  
+    // Function to capture each section and add it to the PDF
     const addSectionToPDF = async (sectionId) => {
       const sectionElement = document.getElementById(sectionId);
       if (!sectionElement) return;
-
-      const canvas = await html2canvas(sectionElement, { useCORS: true, scale: 3 });
+  
+      const canvas = await html2canvas(sectionElement, {
+        useCORS: true,
+        scale: 3,
+        backgroundColor: null, // Keep section transparent
+      });
+  
       const imgData = canvas.toDataURL("image/png");
       const sectionHeight = (canvas.height / canvas.width) * pdfWidth;
-
+  
+      // 🟢 Check if the section fits on the current page
       if (currentY + sectionHeight > pdfHeight) {
         pdf.addPage();
         currentY = 10;
+  
+        // 🟢 Apply background image on new page
+        if (bgImage) {
+          pdf.addImage(bgImage, "PNG", 0, 0, pdfWidth, pdfHeight);
+        }
       }
-
+  
       pdf.addImage(imgData, "PNG", 10, currentY, pdfWidth - 20, sectionHeight);
       currentY += sectionHeight + 10;
-
-      // Add clickable links for sections with links
+  
+      // 🟢 Add clickable links (only for specific sections)
       if (sectionId === "social-links-section" || sectionId === "upi-links-section") {
         const links = formData[sectionId === "social-links-section" ? "socialLinks" : "upiLinks"];
         links.forEach((link, index) => {
@@ -103,30 +188,35 @@ function Resume() {
         });
       }
     };
-
-    // Render each section
+  
+    // 🟢 List of Sections to Add to PDF
     const sections = [
       "profile-section",
       "about-section",
       "experience-section",
-      "skills/hobbies",
+      "skills-hobbies-section", // 🔹 Fixed section name for skills/hobbies
       "contact-section",
       "social-links-section",
       "upi-links-section",
       "products-section",
       "gallery-section",
     ];
-
+  
+    // 🟢 Render each section in the PDF
     for (const sectionId of sections) {
       await addSectionToPDF(sectionId);
     }
-
-    // Save the PDF
+  
+    // 🟢 Save the PDF
     const fileName = formData.fullName
       ? `${formData.fullName.replace(/\s+/g, "_")}_Resume.pdf`
       : "Resume.pdf";
     pdf.save(fileName);
+  
+    // ✅ Handle referral after download
+    handleReferal();
   };
+  
 
   const updateResumeCount = async () => {
     try {
@@ -150,7 +240,7 @@ function Resume() {
     const options = {
       key: "rzp_live_HJLLQQPlyQFOGr",
       razorpay_secret: "cm2v1OSggPZ5vVHX5rl3jrq4",
-      amount: 185 * 100, // Discounted price in paise
+      amount: (prices?.dicountpriceResume || 185) * 100, // Discounted price in paise
       currency: "INR",
       name: "Personal Visiting Card",
       description: "Download PDF",
@@ -193,6 +283,12 @@ function Resume() {
           <div
             id="preview-content"
             className="bg-white p-6 rounded-lg shadow-md max-w-3xl w-full"
+            style={{
+              overflow: "hidden",
+              backgroundImage: selectedBackground ? `url(${selectedBackground})` : "none",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
           >
             {/* Profile Image */}
             <div id="profile-section">
@@ -324,15 +420,15 @@ function Resume() {
             </button>
             <div className="flex justify-center items-center mt-6">
               <div className="text-center">
-                <p className="text-gray-500 line-through">₹500</p>
-                <p className="text-green-600 font-bold text-xl">₹185</p>
-                <p className="text-blue-500 text-sm">(63% Off)</p>
+                <p className="text-gray-500 line-through">₹{prices?.totalpriceResume || 500}</p>
+                <p className="text-green-600 font-bold text-xl">₹{prices?.dicountpriceResume || 185}</p>
+                <p className="text-blue-500 text-sm">(Offer price)</p>
               </div>
               <button
                 className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition ml-4"
-                onClick={handlePDFPayment}
+                onClick={handleDownloadPDF}
               >
-                Pay ₹185 to Download PDF
+                Pay ₹{prices?.dicountpriceResume || 185} to Download PDF
               </button>
             </div>
   
@@ -399,6 +495,16 @@ function Resume() {
           <label className="block mb-2">Address</label>
           <input type="text" name="address" value={formData.address} onChange={handleInputChange} className="w-full border p-2 rounded" />
         </div>
+        <div className="mb-4">
+          <label className="block mb-2">Referal Mail  (Optional)</label>
+          <input
+            type="text"
+            name="referal"
+            value={formData.referal}
+            onChange={handleInputChange}
+            className="w-full border p-2 rounded"
+          />
+        </div>
 
         <div className="mb-4">
           <label className="block mb-2">Certificates</label>
@@ -409,6 +515,29 @@ function Resume() {
           <label className="block mb-2">Gallery</label>
           <input type="file" accept="image/*" multiple onChange={(e) => handleMultipleFileChange(e, "gallery")} />
         </div>
+
+        {/* Background Images Selection */}
+        {backgrounds?.length > 0 && (
+          <div className="mb-4">
+            <label className="block mb-2">Select Background</label>
+            <div className="flex space-x-2 overflow-x-auto">
+              {backgrounds.map((bg, index) => (
+                <img
+                  key={index}
+                  src={`https://admin.qrandcards.com${bg}`}
+                  alt={`Background ${index + 1}`}
+                  className={`w-20 h-20 object-cover rounded cursor-pointer border ${
+                    selectedBackground === `https://admin.qrandcards.com${bg}`
+                      ? "border-blue-800"
+                      : "border-gray-200"
+                  }`}
+                  onClick={() => setSelectedBackground(`https://admin.qrandcards.com${bg}`)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
 
         <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded mt-4">Preview</button>
       </form>

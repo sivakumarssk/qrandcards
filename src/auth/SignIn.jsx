@@ -34,6 +34,7 @@ function SignIn() {
 
       // Save token in local storage
       localStorage.setItem("token", response.data.token);
+      localStorage.setItem("email", formData.email);
 
       // Redirect to the home or QR generation page
       navigate("/qr-generator");

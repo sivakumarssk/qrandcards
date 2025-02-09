@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import getCroppedImg from "./cropImage.js";
@@ -26,6 +26,7 @@ function BioData() {
     phone: "",
     email: "",
     address: "",
+    referal:"",
     socialLinks: [
       { platform: "Facebook", link: "" },
       { platform: "Instagram", link: "" },
@@ -39,11 +40,67 @@ function BioData() {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [imageSrc, setImageSrc] = useState(null);
   const [showCropModal, setShowCropModal] = useState(false);
+  const [prices, setPrices] = useState(null);
+  const [backgrounds, setBackgrounds] = useState([]);
+  const [selectedBackground, setSelectedBackground] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
+
+  const fetchCardsBackground = async () => {
+    try {
+      const response = await axios.get("https://admin.qrandcards.com/api/cardsBackground");
+      if (response.status === 200) {
+        setBackgrounds(response?.data?.image);
+      }
+    } catch (error) {
+      console.error("Error fetching cards background:", error);
+    }
+  };
+
+  const handleReferal = async () => {
+    if (formData.referal && formData.referal.trim() !== "") {
+      const userEmail = localStorage.getItem("email");
+      if (userEmail) {
+        try {
+          await axios.post("https://admin.qrandcards.com/api/addreferals", {
+            user: userEmail,
+            referal: formData.referal,
+            type: "Bio Data",
+          });
+          console.log("Referral posted successfully.");
+        } catch (error) {
+          console.error("Error posting referral:", error);
+        }
+      }
+    }
+  };
+
+  const fetchPrices = async () => {
+    try {
+      const response = await axios.get("https://admin.qrandcards.com/api/getPrice");
+      if (response.data) {
+        const {
+          totalpriceBio,
+          dicountpriceBio
+        } = response.data;
+
+        setPrices({
+          totalpriceBio,
+          dicountpriceBio,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching price data:", error);
+    }
+  };
+
+  useEffect(()=>{
+    fetchPrices()
+    fetchCardsBackground();
+  },[])
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -86,39 +143,25 @@ function BioData() {
     const pdf = new jsPDF("p", "mm", "a4");
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
-    let currentY = 10; // Starting position on the page
-
-    // Function to add sections to the PDF with high-quality rendering
-    const addSectionToPDF = async (sectionId) => {
-      const sectionElement = document.getElementById(sectionId);
-      if (!sectionElement) return;
-
-      const canvas = await html2canvas(sectionElement, { useCORS: true, scale: 3 });
-      const imgData = canvas.toDataURL("image/png");
-      const sectionHeight = (canvas.height / canvas.width) * pdfWidth;
-
-      if (currentY + sectionHeight > pdfHeight) {
-        pdf.addPage();
-        currentY = 10;
-      }
-
-      pdf.addImage(imgData, "PNG", 10, currentY, pdfWidth - 20, sectionHeight);
-      currentY += sectionHeight + 10;
-
-      // Add clickable links for sections with links
-      if (sectionId === "social-links-section" || sectionId === "upi-links-section") {
-        const links = formData[sectionId === "social-links-section" ? "socialLinks" : "upiLinks"];
-        links.forEach((link, index) => {
-          if (link.link) {
-            const linkY = currentY - sectionHeight + 20 + index * 10;
-            pdf.link(20, linkY, pdfWidth - 40, 5, { url: link.link });
-          }
-        });
-      }
-    };
-
-    // Render each section
-    const sections = [
+    const margin = 10;
+    let currentY = margin;
+  
+    // Load background image if selected
+    let bgImage = null;
+    if (selectedBackground) {
+      bgImage = new Image();
+      bgImage.src = selectedBackground;
+      await new Promise((resolve) => {
+        bgImage.onload = resolve;
+      });
+    }
+  
+    // 🟢 Apply background to the first page before adding sections
+    if (bgImage) {
+      pdf.addImage(bgImage, "PNG", 0, 0, pdfWidth, pdfHeight);
+    }
+  
+    const sectionIds = [
       "profile-section",
       "education-section",
       "about-section",
@@ -128,18 +171,42 @@ function BioData() {
       "social-links-section",
       "gallery-section",
     ];
-
-    for (const sectionId of sections) {
-      await addSectionToPDF(sectionId);
+  
+    for (const sectionId of sectionIds) {
+      const sectionElem = document.getElementById(sectionId);
+      if (!sectionElem) continue;
+  
+      const canvas = await html2canvas(sectionElem, {
+        useCORS: true,
+        scale: 3,
+        backgroundColor: null, // 🟢 Keeps sections transparent
+      });
+      
+      const imgData = canvas.toDataURL("image/png");
+      const sectionHeight = (canvas.height / canvas.width) * (pdfWidth - 2 * margin);
+  
+      if (currentY + sectionHeight > pdfHeight - margin) {
+        pdf.addPage();
+        currentY = margin;
+  
+        // 🟢 Reapply background on new pages
+        if (bgImage) {
+          pdf.addImage(bgImage, "PNG", 0, 0, pdfWidth, pdfHeight);
+        }
+      }
+  
+      pdf.addImage(imgData, "PNG", margin, currentY, pdfWidth - 2 * margin, sectionHeight);
+      currentY += sectionHeight + 5;
     }
-
-    // Save the PDF
-    const fileName = formData.name
-      ? `${formData.name.replace(/\s+/g, "_")}_E-Business_Card.pdf`
-      : "E-Business_Card.pdf";
+  
+    const fileName = formData.name ? `${formData.name.replace(/\s+/g, "_")}_BioData.pdf` : "BioData.pdf";
     pdf.save(fileName);
-    updateBioDataCount()
+  
+    // Update backend counts
+    await handleReferal();
   };
+  
+
 
   console.log(formData.name, "nameout");
 
@@ -170,7 +237,7 @@ function BioData() {
     const options = {
       key: "rzp_live_HJLLQQPlyQFOGr",
       razorpay_secret: "cm2v1OSggPZ5vVHX5rl3jrq4",
-      amount: 185 * 100, // Discounted price in paise
+      amount: (prices?.dicountpriceBio || 185) * 100, // Discounted price in paise
       currency: "INR",
       name: "Personal Visiting Card",
       description: "Download PDF",
@@ -207,6 +274,8 @@ function BioData() {
     rzp.open(); // Open Razorpay payment popup
   };
 
+  console.log(prices,'prices');
+  
 
   if (previewMode) {
     return (
@@ -214,7 +283,13 @@ function BioData() {
         <div
           id="preview-content"
           className="bg-white p-6 rounded-lg shadow-md max-w-3xl w-full"
-        >
+          style={{
+            overflow: "hidden",
+            backgroundImage: selectedBackground ? `url(${selectedBackground})` : "none",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        > 
           {/* Profile Image */}
           <div id="profile-section">
           <div className="flex justify-center mb-4"  >
@@ -375,15 +450,15 @@ function BioData() {
           </button>
           <div className="flex justify-center items-center mt-6">
             <div className="text-center">
-              <p className="text-gray-500 line-through">₹500</p>
-              <p className="text-green-600 font-bold text-xl">₹185</p>
-              <p className="text-blue-500 text-sm">(63% Off)</p>
+              <p className="text-gray-500 line-through">₹{prices?.totalpriceBio || 500}</p>
+              <p className="text-green-600 font-bold text-xl">₹{prices?.dicountpriceBio || 185}</p>
+              <p className="text-blue-500 text-sm">(Offer price)</p>
             </div>
             <button
               className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition ml-4"
               onClick={handlePDFPayment}
             >
-              Pay ₹185 to Download PDF
+              Pay ₹{prices?.dicountpriceBio || 185} to Download PDF
             </button>
           </div>
 
@@ -548,6 +623,18 @@ function BioData() {
             className="w-full border p-2 rounded"
           />
         </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Referal Mail (Optional)</label>
+          <input
+            type="text"
+            name="referal"
+            value={formData.referal}
+            onChange={handleInputChange}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+
         <div className="mb-4">
           <label className="block mb-2">Social Links</label>
           {formData.socialLinks.map((link, index) => (
@@ -580,6 +667,29 @@ function BioData() {
             onChange={(e) => handleMultipleFileChange(e, "gallery")}
           />
         </div>
+
+         {/* Background Images Selection */}
+         {backgrounds?.length > 0 && (
+          <div className="mb-4">
+            <label className="block mb-2">Select Background</label>
+            <div className="flex space-x-2 overflow-x-auto">
+              {backgrounds.map((bg, index) => (
+                <img
+                  key={index}
+                  src={`https://admin.qrandcards.com${bg}`}
+                  alt={`Background ${index + 1}`}
+                  className={`w-20 h-20 object-cover rounded cursor-pointer border ${
+                    selectedBackground === `https://admin.qrandcards.com${bg}`
+                      ? "border-blue-800"
+                      : "border-gray-200"
+                  }`}
+                  onClick={() => setSelectedBackground(`https://admin.qrandcards.com${bg}`)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
         <button
           type="submit"
           className="bg-blue-500 text-white py-2 px-4 rounded mt-4"

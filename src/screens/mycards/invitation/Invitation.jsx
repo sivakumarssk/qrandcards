@@ -2,8 +2,6 @@ import React, { useCallback, useState, useEffect } from "react";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import getCroppedImg from "./cropImage.js";
-import PhoneIcon from "../../../assets/socialmedia/phone.png";
-import AddressIcon from "../../../assets/socialmedia/address.png";
 import Cropper from "react-easy-crop";
 import axios from "axios";
 
@@ -18,7 +16,8 @@ function Invitation() {
     phone: "",
     venue: "",
     address: "",
-    regards: ""
+    regards: "",
+    referal:"",
   });
   const [previewMode, setPreviewMode] = useState(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -26,6 +25,7 @@ function Invitation() {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [imageSrc, setImageSrc] = useState(null);
   const [showCropModal, setShowCropModal] = useState(false);
+  const [prices, setPrices] = useState(null);
   
   // New states for backgrounds
   const [backgrounds, setBackgrounds] = useState([]);
@@ -42,14 +42,52 @@ function Invitation() {
     }
   };
 
+  const handleReferal = async () => {
+    if (formData.referal && formData.referal.trim() !== "") {
+      const userEmail = localStorage.getItem("email");
+      if (userEmail) {
+        try {
+          await axios.post("https://admin.qrandcards.com/api/addreferals", {
+            user: userEmail,
+            referal: formData.referal,
+            type: "Invitation card",
+          });
+          console.log("Referral posted successfully.");
+        } catch (error) {
+          console.error("Error posting referral:", error);
+        }
+      }
+    }
+  };
+
+  const fetchPrices = async () => {
+    try {
+      const response = await axios.get("https://admin.qrandcards.com/api/getPrice");
+      if (response.data) {
+        const {
+          totalpriceInvitation,
+          dicountpriceInvitation
+        } = response.data;
+
+        setPrices({
+          totalpriceInvitation,
+          dicountpriceInvitation
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching price data:", error);
+    }
+  };
+
+
   // Fetch background images from API on mount
   useEffect(() => {
     fetchCardsBackground();
+    fetchPrices()
   }, []);
 
   console.log(backgrounds, "back");
   
-  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
@@ -132,6 +170,7 @@ function Invitation() {
       ? `${formData.name.replace(/\s+/g, "_")}_Invitation.pdf`
       : "Invitation.pdf";
     pdf.save(fileName);
+    handleReferal();
     updateBioDataCount();
   };
 
@@ -157,7 +196,7 @@ function Invitation() {
     const options = {
       key: "rzp_live_HJLLQQPlyQFOGr",
       razorpay_secret: "cm2v1OSggPZ5vVHX5rl3jrq4",
-      amount: 185 * 100, // Price in paise
+      amount: (prices?.dicountpriceInvitation || 185) * 100, // Price in paise
       currency: "INR",
       name: "Personal Visiting Card",
       description: "Download PDF",
@@ -200,7 +239,7 @@ function Invitation() {
             overflow: "hidden",
             backgroundImage: selectedBackground ? `url(${selectedBackground})` : "none",
             backgroundSize: "cover",
-            backgroundPosition: "center"
+            backgroundPosition: "center",
           }}
         >
           {/* Overlay to ensure content visibility */}
@@ -305,15 +344,15 @@ function Invitation() {
           </button>
           <div className="flex items-center mt-6">
             <div className="text-center mr-4">
-              <p className="text-gray-500 line-through">₹500</p>
-              <p className="text-green-600 font-bold text-xl">₹185</p>
-              <p className="text-blue-500 text-sm">(63% Off)</p>
+              <p className="text-gray-500 line-through">₹{prices?.totalpriceInvitation || 500}</p>
+              <p className="text-green-600 font-bold text-xl">₹{prices?.dicountpriceInvitation || 185}</p>
+              <p className="text-blue-500 text-sm">(Offer price)</p>
             </div>
             <button
               className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition ml-4"
               onClick={handlePDFPayment}
             >
-              Pay ₹185 to Download PDF
+              Pay ₹{prices?.dicountpriceInvitation || 185} to Download PDF
             </button>
           </div>
         </div>
@@ -434,6 +473,17 @@ function Invitation() {
             type="text"
             name="regards"
             value={formData.regards}
+            onChange={handleInputChange}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Referal Mail  (Optional)</label>
+          <input
+            type="text"
+            name="referal"
+            value={formData.referal}
             onChange={handleInputChange}
             className="w-full border p-2 rounded"
           />
