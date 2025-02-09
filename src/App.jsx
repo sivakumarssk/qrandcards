@@ -14,6 +14,7 @@ import RefundPolicy from './policy/RefundPolicy'
 import BusinessCards from './screens/mycards/businesscards/BusinessCards'
 import Resume from './screens/mycards/resume/Resume'
 import BioData from './screens/mycards/bioData/BioData'
+import Invitation from './screens/mycards/invitation/Invitation'
 
 function App() {
 
@@ -32,6 +33,7 @@ function App() {
       <Route path='/mycards/business' element={<BusinessCards/>}/>
       <Route path='/mycards/resume' element={<Resume/>}/>
       <Route path='/mycards/bioData' element={<BioData/>}/>
+      <Route path='/mycards/invitation' element={<Invitation/>}/>
       <Route path='/policy/termsandconditions' element={<TermsAndConditions/>}/>
       <Route path='/policy/privacy' element={<PrivacyPolicy/>}/>
       <Route path='/policy/refund' element={<RefundPolicy/>}/>

@@ -381,7 +381,7 @@ function BioData() {
             </div>
             <button
               className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition ml-4"
-              onClick={handleDownloadPDF}
+              onClick={handlePDFPayment}
             >
               Pay ₹185 to Download PDF
             </button>

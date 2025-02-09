@@ -50,7 +50,7 @@ function Home() {
 
       <Testimonials/>
 
-      <DownloadApp/>
+      {/* <DownloadApp/> */}
 
 
       <Footer/>
