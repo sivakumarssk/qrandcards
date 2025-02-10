@@ -11,6 +11,8 @@ import PhonePayIcon from "../../../assets/socialmedia/phonepay.png";
 import GooglePayIcon from "../../../assets/socialmedia/gpay.png";
 import Cropper from "react-easy-crop";
 import axios from "axios";
+import whatsappImage from "../../../assets/qrimages/whatsapp.png";
+
 
 function Resume() {
   const [formData, setFormData] = useState({
@@ -346,12 +348,18 @@ function Resume() {
               </h3>
               <ul className="border p-4 rounded-b-lg space-y-2">
                 {formData.phone && (
-                  <li>
-                    <img src={PhoneIcon} alt="Phone" className="inline w-5 h-5 mr-2" />
-                    <a href={`tel:${formData.phone}`} className="text-blue-500 underline">
-                    {formData.phone}
-                  </a>
-                  </li>
+                 <li>
+                 <img src={whatsappImage} alt="Phone" className="inline w-5 h-5 mr-2" />
+                 <a
+                   href={`https://api.whatsapp.com/send?phone=${formData.phone}`}
+                   data-url={`https://api.whatsapp.com/send?phone=${formData.phone}`}
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   className="text-blue-500 underline"
+                 >
+                   {formData.phone}
+                 </a>
+               </li>
                 )}
                 {formData.email && (
                   <li>
@@ -524,7 +532,7 @@ function Resume() {
         <div className="mb-4">
           <label className="block mb-2">Referal Code (Optional)</label>
           <input
-            type="text"
+            type="number"
             name="referal"
             value={formData.referal}
             onChange={handleInputChange}

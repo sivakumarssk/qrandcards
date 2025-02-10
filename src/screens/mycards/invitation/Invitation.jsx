@@ -298,7 +298,7 @@ function Invitation() {
 
                   <span className="mr-2">WhatsApp:</span>
                   <a
-                    href={`https://api.whatsapp.com/send?phone=+91${formData.phone}`}
+                    href={`https://api.whatsapp.com/send?phone=${formData.phone}`}
                     data-url={`https://api.whatsapp.com/send?phone=${formData.phone}`}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -496,9 +496,9 @@ function Invitation() {
         </div>
 
         <div className="mb-4">
-          <label className="block mb-2">Referal Code  (Optional)</label>
+          <label className="block mb-2">Referal Code (Optional)</label>
           <input
-            type="text"
+            type="number"
             name="referal"
             value={formData.referal}
             onChange={handleInputChange}

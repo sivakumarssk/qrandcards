@@ -370,8 +370,8 @@ function BioData() {
                 <li>
                   <img src={whatsappImage} alt="Phone" className="inline w-5 h-5 mr-2" />
                   <a
-                    href={`https://api.whatsapp.com/send?phone=+91${formData.phone}`}
-                    data-url={`https://api.whatsapp.com/send?phone=+91${formData.phone}`}
+                    href={`https://api.whatsapp.com/send?phone=${formData.phone}`}
+                    data-url={`https://api.whatsapp.com/send?phone=${formData.phone}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 underline"
@@ -652,7 +652,7 @@ function BioData() {
         <div className="mb-4">
           <label className="block mb-2">Referal Code (Optional)</label>
           <input
-            type="text"
+            type="number"
             name="referal"
             value={formData.referal}
             onChange={handleInputChange}

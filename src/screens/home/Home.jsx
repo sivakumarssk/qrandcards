@@ -19,6 +19,7 @@ import CardsAbout from "../../components/home/CardsAbout";
 import BussinessCards from "../../components/home/BussinessCards";
 import Resume from "../../components/home/Resume";
 import BioData from "../../components/home/BioData";
+import InvitationHome from "../../components/home/InvitationHome";
 
 function Home() {
   React.useEffect(() => {
@@ -47,6 +48,7 @@ function Home() {
 
       <Resume/>
       <BioData/>
+      <InvitationHome/>
 
       <Testimonials/>
 
