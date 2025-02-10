@@ -509,6 +509,8 @@ function PersonalCards() {
 
         <div className="mt-4 mb-4">
           <p className="text-center"><span className="font-semibold">Note</span> -you can convert your pdf to QR</p>
+          <p className="text-center">By Using Our QR Generator</p>
+        
         </div>
       </div>
     );
@@ -606,12 +608,13 @@ function PersonalCards() {
             name="address"
             value={formData.address}
             onChange={handleInputChange}
+            placeholder="Location Link"
             className="w-full border p-2 rounded"
           />
         </div>
 
         <div className="mb-4">
-          <label className="block mb-2">Referal Mail  (Optional)</label>
+          <label className="block mb-2">Referal Code (Optional)</label>
           <input
             type="text"
             name="referal"
@@ -650,7 +653,7 @@ function PersonalCards() {
               <span className="w-1/3">{link.platform}</span>
               <input
                 type="text"
-                placeholder="Link"
+                placeholder="Upi Id"
                 value={link.link}
                 onChange={(e) =>
                   setFormData({

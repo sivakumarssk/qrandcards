@@ -4,6 +4,9 @@ import { jsPDF } from "jspdf";
 import getCroppedImg from "./cropImage.js";
 import Cropper from "react-easy-crop";
 import axios from "axios";
+import AddressIcon from "../../../assets/socialmedia/address.png";
+import whatsappImage from "../../../assets/qrimages/whatsapp.png";
+
 
 function Invitation() {
   const [formData, setFormData] = useState({
@@ -17,7 +20,7 @@ function Invitation() {
     venue: "",
     address: "",
     regards: "",
-    referal:"",
+    referal: "",
   });
   const [previewMode, setPreviewMode] = useState(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -26,7 +29,7 @@ function Invitation() {
   const [imageSrc, setImageSrc] = useState(null);
   const [showCropModal, setShowCropModal] = useState(false);
   const [prices, setPrices] = useState(null);
-  
+
   // New states for backgrounds
   const [backgrounds, setBackgrounds] = useState([]);
   const [selectedBackground, setSelectedBackground] = useState(null);
@@ -87,7 +90,7 @@ function Invitation() {
   }, []);
 
   console.log(backgrounds, "back");
-  
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
@@ -291,9 +294,11 @@ function Invitation() {
             <div className="border p-4 rounded mb-4 bg-white bg-opacity-80">
               {formData.phone && (
                 <div className="mb-2 flex items-center">
+                  <img src={whatsappImage} alt="Phone" className="inline w-5 h-5 mr-2" />
+
                   <span className="mr-2">WhatsApp:</span>
                   <a
-                    href={`https://api.whatsapp.com/send?phone=${formData.phone}`}
+                    href={`https://api.whatsapp.com/send?phone=+91${formData.phone}`}
                     data-url={`https://api.whatsapp.com/send?phone=${formData.phone}`}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -305,12 +310,22 @@ function Invitation() {
               )}
               {formData.venue && (
                 <div className="mb-2 flex items-center">
+                  <img
+                    src={AddressIcon}
+                    alt="Address"
+                    className="inline w-5 h-5 mr-2"
+                  />
                   <span className="mr-2">Venue:</span>
                   <span>{formData.venue}</span>
                 </div>
               )}
               {formData.address && (
                 <div className="mb-2 flex items-center">
+                  <img
+                    src={AddressIcon}
+                    alt="Address"
+                    className="inline w-5 h-5 mr-2"
+                  />
                   <span className="mr-2">Location:</span>
                   <a
                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
@@ -361,6 +376,7 @@ function Invitation() {
           <p className="text-center">
             <span className="font-semibold">Note</span> - you can convert your PDF to QR
           </p>
+          <p className="text-center">By Using Our QR Generator</p>
         </div>
       </div>
     );
@@ -463,6 +479,7 @@ function Invitation() {
             name="address"
             value={formData.address}
             onChange={handleInputChange}
+            placeholder="Link"
             className="w-full border p-2 rounded"
           />
         </div>
@@ -479,7 +496,7 @@ function Invitation() {
         </div>
 
         <div className="mb-4">
-          <label className="block mb-2">Referal Mail  (Optional)</label>
+          <label className="block mb-2">Referal Code  (Optional)</label>
           <input
             type="text"
             name="referal"
@@ -499,11 +516,10 @@ function Invitation() {
                   key={index}
                   src={`https://admin.qrandcards.com${bg}`}
                   alt={`Background ${index + 1}`}
-                  className={`w-20 h-20 object-cover rounded cursor-pointer border ${
-                    selectedBackground === `https://admin.qrandcards.com${bg}`
-                      ? "border-blue-800"
-                      : "border-gray-200"
-                  }`}
+                  className={`w-20 h-20 object-cover rounded cursor-pointer border ${selectedBackground === `https://admin.qrandcards.com${bg}`
+                    ? "border-blue-800"
+                    : "border-gray-200"
+                    }`}
                   onClick={() => setSelectedBackground(`https://admin.qrandcards.com${bg}`)}
                 />
               ))}

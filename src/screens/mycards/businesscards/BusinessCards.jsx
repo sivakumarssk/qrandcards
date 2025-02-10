@@ -366,13 +366,17 @@ function BusinessCards() {
               {formData.phone && (
                 <li>
                   <img src={PhoneIcon} alt="Phone" className="inline w-5 h-5 mr-2" />
-                  {formData.phone}
+                  <a href={`tel:${formData.phone}`} className="text-blue-500 underline">
+                    {formData.phone}
+                  </a>
                 </li>
               )}
               {formData.email && (
                 <li>
                   <img src={EmailIcon} alt="Email" className="inline w-5 h-5 mr-2" />
-                  {formData.email}
+                  <a href={`mailto:${formData.email}`} className="text-blue-500 underline">
+                    {formData.email}
+                  </a>
                 </li>
               )}
               {formData.address && (
@@ -382,7 +386,19 @@ function BusinessCards() {
                     alt="Address"
                     className="inline w-5 h-5 mr-2"
                   />
-                  {formData.address}
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                      formData.address
+                    )}`}
+                    data-url={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                      formData.address
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 underline"
+                  >
+                    {formData.address}
+                  </a>
                 </li>
               )}
             </ul>
@@ -529,6 +545,7 @@ function BusinessCards() {
 
         <div className="mt-4 mb-4">
           <p className="text-center"><span className="font-semibold">Note</span> -you can convert your pdf to QR</p>
+          <p className="text-center">By Using Our QR Generator</p>
         </div>
       </div>
     );
@@ -636,6 +653,7 @@ function BusinessCards() {
           <input
             type="text"
             name="address"
+            placeholder="Link"
             value={formData.address}
             onChange={handleInputChange}
             className="w-full border p-2 rounded"
@@ -670,7 +688,7 @@ function BusinessCards() {
               <span className="w-1/3">{link.platform}</span>
               <input
                 type="text"
-                placeholder="Link"
+                placeholder="Upi Id"
                 value={link.link}
                 onChange={(e) =>
                   setFormData({
@@ -708,7 +726,7 @@ function BusinessCards() {
         </div>
 
         <div className="mb-4">
-          <label className="block mb-2">Referal Mail  (Optional)</label>
+          <label className="block mb-2">Referal Code  (Optional)</label>
           <input
             type="text"
             name="referal"

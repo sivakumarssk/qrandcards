@@ -7,6 +7,8 @@ import InstagramIcon from "../../../assets/socialmedia/instagram.png";
 import PhoneIcon from "../../../assets/socialmedia/phone.png";
 import EmailIcon from "../../../assets/socialmedia/email.png";
 import AddressIcon from "../../../assets/socialmedia/address.png";
+import whatsappImage from "../../../assets/qrimages/whatsapp.png";
+
 import Cropper from "react-easy-crop";
 import axios from "axios";
 
@@ -366,14 +368,24 @@ function BioData() {
             <ul className="border p-4 rounded-b-lg space-y-2">
               {formData.phone && (
                 <li>
-                  <img src={PhoneIcon} alt="Phone" className="inline w-5 h-5 mr-2" />
-                  {formData.phone}
+                  <img src={whatsappImage} alt="Phone" className="inline w-5 h-5 mr-2" />
+                  <a
+                    href={`https://api.whatsapp.com/send?phone=+91${formData.phone}`}
+                    data-url={`https://api.whatsapp.com/send?phone=+91${formData.phone}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 underline"
+                  >
+                    {formData.phone}
+                  </a>
                 </li>
               )}
               {formData.email && (
                 <li>
                   <img src={EmailIcon} alt="Email" className="inline w-5 h-5 mr-2" />
-                  {formData.email}
+                  <a href={`mailto:${formData.email}`} className="text-blue-500 underline">
+                    {formData.email}
+                  </a>
                 </li>
               )}
               {formData.address && (
@@ -383,7 +395,19 @@ function BioData() {
                     alt="Address"
                     className="inline w-5 h-5 mr-2"
                   />
-                  {formData.address}
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                      formData.address
+                    )}`}
+                    data-url={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                      formData.address
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 underline"
+                  >
+                    {formData.address}
+                  </a>
                 </li>
               )}
             </ul>
@@ -620,12 +644,13 @@ function BioData() {
             name="address"
             value={formData.address}
             onChange={handleInputChange}
+            placeholder="Link"
             className="w-full border p-2 rounded"
           />
         </div>
 
         <div className="mb-4">
-          <label className="block mb-2">Referal Mail (Optional)</label>
+          <label className="block mb-2">Referal Code (Optional)</label>
           <input
             type="text"
             name="referal"

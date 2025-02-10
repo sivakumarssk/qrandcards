@@ -306,6 +306,14 @@ function Navbar() {
                   Bio Data
                 </NavLink>
               </li>
+              <li>
+                <NavLink
+                  to="/mycards/invitation"
+                  className="block px-4 py-2 text-sm hover:bg-blue-100 transition"
+                >
+                  Invitation Cards
+                </NavLink>
+              </li>
             </ul>
           </div>
           
