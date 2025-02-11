@@ -8,6 +8,7 @@ const QRForm = ({ activeType, onSubmit }) => {
   const [imageFile, setImageFile] = useState(null);
   const [pdfFile, setPdfFile] = useState(null);
   const navigate = useNavigate();
+  const [loading,setLoading] = useState(false)
 
   useEffect(() => {
     setFormData({});
@@ -43,17 +44,20 @@ const QRForm = ({ activeType, onSubmit }) => {
     }
 
     try {
+      setLoading(true)
       const response = await axios.post("https://admin.qrandcards.com/api/qrfiles", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       if (response) {
         alert(`${type} uploaded successfully`);
         setFormData((prev) => ({ ...prev, url: response?.data?.url }))
+        setLoading(false)
         console.log(response.data);
       }
     } catch (error) {
       console.error("Upload failed", error);
       alert(`${type} upload failed`);
+      setLoading(false)
     }
   };
 
@@ -138,6 +142,15 @@ const QRForm = ({ activeType, onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if(loading){
+      return;
+    } 
+    if(activeType ==='image' || activeType ==='pdf'){
+      if(!imageFile || !pdfFile){
+        alert(`Please select a ${type} file to upload.`);
+        return
+      }
+    }
     const token = localStorage.getItem("token");
 
     if (!token) {

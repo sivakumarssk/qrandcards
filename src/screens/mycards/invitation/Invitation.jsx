@@ -6,6 +6,7 @@ import Cropper from "react-easy-crop";
 import axios from "axios";
 import AddressIcon from "../../../assets/socialmedia/address.png";
 import whatsappImage from "../../../assets/qrimages/whatsapp.png";
+import { useNavigate } from "react-router-dom";
 
 
 function Invitation() {
@@ -20,6 +21,7 @@ function Invitation() {
     venue: "",
     address: "",
     regards: "",
+    gallery: [],
     referal: "",
   });
   const [previewMode, setPreviewMode] = useState(false);
@@ -33,6 +35,8 @@ function Invitation() {
   // New states for backgrounds
   const [backgrounds, setBackgrounds] = useState([]);
   const [selectedBackground, setSelectedBackground] = useState(null);
+  const navigate = useNavigate();
+
 
   const fetchCardsBackground = async () => {
     try {
@@ -96,6 +100,11 @@ function Invitation() {
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
+  const handleMultipleFileChange = (e, key) => {
+    const files = Array.from(e.target.files);
+    setFormData({ ...formData, [key]: [...formData[key], ...files] });
+  };
+
   // Handle file input for profile image
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -136,46 +145,77 @@ function Invitation() {
     const pdf = new jsPDF("p", "mm", "a4");
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
-    // Set a fixed top margin (e.g., 10 mm)
-    const marginY = 10;
-    const cardElement = document.getElementById("invitation-card");
-
-    if (cardElement) {
-      // Use a defined scale for html2canvas for good quality
-      const html2canvasScale = 3;
-      const canvas = await html2canvas(cardElement, { useCORS: true, scale: html2canvasScale });
-      const imgData = canvas.toDataURL("image/png");
-      // Calculate the height of the card in PDF dimensions based on available width (with 10 mm margin on each side)
-      const cardHeight = (canvas.height / canvas.width) * (pdfWidth - 20);
-      // Instead of centering vertically, we use our fixed marginY.
-      pdf.addImage(imgData, "PNG", 10, marginY, pdfWidth - 20, cardHeight);
-
-      // Compute scaleFactor (mm per canvas pixel)
-      const scaleFactor = (pdfWidth - 20) / canvas.width;
-      const cardRect = cardElement.getBoundingClientRect();
-      // For each clickable element with a data-url attribute, add a link annotation.
-      const clickableElements = cardElement.querySelectorAll("[data-url]");
-      clickableElements.forEach((elem) => {
-        const elemRect = elem.getBoundingClientRect();
-        // Convert DOM coordinates to PDF coordinates using the fixed marginY.
-        const x = 10 + ((elemRect.left - cardRect.left) * html2canvasScale) * scaleFactor;
-        const y = marginY + ((elemRect.top - cardRect.top) * html2canvasScale) * scaleFactor;
-        const width = (elemRect.width * html2canvasScale) * scaleFactor;
-        const height = (elemRect.height * html2canvasScale) * scaleFactor;
-        const url = elem.getAttribute("data-url");
-        if (url) {
-          pdf.link(x, y, width, height, { url });
-        }
+    let currentY = 10; // Start position for content
+  
+    // 🖼️ Load and apply background image (if selected)
+    let bgImage = null;
+    if (selectedBackground) {
+      bgImage = new Image();
+      bgImage.src = selectedBackground;
+      await new Promise((resolve) => {
+        bgImage.onload = resolve;
       });
     }
-
+  
+    // 🟢 Apply background to the first page
+    if (bgImage) {
+      pdf.addImage(bgImage, "PNG", 0, 0, pdfWidth, pdfHeight);
+    }
+  
+    // Function to capture each section and add it to the PDF
+    const addSectionToPDF = async (sectionId) => {
+      const sectionElement = document.getElementById(sectionId);
+      if (!sectionElement) return;
+  
+      const canvas = await html2canvas(sectionElement, {
+        useCORS: true,
+        scale: 3,
+        backgroundColor: null, // Keep section transparent
+      });
+  
+      const imgData = canvas.toDataURL("image/png");
+      const sectionHeight = (canvas.height / canvas.width) * pdfWidth;
+  
+      // 🟢 Check if the section fits on the current page
+      if (currentY + sectionHeight > pdfHeight - 10) {
+        pdf.addPage();
+        currentY = 10;
+  
+        // 🟢 Apply background image on new page
+        if (bgImage) {
+          pdf.addImage(bgImage, "PNG", 0, 0, pdfWidth, pdfHeight);
+        }
+      }
+  
+      pdf.addImage(imgData, "PNG", 10, currentY, pdfWidth - 20, sectionHeight);
+      currentY += sectionHeight + 10;
+    };
+  
+    // 🟢 List of Sections to Add to PDF
+    const sections = [
+      "foreground-section",
+      "gallery-section",
+    ];
+  
+    // 🟢 Render each section in the PDF
+    for (const sectionId of sections) {
+      await addSectionToPDF(sectionId);
+    }
+  
+    // 🟢 Save the PDF
     const fileName = formData.name
       ? `${formData.name.replace(/\s+/g, "_")}_Invitation.pdf`
       : "Invitation.pdf";
     pdf.save(fileName);
+  
+    // ✅ Handle referral after download
     handleReferal();
-    updateBioDataCount();
   };
+  
+  
+  
+  
+  
 
   // Update backend count after PDF generation
   const updateBioDataCount = async () => {
@@ -195,41 +235,63 @@ function Invitation() {
   };
 
   // Payment handler (uses Razorpay) before PDF download
-  const handlePDFPayment = () => {
-    const options = {
-      key: "rzp_live_HJLLQQPlyQFOGr",
-      razorpay_secret: "cm2v1OSggPZ5vVHX5rl3jrq4",
-      amount: (prices?.dicountpriceInvitation || 185) * 100, // Price in paise
-      currency: "INR",
-      name: "Personal Visiting Card",
-      description: "Download PDF",
-      handler: function (response) {
-        handleDownloadPDF();
-        updateBioDataCount();
-        alert("Payment successful! Your PDF will be downloaded.");
-      },
-      modal: {
-        ondismiss: function () {
-          alert("Payment cancelled.");
+  const handlePDFPayment = async () => {
+    const token = localStorage.getItem("token");
+  
+    if (!token) {
+      navigate("/signin");
+      return;
+    }
+  
+    try {
+      // Fetch order ID from backend
+      const response = await axios.post("https://admin.qrandcards.com/api/create-order", {
+        amount: prices?.dicountpriceInvitation || 185,
+        currency: "INR",
+      });
+  
+      const { orderId, amount } = response.data;
+  
+      // Razorpay payment options
+      const options = {
+        key: "rzp_live_HJLLQQPlyQFOGr",
+        amount: amount, // Amount from backend
+        currency: "INR",
+        name: "Personal Visiting Card",
+        description: "Download PDF",
+        order_id: orderId, // Use order ID from backend
+        handler: function (paymentResponse) {
+          handleDownloadPDF();
+          updateBioDataCount();
+          alert("Payment successful! Your PDF will be downloaded.");
+        },
+        modal: {
+          ondismiss: function () {
+            alert("Payment cancelled.");
+          }
+        },
+        prefill: {
+          name: "John Doe",
+          email: "johndoe@example.com",
+          contact: "9876543210"
+        },
+        theme: {
+          color: "#3399cc"
         }
-      },
-      prefill: {
-        name: "John Doe",
-        email: "johndoe@example.com",
-        contact: "9876543210"
-      },
-      theme: {
-        color: "#3399cc"
-      }
-    };
-
-    const rzp = new window.Razorpay(options);
-    rzp.on("payment.failed", function (response) {
-      alert("Payment failed. Please try again.");
-      console.error(response.error);
-    });
-    rzp.open();
+      };
+  
+      const rzp = new window.Razorpay(options);
+      rzp.on("payment.failed", function (response) {
+        alert("Payment failed. Please try again.");
+        console.error(response.error);
+      });
+      rzp.open();
+    } catch (error) {
+      console.error("Error creating Razorpay order:", error);
+      alert("Payment initiation failed. Please try again.");
+    }
   };
+  
 
   if (previewMode) {
     return (
@@ -246,11 +308,11 @@ function Invitation() {
           }}
         >
           {/* Overlay to ensure content visibility */}
-          <div className="absolute inset-0 bg-white opacity-70 pointer-events-none"></div>
+          {/* <div className="absolute inset-0 bg-white opacity-70 pointer-events-none"></div> */}
 
           {/* Background Watermark (if any) */}
           {formData.occasion && (
-            <div className="absolute inset-0 flex justify-center items-center pointer-events-none">
+            <div id ="Background-Watermark" className="absolute inset-0 flex justify-center items-center pointer-events-none">
               <span
                 className="text-6xl font-bold text-center"
                 style={{ color: "rgba(0, 0, 0, 0.1)" }}
@@ -261,7 +323,7 @@ function Invitation() {
           )}
 
           {/* Foreground Content */}
-          <div className="relative">
+          <div className="relative mt-6" id="foreground-section">
             <div className="flex justify-center mb-4">
               {formData.croppedProfileImage ? (
                 <img
@@ -291,7 +353,7 @@ function Invitation() {
               <p className="mb-2 text-center">Date/Time: {formData.dob}</p>
             )}
             {/* Contact Details Box */}
-            <div className="border p-4 rounded mb-4 bg-white bg-opacity-80">
+            <div className="border p-4 rounded my-4 mt-6 bg-white bg-opacity-80">
               {formData.phone && (
                 <div className="mb-2 flex items-center">
                   <img src={whatsappImage} alt="Phone" className="inline w-5 h-5 mr-2" />
@@ -347,6 +409,23 @@ function Invitation() {
               )}
             </div>
           </div>
+
+           {/* Gallery */}
+           {formData.gallery.length > 0 && (
+            <div className="mb-6" id="gallery-section">
+              <div className="border p-4 rounded-b-lg grid grid-cols-4 gap-4 justify-items-center">
+                {formData.gallery.map((file, index) => (
+                  <img
+                    key={index}
+                    src={URL.createObjectURL(file)}
+                    alt="Gallery"
+                    className="w-24 h-24 object-cover rounded-lg"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+          
         </div>
 
         {/* Action Buttons */}
@@ -365,7 +444,7 @@ function Invitation() {
             </div>
             <button
               className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition ml-4"
-              onClick={handlePDFPayment}
+              onClick={handleDownloadPDF}
             >
               Pay ₹{prices?.dicountpriceInvitation || 185} to Download PDF
             </button>
@@ -492,6 +571,16 @@ function Invitation() {
             value={formData.regards}
             onChange={handleInputChange}
             className="w-full border p-2 rounded"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Images/Friends</label>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => handleMultipleFileChange(e, "gallery")}
           />
         </div>
 

@@ -15,6 +15,7 @@ const QRGenerator = () => {
   const [showWatermark, setShowWatermark] = useState(true);
   const [isPaymentComplete, setIsPaymentComplete] = useState(false);
   const [prices, setPrices] = useState(null);
+  
 
   const qrCodeRef = useRef(null);
 
@@ -92,10 +93,10 @@ const QRGenerator = () => {
         value = `https://admin.qrandcards.com/api/app?ios=${data.appappStore || "#"}&android=${data.appplayStore || "#"}`;
         break;
       case "image":
-        value = `https://admin.qrandcards.com/api${data.url}`;
+        value = `https://admin.qrandcards.com${data.url}`;
         break;
       case "pdf":
-        value = `https://admin.qrandcards.com/api${data.url}`;
+        value = `https://admin.qrandcards.com${data.url}`;
         break;
       default:
         value = "";
@@ -217,49 +218,63 @@ const QRGenerator = () => {
     }
   };
 
-  const handlePayment = () => {
-    const options = {
-      key: "rzp_live_HJLLQQPlyQFOGr",
-      razorpay_secret: "cm2v1OSggPZ5vVHX5rl3jrq4",
-      amount: (prices?.dicountpriceQR || 37) * 100, // Convert to smallest currency unit (paise)
-      currency: "INR",
-      name: "QR Code Generator",
-      description: "Remove Watermark",
-      handler: function (response) {
-        // Payment was successful
-        setShowWatermark(false);
-        setIsPaymentComplete(true);
-        alert("Payment successful! Watermark removed.");
-        updateQRCodeCount();
-      },
-      modal: {
-        ondismiss: function () {
-          // This function is called when the user closes the Razorpay payment popup.
-          alert("Payment cancelled.");
+  const handlePayment = async () => {
+    const token = localStorage.getItem("token");
+  
+    if (!token) {
+      navigate("/signin");
+      return;
+    }
+  
+    try {
+      // Fetch order ID from backend
+      const response = await axios.post("https://admin.qrandcards.com/api/create-order", {
+        amount: prices?.dicountpriceQR || 37,
+        currency: "INR",
+      });
+  
+      const { orderId, amount } = response.data;
+  
+      // Razorpay payment options
+      const options = {
+        key: "rzp_live_HJLLQQPlyQFOGr",
+        amount: amount, // Amount from backend
+        currency: "INR",
+        name: "Personal Visiting Card",
+        description: "Download PDF",
+        order_id: orderId, // Use order ID from backend
+        handler: function (paymentResponse) {
+          setShowWatermark(false);
+          setIsPaymentComplete(true);
+          alert("Payment successful! Watermark removed.");
+          updateQRCodeCount();
         },
-      },
-      prefill: {
-        name: "John Doe",
-        email: "johndoe@example.com",
-        contact: "9876543210",
-      },
-      theme: {
-        color: "#3399cc",
-      },
-    };
-
-    const rzp = new window.Razorpay(options);
-
-    // Handle Razorpay instance errors
-    rzp.on("payment.failed", function (response) {
-      alert("Payment failed. Please try again.");
-      console.error(response.error);
-    });
-
-    // Open the Razorpay payment window
-    rzp.open();
+        modal: {
+          ondismiss: function () {
+            alert("Payment cancelled.");
+          }
+        },
+        prefill: {
+          name: "John Doe",
+          email: "johndoe@example.com",
+          contact: "9876543210"
+        },
+        theme: {
+          color: "#3399cc"
+        }
+      };
+  
+      const rzp = new window.Razorpay(options);
+      rzp.on("payment.failed", function (response) {
+        alert("Payment failed. Please try again.");
+        console.error(response.error);
+      });
+      rzp.open();
+    } catch (error) {
+      console.error("Error creating Razorpay order:", error);
+      alert("Payment initiation failed. Please try again.");
+    }
   };
-
 
   return (
     <div className="py-8 px-4 mt-[4%] bg-gray-100 min-h-screen">
@@ -294,8 +309,8 @@ const QRGenerator = () => {
                 src: logoUrl,
                 x: undefined,
                 y: undefined,
-                height: 45,
-                width: 45,
+                height: 35,
+                width: 35,
                 excavate: true,
               }}
             />

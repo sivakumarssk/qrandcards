@@ -11,6 +11,7 @@ import whatsappImage from "../../../assets/qrimages/whatsapp.png";
 
 import Cropper from "react-easy-crop";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function BioData() {
   const [formData, setFormData] = useState({
@@ -45,6 +46,8 @@ function BioData() {
   const [prices, setPrices] = useState(null);
   const [backgrounds, setBackgrounds] = useState([]);
   const [selectedBackground, setSelectedBackground] = useState(null);
+  const navigate = useNavigate();
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -235,45 +238,61 @@ function BioData() {
     }
   };
 
-  const handlePDFPayment = () => {
-    const options = {
-      key: "rzp_live_HJLLQQPlyQFOGr",
-      razorpay_secret: "cm2v1OSggPZ5vVHX5rl3jrq4",
-      amount: (prices?.dicountpriceBio || 185) * 100, // Discounted price in paise
-      currency: "INR",
-      name: "Personal Visiting Card",
-      description: "Download PDF",
-      handler: function (response) {
-        // Payment successful
-        handleDownloadPDF();
-        updateBioDataCount();
-        alert("Payment successful! Your PDF will be downloaded.");
-      },
-      modal: {
-        ondismiss: function () {
-          // Payment popup closed by the user
-          alert("Payment cancelled.");
+  const handlePDFPayment = async () => {
+    const token = localStorage.getItem("token");
+  
+    if (!token) {
+      navigate("/signin");
+      return;
+    }
+  
+    try {
+      // Fetch order ID from backend
+      const response = await axios.post("https://admin.qrandcards.com/api/create-order", {
+        amount: prices?.dicountpriceInvitation || 185,
+        currency: "INR",
+      });
+  
+      const { orderId, amount } = response.data;
+  
+      // Razorpay payment options
+      const options = {
+        key: "rzp_live_HJLLQQPlyQFOGr",
+        amount: amount, // Amount from backend
+        currency: "INR",
+        name: "Personal Visiting Card",
+        description: "Download PDF",
+        order_id: orderId, // Use order ID from backend
+        handler: function (paymentResponse) {
+          handleDownloadPDF();
+          updateBioDataCount();
+          alert("Payment successful! Your PDF will be downloaded.");
         },
-      },
-      prefill: {
-        name: "John Doe",
-        email: "johndoe@example.com",
-        contact: "9876543210",
-      },
-      theme: {
-        color: "#3399cc",
-      },
-    };
-
-    const rzp = new window.Razorpay(options);
-
-    rzp.on("payment.failed", function (response) {
-      // Handle payment failure
-      alert("Payment failed. Please try again.");
-      console.error(response.error);
-    });
-
-    rzp.open(); // Open Razorpay payment popup
+        modal: {
+          ondismiss: function () {
+            alert("Payment cancelled.");
+          }
+        },
+        prefill: {
+          name: "John Doe",
+          email: "johndoe@example.com",
+          contact: "9876543210"
+        },
+        theme: {
+          color: "#3399cc"
+        }
+      };
+  
+      const rzp = new window.Razorpay(options);
+      rzp.on("payment.failed", function (response) {
+        alert("Payment failed. Please try again.");
+        console.error(response.error);
+      });
+      rzp.open();
+    } catch (error) {
+      console.error("Error creating Razorpay order:", error);
+      alert("Payment initiation failed. Please try again.");
+    }
   };
 
   console.log(prices,'prices');
