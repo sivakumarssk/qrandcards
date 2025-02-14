@@ -1,42 +1,122 @@
 import React, { useCallback, useEffect, useState } from "react";
-import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
+import axios from "axios";
+import Cropper from "react-easy-crop";
 import getCroppedImg from "./cropImage.js";
-import FacebookIcon from "../../../assets/socialmedia/facebook.png";
-import InstagramIcon from "../../../assets/socialmedia/instagram.png";
-import PhoneIcon from "../../../assets/socialmedia/phone.png";
-import EmailIcon from "../../../assets/socialmedia/email.png";
+import { useNavigate } from "react-router-dom";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
 import AddressIcon from "../../../assets/socialmedia/address.png";
 import whatsappImage from "../../../assets/qrimages/whatsapp.png";
+import EmailIcon from "../../../assets/socialmedia/email.png";
+import FacebookIcon from "../../../assets/socialmedia/facebook.png";
+import InstagramIcon from "../../../assets/socialmedia/instagram.png";
 
-import Cropper from "react-easy-crop";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+pdfMake.vfs = pdfFonts.vfs;
+
+// === Helpers ===
+
+// Convert an image URL (or blob URL) to a data URL.
+const getBase64FromUrl = async (url) => {
+  const data = await fetch(url);
+  const blob = await data.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = reject;
+  });
+};
+
+// Convert a File object to a data URL.
+const getBase64FromFile = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
+};
+
+// If source is already a data URL, return it; otherwise, convert.
+const convertToDataURL = async (source) => {
+  if (typeof source === "string" && source.startsWith("data:")) {
+    return source;
+  }
+  try {
+    return await getBase64FromUrl(source);
+  } catch (e) {
+    console.error("Error converting image:", source, e);
+    return source;
+  }
+};
+
+// Create a circular image (used for the profile) via canvas.
+const makeImageCircular = async (dataUrl, size = 96, borderWidth = 4, borderColor = "#d1d5db", padding = 4) => {
+  const scaleFactor = 2;
+  const canvas = document.createElement("canvas");
+  canvas.width = size * scaleFactor;
+  canvas.height = size * scaleFactor;
+  const ctx = canvas.getContext("2d");
+
+  ctx.scale(scaleFactor, scaleFactor);
+  const centerX = size / 2;
+  const centerY = size / 2;
+  const innerRadius = (size - borderWidth - 2 * padding) / 2;
+
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, innerRadius + borderWidth / 2, 0, Math.PI * 2, false);
+  ctx.fillStyle = borderColor;
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2, false);
+  ctx.clip();
+
+  const img = new Image();
+  img.src = dataUrl;
+  await new Promise((resolve) => { img.onload = resolve; });
+  ctx.drawImage(img, padding, padding, size - 2 * padding, size - 2 * padding);
+  return canvas.toDataURL();
+};
+
+// Helper: Group an array of items into rows of a given count.
+const groupIntoRows = (items, count = 4) => {
+  const rows = [];
+  for (let i = 0; i < items.length; i += count) {
+    let row = items.slice(i, i + count);
+    while (row.length < count) row.push({ text: "" });
+    rows.push({
+      columns: row,
+      columnGap: 10,
+      margin: [0, 5, 0, 5],
+    });
+  }
+  return rows;
+};
 
 function BioData() {
   const [formData, setFormData] = useState({
     name: "",
-    profileImage: null,
-    croppedProfileImage: null,
     education: "",
-    profession:"",
+    profession: "",
     dob: "",
-    height:"",
+    height: "",
     nativeplace: "",
-    caste:"",
-    familydetails:"",
-    hobbies:"",
+    caste: "",
+    familydetails: "",
+    hobbies: "",
     phone: "",
     email: "",
     address: "",
-    referal:"",
+    referal: "",
     socialLinks: [
       { platform: "Facebook", link: "" },
       { platform: "Instagram", link: "" },
     ],
     gallery: [],
+    profileImage: null,
+    croppedProfileImage: null,
   });
-
   const [previewMode, setPreviewMode] = useState(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -48,10 +128,23 @@ function BioData() {
   const [selectedBackground, setSelectedBackground] = useState(null);
   const navigate = useNavigate();
 
+  // Social icons mapping
+  const socialIcons = {
+    Facebook: FacebookIcon,
+    Instagram: InstagramIcon,
+  };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  // -------------------- Fetching Data --------------------
+  const fetchPrices = async () => {
+    try {
+      const response = await axios.get("https://admin.qrandcards.com/api/getPrice");
+      if (response.data) {
+        const { totalpriceBio, dicountpriceBio } = response.data;
+        setPrices({ totalpriceBio, dicountpriceBio });
+      }
+    } catch (error) {
+      console.error("Error fetching price data:", error);
+    }
   };
 
   const fetchCardsBackground = async () => {
@@ -63,6 +156,346 @@ function BioData() {
     } catch (error) {
       console.error("Error fetching cards background:", error);
     }
+  };
+
+  useEffect(() => {
+    fetchPrices();
+    fetchCardsBackground();
+  }, []);
+
+  // -------------------- Input Handlers --------------------
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleMultipleFileChange = (e, key) => {
+    const files = Array.from(e.target.files);
+    setFormData((prev) => ({ ...prev, [key]: [...prev[key], ...files] }));
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImageSrc(reader.result);
+      setShowCropModal(true);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // -------------------- Cropper --------------------
+  const onCropComplete = useCallback((_, croppedAreaPixels) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
+
+  const handleCrop = async () => {
+    try {
+      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
+      setFormData((prev) => ({ ...prev, croppedProfileImage: croppedImage }));
+      setShowCropModal(false);
+    } catch (error) {
+      console.error("Cropping error:", error);
+    }
+  };
+
+  const handlePreview = () => {
+    setPreviewMode(true);
+  };
+
+  // -------------------- PDF Generation with pdfMake --------------------
+  // Build a document definition that mimics your Resume component style.
+  // Only the value part of contact and social links will be clickable.
+  const handleDownloadPDF = async () => {
+    let bgDataUrl = null;
+    if (selectedBackground) {
+      try {
+        bgDataUrl = await getBase64FromUrl(selectedBackground);
+      } catch (error) {
+        console.error("Error converting background image:", error);
+      }
+    }
+    // Process gallery images into rows of 4.
+    let galleryItems = [];
+    if (formData.gallery && formData.gallery.length > 0) {
+      galleryItems = await Promise.all(
+        formData.gallery.map(async (file) => ({
+          image: await getBase64FromFile(file),
+          width: 120,
+          height: 120,
+          alignment: "center",
+        }))
+      );
+    }
+    const galleryRows = groupIntoRows(galleryItems, 4);
+
+    // Process profile image.
+    let profileImageObj = null;
+    if (formData.croppedProfileImage) {
+      const profileDataUrl = await convertToDataURL(formData.croppedProfileImage);
+      const circularProfile = await makeImageCircular(profileDataUrl, 96, 4, "#d1d5db", 4);
+      profileImageObj = {
+        image: circularProfile,
+        width: 96,
+        height: 96,
+        alignment: "center",
+        margin: [0, 20, 0, 20],
+      };
+    }
+
+// Build Contact Details with only the value clickable.
+const contactDetails = [];
+if (formData.phone) {
+  contactDetails.push({
+    columns: [
+      { image: await convertToDataURL(whatsappImage), width: 20, height: 20, margin: [0,0,0,0] },
+      {
+        text: [
+          { text: "WhatsApp: ", color: "black" },
+          { text: formData.phone, link: `https://api.whatsapp.com/send?phone=${formData.phone}`, color: "blue" }
+        ],
+        margin: [0,0,0,0]
+      }
+    ],
+    columnGap: 0,
+    margin: [0,0,0,0]
+  });
+}
+if (formData.email) {
+  contactDetails.push({
+    columns: [
+      { image: await convertToDataURL(EmailIcon), width: 20, height: 20, margin: [0,0,0,0] },
+      {
+        text: [
+          { text: "Email: ", color: "black" },
+          { text: formData.email, link: `mailto:${formData.email}`, color: "blue" }
+        ],
+        margin: [0,0,0,0]
+      }
+    ],
+    columnGap: 0,
+    margin: [0,0,0,0]
+  });
+}
+if (formData.address) {
+  contactDetails.push({
+    columns: [
+      { image: await convertToDataURL(AddressIcon), width: 20, height: 20, margin: [0,0,0,0] },
+      {
+        text: [
+          { text: "Address: ", color: "black" },
+          { text: formData.address, link: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(formData.address)}`, color: "blue" }
+        ],
+        margin: [0,0,0,0]
+      }
+    ],
+    columnGap: 0,
+    margin: [0,0,0,0]
+  });
+}
+
+// Build Social Links with only the value clickable.
+const socialItems = await Promise.all(
+  formData.socialLinks
+    .filter((s) => s.link)
+    .map(async (s) => {
+      const iconDataUrl = await convertToDataURL(
+        s.platform === "Facebook" ? FacebookIcon : InstagramIcon
+      );
+      return {
+        columns: [
+          { image: iconDataUrl, width: 20, height: 20, margin: [0,0,0,0] },
+          {
+            text: [
+              { text: `${s.platform}: `, color: "black" },
+              { text: s.link, link: s.link, color: "blue" }
+            ],
+            margin: [0,0,0,0]
+          }
+        ],
+        columnGap: 0,
+        margin: [0,0,0,0]
+      };
+    })
+);
+
+    const docDefinition = {
+      content: [
+        profileImageObj,
+        { text: formData.name, style: "header", alignment: "center" },
+        { text: `DOB: ${formData.dob}`, style: "subheader", alignment: "center" },
+        {
+          table: {
+            widths: ["*"],
+            body: [
+              [{ text: "Education", style: "sectionTitle" }],
+              [{ text: formData.education, style: "sectionContent" }],
+            ],
+          },
+          layout: "lightHorizontalLines",
+          margin: [0, 10, 0, 10],
+        },
+        {
+          table: {
+            widths: ["*"],
+            body: [
+              [{ text: "About Me", style: "sectionTitle" }],
+              [{
+                text:
+                  `Profession: ${formData.profession}\n` +
+                  `Height: ${formData.height}\n` +
+                  `Native Place: ${formData.nativeplace}\n` +
+                  `Caste/Sub Caste: ${formData.caste}`,
+                style: "sectionContent",
+              }],
+            ],
+          },
+          layout: "lightHorizontalLines",
+          margin: [0, 10, 0, 10],
+        },
+        {
+          table: {
+            widths: ["*"],
+            body: [
+              [{ text: "Family Details", style: "sectionTitle" }],
+              [{ text: formData.familydetails, style: "sectionContent" }],
+            ],
+          },
+          layout: "lightHorizontalLines",
+          margin: [0, 10, 0, 10],
+        },
+        {
+          table: {
+            widths: ["*"],
+            body: [
+              [{ text: "Activities / Hobbies", style: "sectionTitle" }],
+              [{ text: formData.hobbies, style: "sectionContent" }],
+            ],
+          },
+          layout: "lightHorizontalLines",
+          margin: [0, 10, 0, 10],
+        },
+        {
+          table: {
+            widths: ["*"],
+            body: [
+              [{ text: "Contact Details", style: "sectionTitle" }],
+              [{ stack: contactDetails, style: "sectionContent" }],
+            ],
+          },
+          layout: "lightHorizontalLines",
+          margin: [0, 10, 0, 10],
+        },
+        {
+          table: {
+            widths: ["*"],
+            body: [
+              [{ text: "Social Links", style: "sectionTitle" }],
+              [{ stack: socialItems, style: "sectionContent" }],
+            ],
+          },
+          layout: "lightHorizontalLines",
+          margin: [0, 10, 0, 10],
+        },
+        galleryItems.length > 0 && {
+          table: {
+            widths: ["*"],
+            body: [
+              [{ text: "Gallery", style: "sectionTitle" }],
+              [{ stack: groupIntoRows(galleryItems, 4) }],
+            ],
+          },
+          layout: "lightHorizontalLines",
+          margin: [0, 10, 0, 10],
+        },
+      ].filter(Boolean),
+      styles: {
+        header: {
+          fontSize: 24,
+          bold: true,
+          alignment: "center",
+          margin: [0, 10, 0, 10],
+        },
+        subheader: {
+          fontSize: 16,
+          alignment: "center",
+          margin: [0, 5, 0, 10],
+        },
+        sectionTitle: {
+          fontSize: 18,
+          bold: true,
+          fillColor: "#3b82f6",
+          color: "white",
+          alignment: "center",
+          margin: [0, 5, 0, 5],
+          padding: 5,
+        },
+        sectionContent: {
+          fontSize: 14,
+          alignment: "left",
+          margin: [5, 5, 5, 5],
+        },
+      },
+      pageMargins: [40, 40, 40, 40],
+    };
+
+    // Wrap content in an outer container table of fixed width and center it.
+    const containerWidth = 515;
+    const fullContainer = {
+      alignment: "center",
+      table: {
+        widths: [containerWidth],
+        body: [
+          [
+            {
+              stack: docDefinition.content,
+              margin: [0, 0, 0, 0],
+            },
+          ],
+        ],
+      },
+      layout: {
+        hLineWidth: () => 1,
+        vLineWidth: () => 1,
+        hLineColor: () => "#e5e7eb",
+        vLineColor: () => "#e5e7eb",
+        paddingLeft: () => 10,
+        paddingRight: () => 10,
+        paddingTop: () => 10,
+        paddingBottom: () => 10,
+      },
+    };
+
+    const finalDocDefinition = {
+      content: [fullContainer],
+      pageSize: "A4",
+      pageMargins: [20, 40, 40, 40],
+      styles: docDefinition.styles,
+      defaultStyle: {
+        fontSize: 12,
+        lineHeight: 1.4,
+        color: "#374151",
+      },
+      background: (currentPage, pageSize) => {
+        if (bgDataUrl) {
+          return {
+            image: bgDataUrl,
+            width: pageSize.width,
+            height: pageSize.height,
+            opacity: 0.6,
+          };
+        }
+        return {};
+      },
+    };
+
+    const fileName = formData.name
+      ? `${formData.name.replace(/\s+/g, "_")}_BioData.pdf`
+      : "BioData.pdf";
+
+    pdfMake.createPdf(finalDocDefinition).download(fileName);
+    handleReferal();
   };
 
   const handleReferal = async () => {
@@ -83,186 +516,41 @@ function BioData() {
     }
   };
 
-  const fetchPrices = async () => {
-    try {
-      const response = await axios.get("https://admin.qrandcards.com/api/getPrice");
-      if (response.data) {
-        const {
-          totalpriceBio,
-          dicountpriceBio
-        } = response.data;
-
-        setPrices({
-          totalpriceBio,
-          dicountpriceBio,
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching price data:", error);
-    }
-  };
-
-  useEffect(()=>{
-    fetchPrices()
-    fetchCardsBackground();
-  },[])
-
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      setImageSrc(reader.result);
-      setShowCropModal(true);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
-    setCroppedAreaPixels(croppedAreaPixels);
-  }, []);
-
-  const handleCrop = async () => {
-
-    try {
-      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
-      setFormData({ ...formData, croppedProfileImage: croppedImage });
-      setShowCropModal(false);
-    } catch (error) {
-      console.error("Cropping error:", error);
-    }
-  };
-
-  const handleMultipleFileChange = (e, key) => {
-    const files = Array.from(e.target.files);
-    setFormData({ ...formData, [key]: [...formData[key], ...files] });
-  };
-
-  const handlePreview = () => {
-    setPreviewMode(true);
-  };
-
-
-  const handleDownloadPDF = async () => {
-    const pdf = new jsPDF("p", "mm", "a4");
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-    const margin = 10;
-    let currentY = margin;
-  
-    // Load background image if selected
-    let bgImage = null;
-    if (selectedBackground) {
-      bgImage = new Image();
-      bgImage.src = selectedBackground;
-      await new Promise((resolve) => {
-        bgImage.onload = resolve;
-      });
-    }
-  
-    // 🟢 Apply background to the first page before adding sections
-    if (bgImage) {
-      pdf.addImage(bgImage, "PNG", 0, 0, pdfWidth, pdfHeight);
-    }
-  
-    const sectionIds = [
-      "profile-section",
-      "education-section",
-      "about-section",
-      "family-section",
-      "hobbies-section",
-      "contact-section",
-      "social-links-section",
-      "gallery-section",
-    ];
-  
-    for (const sectionId of sectionIds) {
-      const sectionElem = document.getElementById(sectionId);
-      if (!sectionElem) continue;
-  
-      const canvas = await html2canvas(sectionElem, {
-        useCORS: true,
-        scale: 3,
-        backgroundColor: null, // 🟢 Keeps sections transparent
-      });
-      
-      const imgData = canvas.toDataURL("image/png");
-      const sectionHeight = (canvas.height / canvas.width) * (pdfWidth - 2 * margin);
-  
-      if (currentY + sectionHeight > pdfHeight - margin) {
-        pdf.addPage();
-        currentY = margin;
-  
-        // 🟢 Reapply background on new pages
-        if (bgImage) {
-          pdf.addImage(bgImage, "PNG", 0, 0, pdfWidth, pdfHeight);
-        }
-      }
-  
-      pdf.addImage(imgData, "PNG", margin, currentY, pdfWidth - 2 * margin, sectionHeight);
-      currentY += sectionHeight + 5;
-    }
-  
-    const fileName = formData.name ? `${formData.name.replace(/\s+/g, "_")}_BioData.pdf` : "BioData.pdf";
-    pdf.save(fileName);
-  
-    // Update backend counts
-    await handleReferal();
-  };
-  
-
-
-  console.log(formData.name, "nameout");
-
-  const socialIcons = {
-    Facebook: FacebookIcon,
-    Instagram: InstagramIcon,
-  };
-
   const updateBioDataCount = async () => {
     try {
       await axios.post("https://admin.qrandcards.com/api/incrementCount", {
         type: "totalBio",
-        value: 1
+        value: 1,
       });
-
       await axios.post("https://admin.qrandcards.com/api/incrementCount", {
         type: "dailyBio",
-        value: 1
+        value: 1,
       });
-
-      console.log("QR code count updated successfully!");
+      console.log("Bio Data count updated successfully!");
     } catch (error) {
-      console.error("Error updating QR code count:", error);
+      console.error("Error updating Bio Data count:", error);
     }
   };
 
   const handlePDFPayment = async () => {
     const token = localStorage.getItem("token");
-  
     if (!token) {
       navigate("/signin");
       return;
     }
-  
     try {
-      // Fetch order ID from backend
       const response = await axios.post("https://admin.qrandcards.com/api/create-order", {
-        amount: prices?.dicountpriceInvitation || 185,
+        amount: prices?.dicountpriceBio || 185,
         currency: "INR",
       });
-  
       const { orderId, amount } = response.data;
-  
-      // Razorpay payment options
       const options = {
         key: "rzp_live_HJLLQQPlyQFOGr",
-        amount: amount, // Amount from backend
+        amount: amount,
         currency: "INR",
         name: "Personal Visiting Card",
         description: "Download PDF",
-        order_id: orderId, // Use order ID from backend
+        order_id: orderId,
         handler: function (paymentResponse) {
           handleDownloadPDF();
           updateBioDataCount();
@@ -271,18 +559,17 @@ function BioData() {
         modal: {
           ondismiss: function () {
             alert("Payment cancelled.");
-          }
+          },
         },
         prefill: {
           name: "John Doe",
           email: "johndoe@example.com",
-          contact: "9876543210"
+          contact: "9876543210",
         },
         theme: {
-          color: "#3399cc"
-        }
+          color: "#3399cc",
+        },
       };
-  
       const rzp = new window.Razorpay(options);
       rzp.on("payment.failed", function (response) {
         alert("Payment failed. Please try again.");
@@ -295,12 +582,9 @@ function BioData() {
     }
   };
 
-  console.log(prices,'prices');
-  
-
   if (previewMode) {
     return (
-      <div className="p-6 bg-gray-100 mt-[5%] min-h-screen flex flex-col justify-center items-center">
+      <div className="p-6 bg-gray-100 min-h-screen mt-[5%] flex flex-col justify-center items-center">
         <div
           id="preview-content"
           className="bg-white p-6 rounded-lg shadow-md max-w-3xl w-full"
@@ -310,90 +594,83 @@ function BioData() {
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
-        > 
-          {/* Profile Image */}
-          <div id="profile-section">
-          <div className="flex justify-center mb-4"  >
-            {formData.croppedProfileImage ? (
-              <img
-                src={formData.croppedProfileImage}
-                alt="Profile"
-                className="w-24 h-24 rounded-full border-4 border-gray-300"
-              />
-            ) : formData.profileImage ? (
-              <img
-                src={URL.createObjectURL(formData.profileImage)}
-                alt="Profile"
-                className="w-24 h-24 rounded-full border-4 border-gray-300"
-              />
-            ) : (
-              <p>No Image Selected</p>
-            )}
+        >
+          {/* Profile Section */}
+          <div id="profile-section" className="flex flex-col items-center mb-6">
+            <div className="flex justify-center mb-4">
+              {formData.croppedProfileImage ? (
+                <img
+                  src={formData.croppedProfileImage}
+                  alt="Profile"
+                  className="w-24 h-24 rounded-full border-4 border-gray-300"
+                />
+              ) : formData.profileImage ? (
+                <img
+                  src={URL.createObjectURL(formData.profileImage)}
+                  alt="Profile"
+                  className="w-24 h-24 rounded-full border-4 border-gray-300"
+                />
+              ) : (
+                <p>No Image Selected</p>
+              )}
+            </div>
+            <h2 className="text-xl font-bold text-center">{formData.name}</h2>
+            <h3 className="text-lg text-center mt-1 mb-2">{formData.dob}</h3>
           </div>
-
-            <h2 className="text-xl font-bold text-center mb-2 pb-4">{formData.name}</h2>
-          </div>
-
+  
           {/* Education Section */}
-          <div className="mb-6" id="education-section">
-            <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
-            Education
+          <div id="education-section" className="mb-6">
+            <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
+              Education
             </h3>
-            
-            <p className="border p-4 rounded-b-lg">
-            {formData.education}</p>
+            <p className="border p-4 rounded-b-lg">{formData.education}</p>
           </div>
-           
-          {/* About Section */}
-          <div className="mb-6" id="about-section">
-            <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
-             About me
+  
+          {/* About Me Section */}
+          <div id="about-section" className="mb-6">
+            <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
+              About me
             </h3>
-            
             <p className="border p-4 rounded-b-lg">
-            {formData.profession && <h4><span className="text-md font-bold mb-1">Profession: </span> {formData.profession}</h4>}<br/>
-            {formData.dob && <h4><span className="text-md font-bold mb-1">Date, time, place of birth: </span> {formData.dob}</h4>}<br/>
-            {formData.height && <h4><span className="text-md font-bold mb-1">Height: </span> {formData.height}</h4>}<br/>
-            {formData.nativeplace && <h4><span className="text-md font-bold mb-1">Native place: </span> {formData.nativeplace}</h4>}<br/>
-            {formData.caste && <h4><span className="text-md font-bold mb-1">Caste / sub caste: </span> {formData.caste}</h4>}<br/>
+              {formData.profession && (<><span className="font-bold">Profession: </span>{formData.profession}<br/></>)}
+              {formData.dob && (<><span className="font-bold">Date, time, place of birth: </span>{formData.dob}<br/></>)}
+              {formData.height && (<><span className="font-bold">Height: </span>{formData.height}<br/></>)}
+              {formData.nativeplace && (<><span className="font-bold">Native place: </span>{formData.nativeplace}<br/></>)}
+              {formData.caste && (<><span className="font-bold">Caste / sub caste: </span>{formData.caste}</>)}
             </p>
           </div>
-
-        {/* Family details Section */}
-          <div className="mb-6" id="family-section">
-            <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
-            Family details
+  
+          {/* Family Details Section */}
+          <div id="family-section" className="mb-6">
+            <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
+              Family details
             </h3>
-            
-            <p className="border p-4 rounded-b-lg">
-            {formData.familydetails}</p>
+            <p className="border p-4 rounded-b-lg">{formData.familydetails}</p>
           </div>
-
-           {/* Activities/ hobbies Section */}
-           <div className="mb-6" id="hobbies-section">
-            <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
-            Activities/ hobbies
+  
+          {/* Hobbies Section */}
+          <div id="hobbies-section" className="mb-6">
+            <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
+              Activities/ hobbies
             </h3>
-            
-            <p className="border p-4 rounded-b-lg">
-            {formData.hobbies}</p>
+            <p className="border p-4 rounded-b-lg">{formData.hobbies}</p>
           </div>
-
-          {/* Contact Details */}
-          <div className="mb-6" id="contact-section" >
-            <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
+  
+          {/* Contact Details Section */}
+          <div id="contact-section" className="mb-6">
+            <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
               Contact Details
             </h3>
             <ul className="border p-4 rounded-b-lg space-y-2">
               {formData.phone && (
                 <li>
                   <img src={whatsappImage} alt="Phone" className="inline w-5 h-5 mr-2" />
+                  <span className="font-bold">WhatsApp: </span>
                   <a
                     href={`https://api.whatsapp.com/send?phone=${formData.phone}`}
-                    data-url={`https://api.whatsapp.com/send?phone=${formData.phone}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-500 underline"
+                    className="text-blue-500 no-underline"
                   >
                     {formData.phone}
                   </a>
@@ -402,28 +679,21 @@ function BioData() {
               {formData.email && (
                 <li>
                   <img src={EmailIcon} alt="Email" className="inline w-5 h-5 mr-2" />
-                  <a href={`mailto:${formData.email}`} className="text-blue-500 underline">
+                  <span className="font-bold">Email: </span>
+                  <a href={`mailto:${formData.email}`} className="text-blue-500 no-underline">
                     {formData.email}
                   </a>
                 </li>
               )}
               {formData.address && (
                 <li>
-                  <img
-                    src={AddressIcon}
-                    alt="Address"
-                    className="inline w-5 h-5 mr-2"
-                  />
+                  <img src={AddressIcon} alt="Address" className="inline w-5 h-5 mr-2" />
+                  <span className="font-bold">Address: </span>
                   <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                      formData.address
-                    )}`}
-                    data-url={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                      formData.address
-                    )}`}
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(formData.address)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-500 underline"
+                    className="text-blue-500 no-underline"
                   >
                     {formData.address}
                   </a>
@@ -431,11 +701,11 @@ function BioData() {
               )}
             </ul>
           </div>
-
-          {/* Social Links */}
+  
+          {/* Social Links Section */}
           {formData.socialLinks.some((link) => link.link) && (
-            <div className="mb-6" id="social-links-section">
-              <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
+            <div id="social-links-section" className="mb-6">
+              <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
                 Social Media Links
               </h3>
               <ul className="border p-4 rounded-b-lg space-y-2">
@@ -444,15 +714,16 @@ function BioData() {
                     link.link && (
                       <li key={index}>
                         <img
-                          src={socialIcons[link.platform]}
+                          src={link.platform === "Facebook" ? FacebookIcon : InstagramIcon}
                           alt={link.platform}
                           className="inline w-5 h-5 mr-2"
                         />
+                        <span className="font-bold">{link.platform}: </span>
                         <a
                           href={link.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-500 underline"
+                          className="text-blue-500 no-underline"
                         >
                           {link.link}
                         </a>
@@ -462,12 +733,12 @@ function BioData() {
               </ul>
             </div>
           )}
-
-          {/* Gallery */}
+  
+          {/* Gallery Section */}
           {formData.gallery.length > 0 && (
-            <div className="mb-6" id="gallery-section">
-              <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg">
-              YOUR IMAGES
+            <div id="gallery-section" className="mb-6">
+              <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
+                YOUR IMAGES
               </h3>
               <div className="border p-4 rounded-b-lg grid grid-cols-4 gap-4 justify-items-center">
                 {formData.gallery.map((file, index) => (
@@ -481,41 +752,37 @@ function BioData() {
               </div>
             </div>
           )}
-        </div>
-
-        <div className="flex justify-center items-center">
-
-          <button
-            className="bg-red-500 text-white mt-4 py-2 px-4 rounded"
-            onClick={() => setPreviewMode(false)}
-          >
-            Edit Details
-          </button>
-          <div className="flex justify-center items-center mt-6">
-            <div className="text-center">
-              <p className="text-gray-500 line-through">₹{prices?.totalpriceBio || 500}</p>
-              <p className="text-green-600 font-bold text-xl">₹{prices?.dicountpriceBio || 185}</p>
-              <p className="text-blue-500 text-sm">(Offer price)</p>
-            </div>
+  
+          <div className="flex justify-center items-center">
             <button
-              className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition ml-4"
-              onClick={handlePDFPayment}
+              className="bg-red-500 text-white mt-4 py-2 px-4 rounded"
+              onClick={() => setPreviewMode(false)}
             >
-              Pay ₹{prices?.dicountpriceBio || 185} to Download PDF
+              Edit Details
             </button>
+            <div className="flex justify-center items-center mt-6">
+              <div className="text-center">
+                <p className="text-gray-500 line-through">₹{prices?.totalpriceBio || 500}</p>
+                <p className="text-green-600 font-bold text-xl">₹{prices?.dicountpriceBio || 185}</p>
+                <p className="text-blue-500 text-sm">(Offer price)</p>
+              </div>
+              <button
+                className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition ml-4"
+                onClick={handleDownloadPDF}
+              >
+                Pay ₹{prices?.dicountpriceBio || 185} to Download PDF
+              </button>
+            </div>
           </div>
-
-        </div>
-
-        <div className="mt-4 mb-4">
-          <p className="text-center"><span className="font-semibold">Note</span> -you can convert your pdf to QR</p>
+  
+          <div className="mt-4 mb-4">
+            <p className="text-center"><span className="font-semibold">Note</span> - you can convert your PDF to QR</p>
+          </div>
         </div>
       </div>
     );
   }
-
-
-
+  
   return (
     <div className="p-6 bg-gray-100 min-h-screen mt-[14%] lg:mt-[4%]">
       <h1 className="text-3xl font-bold mb-6">Create Bio Data</h1>
@@ -523,7 +790,7 @@ function BioData() {
         className="bg-white p-6 rounded-lg shadow-md"
         onSubmit={(e) => {
           e.preventDefault();
-          handlePreview();
+          setPreviewMode(true);
         }}
       >
         <div className="mb-4">
@@ -539,18 +806,18 @@ function BioData() {
             </div>
           )}
         </div>
-
+  
         <div className="mb-4">
           <label className="block mb-2">Name</label>
           <input
             type="text"
-            name="name" // Ensure this matches the key in formData
+            name="name"
             value={formData.name}
             onChange={handleInputChange}
             className="w-full border p-2 rounded"
           />
         </div>
-
+  
         <div className="mb-4">
           <label className="block mb-2">Education</label>
           <textarea
@@ -560,7 +827,7 @@ function BioData() {
             className="w-full border p-2 rounded"
           ></textarea>
         </div>
-
+  
         <div className="mb-4">
           <label className="block mb-2">Profession</label>
           <input
@@ -571,7 +838,7 @@ function BioData() {
             className="w-full border p-2 rounded"
           />
         </div>
-
+  
            <div className="mb-4">
           <label className="block mb-2">Date, time, place of birth</label>
           <input
@@ -582,19 +849,18 @@ function BioData() {
             className="w-full border p-2 rounded"
           />
         </div>
-
-
+  
         <div className="mb-4">
           <label className="block mb-2">Height</label>
           <input
             type="text"
             name="height"
-            value={formData.height }
+            value={formData.height}
             onChange={handleInputChange}
             className="w-full border p-2 rounded"
           />
         </div>
-
+  
         <div className="mb-4">
           <label className="block mb-2">Native Place</label>
           <input
@@ -605,7 +871,7 @@ function BioData() {
             className="w-full border p-2 rounded"
           />
         </div>
-
+  
         <div className="mb-4">
           <label className="block mb-2">Caste / Sub Caste</label>
           <input
@@ -616,7 +882,7 @@ function BioData() {
             className="w-full border p-2 rounded"
           />
         </div>
-
+  
         <div className="mb-4">
           <label className="block mb-2">Family Details</label>
           <textarea
@@ -663,11 +929,10 @@ function BioData() {
             name="address"
             value={formData.address}
             onChange={handleInputChange}
-            placeholder="Link"
             className="w-full border p-2 rounded"
           />
         </div>
-
+  
         <div className="mb-4">
           <label className="block mb-2">Referal Code (Optional)</label>
           <input
@@ -678,7 +943,7 @@ function BioData() {
             className="w-full border p-2 rounded"
           />
         </div>
-
+  
         <div className="mb-4">
           <label className="block mb-2">Social Links</label>
           {formData.socialLinks.map((link, index) => (
@@ -701,19 +966,13 @@ function BioData() {
             </div>
           ))}
         </div>
-
+  
         <div className="mb-4">
           <label className="block mb-2">YOUR IMAGES</label>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => handleMultipleFileChange(e, "gallery")}
-          />
+          <input type="file" accept="image/*" multiple onChange={(e) => handleMultipleFileChange(e, "gallery")} />
         </div>
-
-         {/* Background Images Selection */}
-         {backgrounds?.length > 0 && (
+  
+        {backgrounds?.length > 0 && (
           <div className="mb-4">
             <label className="block mb-2">Select Background</label>
             <div className="flex space-x-2 overflow-x-auto">
@@ -733,49 +992,38 @@ function BioData() {
             </div>
           </div>
         )}
-
-        <button
-          type="submit"
-          className="bg-blue-500 text-white py-2 px-4 rounded mt-4"
-        >
+  
+        <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded mt-4">
           Preview
         </button>
       </form>
-
-      {/* Cropper Modal */}
+  
       {showCropModal && (
-          <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
-            <div className="bg-white p-4 rounded-lg shadow-lg">
-              <h3 className="text-lg font-bold mb-2">Crop Your Image</h3>
-              <div className="relative w-[300px] h-[300px]">
-                <Cropper
-                  image={imageSrc}
-                  crop={crop}
-                  zoom={zoom}
-                  aspect={1}
-                  onCropChange={setCrop}
-                  onZoomChange={setZoom}
-                  onCropComplete={onCropComplete}
-                />
-              </div>
-              <div className="mt-4 flex justify-between">
-                <button
-                  className="bg-red-500 text-white px-4 py-2 rounded"
-                  onClick={() => setShowCropModal(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="bg-green-500 text-white px-4 py-2 rounded"
-                  onClick={handleCrop}
-                >
-                  Crop & Save
-                </button>
-              </div>
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-4 rounded-lg shadow-lg">
+            <h3 className="text-lg font-bold mb-2">Crop Your Image</h3>
+            <div className="relative w-[300px] h-[300px]">
+              <Cropper
+                image={imageSrc}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={onCropComplete}
+              />
+            </div>
+            <div className="mt-4 flex justify-between">
+              <button className="bg-red-500 text-white px-4 py-2 rounded" onClick={() => setShowCropModal(false)}>
+                Cancel
+              </button>
+              <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={handleCrop}>
+                Crop & Save
+              </button>
             </div>
           </div>
-        )}
-
+        </div>
+      )}
     </div>
   );
 }
