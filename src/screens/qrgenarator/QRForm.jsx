@@ -128,10 +128,10 @@ const QRForm = ({ activeType, onSubmit }) => {
         if (!formData.password) newErrors.password = "Password is required.";
         break;
       case "Image":
-        if (!formData.image) newErrors.image = "Image is required.";
+        if (!formData.url) newErrors.image = "Image is required.";
         break;
       case "Pdf":
-        if (!formData.pdf) newErrors.pdf = "PDF is required.";
+        if (!formData.url) newErrors.pdf = "PDF is required.";
         break;
       default:
         break;
@@ -146,8 +146,8 @@ const QRForm = ({ activeType, onSubmit }) => {
       return;
     } 
     if(activeType ==='image' || activeType ==='pdf'){
-      if(!imageFile || !pdfFile){
-        alert(`Please select a ${type} file to upload.`);
+      if(!imageFile && !pdfFile){
+        alert(`Please select a ${activeType} file to upload.`);
         return
       }
     }
@@ -159,9 +159,8 @@ const QRForm = ({ activeType, onSubmit }) => {
     }
 
     if (validateForm()) {
-      if (imageFile) {
-
-      }
+      console.log(formData,'formData');
+      
       onSubmit(formData);
     }
   };
