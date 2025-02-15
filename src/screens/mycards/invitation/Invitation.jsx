@@ -308,7 +308,7 @@ function Invitation() {
             width: "*",
             text: formData.phone,
             color: "#3b82f6",
-            link: `https://api.whatsapp.com/send?phone=${formData.phone}`,
+            link: `https://api.whatsapp.com/send?phone=+91${formData.phone}`,
             margin: [5, 2, 0, 0],
           },
         ],
@@ -590,7 +590,7 @@ function Invitation() {
                   />
                   <span className="mr-2">WhatsApp:</span>
                   <a
-                    href={`https://api.whatsapp.com/send?phone=${formData.phone}`}
+                    href={`https://api.whatsapp.com/send?phone=+91${formData.phone}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500"

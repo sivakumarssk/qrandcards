@@ -274,7 +274,7 @@ function PersonalCards() {
           {
             text: [
               { text: "WhatsApp: ", color: "black" },
-              { text: formData.phone, link: `https://api.whatsapp.com/send?phone=${formData.phone}`, color: "blue" }
+              { text: formData.phone, link: `https://api.whatsapp.com/send?phone=+91${formData.phone}`, color: "blue" }
             ],
             margin: [0,0,0,0]
           }
@@ -665,7 +665,7 @@ function PersonalCards() {
                   <img src={whatsappImage} alt="Phone" className="inline w-5 h-5 mr-2" />
                   <span className="font-bold">WhatsApp: </span>
                   <a
-                    href={`https://api.whatsapp.com/send?phone=${formData.phone}`}
+                    href={`https://api.whatsapp.com/send?phone=+91${formData.phone}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500"
