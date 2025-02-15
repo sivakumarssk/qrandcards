@@ -99,7 +99,7 @@ const groupIntoRows = (items, count = 4) => {
     while (row.length < count) row.push({ text: "" });
     rows.push({
       columns: row,
-      columnGap: 10,
+      columnGap: 35,
       margin: [0, 5, 0, 5],
     });
   }
@@ -242,8 +242,8 @@ function BusinessCards() {
       productItems = await Promise.all(
         formData.productImages.map(async (file) => ({
           image: await getBase64FromFile(file),
-          width: 120,
-          height: 120,
+          width: 100,
+          height: 110,
           alignment: "center",
         }))
       );
@@ -256,8 +256,8 @@ function BusinessCards() {
       galleryItems = await Promise.all(
         formData.gallery.map(async (file) => ({
           image: await getBase64FromFile(file),
-          width: 120,
-          height: 120,
+          width: 100,
+          height: 110,
           alignment: "center",
         }))
       );
@@ -292,7 +292,7 @@ function BusinessCards() {
           },
         ],
         columnGap: 0,
-        margin: [0, 0, 0, 0],
+        margin: [5, 0, 0, 5],
       });
     }
     if (formData.email) {
@@ -307,7 +307,7 @@ function BusinessCards() {
           },
         ],
         columnGap: 0,
-        margin: [0, 0, 0, 0],
+        margin: [0, 0, 0, 5],
       });
     }
     if (formData.address) {
@@ -322,7 +322,7 @@ function BusinessCards() {
           },
         ],
         columnGap: 0,
-        margin: [0, 0, 0, 0],
+        margin: [0, 0, 0, 5],
       });
     }
 
@@ -345,7 +345,7 @@ function BusinessCards() {
               },
             ],
             columnGap: 0,
-            margin: [0, 0, 0, 0],
+            margin: [5, 0, 0, 5],
           };
         })
     );
@@ -369,7 +369,7 @@ function BusinessCards() {
               },
             ],
             columnGap: 0,
-            margin: [0, 0, 0, 0],
+            margin: [5, 0, 0, 5],
           };
         })
     );
@@ -1095,7 +1095,7 @@ function BusinessCards() {
           />
         </div>
   
-        <div className="mb-4">
+        <div >
           <label className="block mb-2">Product Images</label>
           <input
             type="file"
@@ -1104,7 +1104,11 @@ function BusinessCards() {
             onChange={(e) => handleMultipleFileChange(e, "productImages")}
           />
         </div>
-        <div className="mb-4">
+        <div>
+        <p className="text-left pt-2 mb-4">Note: Please Upload Images in 6:9 ratio for Best Quality Cards</p>
+        </div>
+
+        <div>
           <label className="block mb-2">Your Other Business Images</label>
           <input
             type="file"
@@ -1112,6 +1116,10 @@ function BusinessCards() {
             multiple
             onChange={(e) => handleMultipleFileChange(e, "gallery")}
           />
+        </div>
+
+        <div>
+        <p className="text-left pt-2 mb-4">Note: Please Upload Images in 6:9 ratio for Best Quality Cards</p>
         </div>
   
         {backgrounds?.length > 0 && (

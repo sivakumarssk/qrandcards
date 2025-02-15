@@ -222,8 +222,8 @@ function BioData() {
       galleryItems = await Promise.all(
         formData.gallery.map(async (file) => ({
           image: await getBase64FromFile(file),
-          width: 120,
-          height: 120,
+          width: 100,
+          height: 110,
           alignment: "center",
         }))
       );
@@ -255,7 +255,7 @@ if (formData.phone) {
           { text: "WhatsApp: ", color: "black" },
           { text: formData.phone, link: `https://api.whatsapp.com/send?phone=+91${formData.phone}`, color: "blue" }
         ],
-        margin: [0,0,0,0]
+        margin: [5,0,0,5]
       }
     ],
     columnGap: 0,
@@ -271,7 +271,7 @@ if (formData.email) {
           { text: "Email: ", color: "black" },
           { text: formData.email, link: `mailto:${formData.email}`, color: "blue" }
         ],
-        margin: [0,0,0,0]
+        margin: [0,0,0,5]
       }
     ],
     columnGap: 0,
@@ -287,7 +287,7 @@ if (formData.address) {
           { text: "Address: ", color: "black" },
           { text: formData.address, link: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(formData.address)}`, color: "blue" }
         ],
-        margin: [0,0,0,0]
+        margin: [0,0,0,5]
       }
     ],
     columnGap: 0,
@@ -311,7 +311,7 @@ const socialItems = await Promise.all(
               { text: `${s.platform}: `, color: "black" },
               { text: s.link, link: s.link, color: "blue" }
             ],
-            margin: [0,0,0,0]
+            margin: [0,0,0,5]
           }
         ],
         columnGap: 0,
@@ -777,6 +777,7 @@ const socialItems = await Promise.all(
   
           <div className="mt-4 mb-4">
             <p className="text-center"><span className="font-semibold">Note</span> - you can convert your PDF to QR</p>
+            <p className="text-center">By Using Our QR Generator</p>
           </div>
         </div>
       </div>
@@ -967,11 +968,15 @@ const socialItems = await Promise.all(
           ))}
         </div>
   
-        <div className="mb-4">
+        <div>
           <label className="block mb-2">YOUR IMAGES</label>
           <input type="file" accept="image/*" multiple onChange={(e) => handleMultipleFileChange(e, "gallery")} />
         </div>
   
+        <div>
+        <p className="text-left pt-2 mb-4">Note: Please Upload Images in 6:9 ratio for Best Quality Cards</p>
+        </div>
+
         {backgrounds?.length > 0 && (
           <div className="mb-4">
             <label className="block mb-2">Select Background</label>

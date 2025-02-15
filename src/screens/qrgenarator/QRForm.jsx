@@ -145,9 +145,25 @@ const QRForm = ({ activeType, onSubmit }) => {
     if(loading){
       return;
     } 
-    if(activeType ==='image' || activeType ==='pdf'){
-      if(!imageFile && !pdfFile){
+    if(activeType ==='image'){
+      if(!imageFile){
         alert(`Please select a ${activeType} file to upload.`);
+        return
+      }
+      if(!formData.url){
+        alert(`Please upload ${activeType} upload.`);
+        return
+      }
+    }
+
+    if(activeType ==='pdf'){
+      if(!pdfFile){
+        alert(`Please select a ${activeType} file to upload.`);
+        return
+      }
+
+      if(!formData.url){
+        alert(`Please upload ${activeType} file.`);
         return
       }
     }

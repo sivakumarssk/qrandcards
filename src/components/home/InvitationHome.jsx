@@ -25,7 +25,7 @@ function InvitationHome() {
 
         {/* Text Content */}
         <div data-aos="fade-left">
-          <h2 className="text-3xl font-bold mb-4">Elegant Invitation Cards</h2>
+          <h2 className="text-3xl font-bold mb-4">Elegant Invitation Cards / Property Cards</h2>
           <p className="text-gray-600 text-xl text-justify">
             Celebrate in style with our exquisite invitation cards designed to leave a lasting impression. Whether you’re hosting a wedding, a birthday party, an anniversary, or a corporate event, our invitations are crafted to reflect your unique style and set the tone for your special occasion.
           </p>

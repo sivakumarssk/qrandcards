@@ -38,11 +38,11 @@ function Navbar() {
           data-aos-delay="100"
         >
           <NavLink to="/" exact className='flex'>
-            {/* <img
+            <img
               src={logo}
               alt="logo"
-              className="w-12 h-12 sm:w-16 sm:h-16 object-contain mx-auto"
-            /> */}
+              className="w-12 h-12 object-contain mr-4 mx-auto"
+            />
             <span className="text-lg sm:text-xl font-bold text-center block mt-2">
               QR AND CARDS
             </span>

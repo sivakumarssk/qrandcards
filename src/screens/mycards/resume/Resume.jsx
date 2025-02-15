@@ -350,7 +350,7 @@ function Resume() {
             text: formData.phone,
             color: "#3b82f6",
             link: `https://api.whatsapp.com/send?phone=+91${formData.phone}`,
-            margin: [5, 2, 0, 0],
+            margin: [5, 2, 0, 5],
           },
         ],
         style: "sectionContent",
@@ -366,7 +366,7 @@ function Resume() {
             text: formData.email,
             color: "#3b82f6",
             link: `mailto:${formData.email}`,
-            margin: [5, 2, 0, 0],
+            margin: [5, 2, 0, 5],
           },
         ],
         style: "sectionContent",
@@ -382,7 +382,7 @@ function Resume() {
             text: formData.address,
             color: "#3b82f6",
             link: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(formData.address)}`,
-            margin: [5, 2, 0, 0],
+            margin: [5, 2, 0, 5],
           },
         ],
         style: "sectionContent",
@@ -413,8 +413,8 @@ function Resume() {
       const certificateImages = await Promise.all(
         formData.certificates.map(async (file) => ({
           image: await getBase64FromFile(file),
-          width: 120,
-          height: 120,
+          width: 100,
+          height: 110,
           alignment: "center",
           style: "galleryImage",
         }))
@@ -425,7 +425,7 @@ function Resume() {
         while (row.length < 4) row.push({ text: "" });
         certRows.push({
           columns: row,
-          columnGap: 15,
+          columnGap: 35,
           margin: [0, 10, 0, 10],
         });
       }
@@ -453,8 +453,8 @@ function Resume() {
       const galleryImages = await Promise.all(
         formData.gallery.map(async (file) => ({
           image: await getBase64FromFile(file),
-          width: 120,
-          height: 120,
+          width: 100,
+          height: 110,
           alignment: "center",
           style: "galleryImage",
         }))
@@ -465,7 +465,7 @@ function Resume() {
         while (row.length < 4) row.push({ text: "" });
         galleryRows.push({
           columns: row,
-          columnGap: 15,
+          columnGap: 35,
           margin: [0, 10, 0, 10],
         });
       }
@@ -797,7 +797,7 @@ function Resume() {
               </div>
               <button
                 className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition ml-4"
-                onClick={handlePDFPayment}
+                onClick={handleDownloadPDF}
               >
                 Pay ₹{prices?.dicountpriceResume || 185} to Download PDF
               </button>
@@ -884,15 +884,23 @@ function Resume() {
             <input type="number" name="referal" value={formData.referal} onChange={handleInputChange} className="w-full border p-2 rounded" />
           </div>
   
-          <div className="mb-4">
+          <div>
             <label className="block mb-2">Certificates</label>
             <input type="file" accept="image/*" multiple onChange={(e) => handleMultipleFileChange(e, "certificates")} />
           </div>
+
+          <div>
+        <p className="text-left pt-2 mb-4">Note: Please Upload Images in 6:9 ratio for Best Quality Cards</p>
+        </div>
   
-          <div className="mb-4">
+          <div >
             <label className="block mb-2">Gallery</label>
             <input type="file" accept="image/*" multiple onChange={(e) => handleMultipleFileChange(e, "gallery")} />
           </div>
+
+          <div>
+        <p className="text-left pt-2 mb-4">Note: Please Upload Images in 6:9 ratio for Best Quality Cards</p>
+        </div>
   
           {backgrounds?.length > 0 && (
             <div className="mb-4">

@@ -367,7 +367,7 @@ function Invitation() {
         formData.gallery.map(async (file) => ({
           image: await getBase64FromFile(file),
           width: 100,
-          height: 100,
+          height: 110,
           style: "galleryImage",
           alignment: "center",
         }))
@@ -381,7 +381,7 @@ function Invitation() {
         }
         rows.push({
           columns: row,
-          columnGap: 25,
+          columnGap: 35,
           margin: [7, 10, 7, 10],
           style: "galleryContainer",
         });
@@ -667,7 +667,7 @@ function Invitation() {
             </div>
             <button
               className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition ml-4"
-              onClick={handlePDFPayment}
+              onClick={handleDownloadPDF}
             >
               Pay ₹{prices?.dicountpriceInvitation || 185} to Download PDF
             </button>
@@ -719,11 +719,18 @@ function Invitation() {
         </div>
         <div className="mb-4">
           <label className="block mb-2">Occasion</label>
+          {/* <select name="occasion" onChange={handleInputChange} className="w-full border p-2 rounded">
+            <option value=''>Select Occation</option>
+            <option value='Birthday'>Birthday</option>
+            <option value='Shop Opening'>Shop Opening</option>
+            <option value='Other'>Other</option>
+          </select> */}
           <input
             type="text"
             name="occasion"
             value={formData.occasion}
             onChange={handleInputChange}
+            placeholder="Eg: Birthday, Anniversary, and Many more.."
             className="w-full border p-2 rounded"
           />
         </div>
@@ -787,7 +794,7 @@ function Invitation() {
             className="w-full border p-2 rounded"
           />
         </div>
-        <div className="mb-4">
+        <div>
           <label className="block mb-2">Images/Friends</label>
           <input
             type="file"
@@ -796,6 +803,11 @@ function Invitation() {
             onChange={(e) => handleMultipleFileChange(e, "gallery")}
           />
         </div>
+
+        <div>
+        <p className="text-left pt-2 mb-4">Note: Please Upload Images in 6:9 ratio for Best Quality Cards</p>
+        </div>
+        
         <div className="mb-4">
           <label className="block mb-2">Referal Code (Optional)</label>
           <input
