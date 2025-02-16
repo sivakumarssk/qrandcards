@@ -64,7 +64,7 @@ const frameImageWithWhiteBackground = async (
   dataUrl,
   frameSize = 100,
   frameHeight =130,
-  scaleFactor = 40
+  scaleFactor = 20
 ) => {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -576,7 +576,7 @@ function Invitation() {
   // -------------------- Render --------------------
   if (previewMode) {
     return (
-      <div className="p-6 bg-gray-100 mt-[5%] min-h-screen flex flex-col items-center justify-center">
+      <div className="p-6 bg-gray-100 mt-[5%] mt-20 flex flex-col items-center justify-center">
         {/* Preview Container – PDF will be generated from this view */}
         <div
           id="invitation-card"

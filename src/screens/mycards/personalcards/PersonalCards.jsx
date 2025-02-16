@@ -102,7 +102,7 @@ const frameImageWithWhiteBackground = async (
   dataUrl,
   frameSize = 100,
   frameHeight =130,
-  scaleFactor = 40
+  scaleFactor = 20
 ) => {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -263,7 +263,7 @@ function PersonalCards() {
         console.error("Error converting background image:", error);
       }
     }
-    // Process product images into rows of 4.
+    // Process Achievements into rows of 4.
     let productItems = [];
     if (formData.productImages && formData.productImages.length > 0) {
       productItems = await Promise.all(
@@ -469,7 +469,7 @@ function PersonalCards() {
           table: {
             widths: ["*"],
             body: [
-              [{ text: "Product Images", style: "sectionTitle" }],
+              [{ text: "Achievements", style: "sectionTitle" }],
               [{ stack: groupIntoRows(productItems, 4) }],
             ],
           },
@@ -480,7 +480,7 @@ function PersonalCards() {
           table: {
             widths: ["*"],
             body: [
-              [{ text: "Gallery", style: "sectionTitle" }],
+              [{ text: "My images", style: "sectionTitle" }],
               [{ stack: groupIntoRows(galleryItems, 4) }],
             ],
           },
@@ -663,7 +663,7 @@ function PersonalCards() {
 
   if (previewMode) {
     return (
-      <div className="p-6 bg-gray-100 min-h-screen mt-[5%] flex flex-col justify-center items-center">
+      <div className="p-6 bg-gray-100 mt-20 mt-[5%] flex flex-col justify-center items-center">
         <div
           id="preview-content"
           className="bg-white p-6 rounded-lg shadow-md max-w-3xl w-full"
@@ -816,7 +816,7 @@ function PersonalCards() {
             </div>
           )}
   
-          {/* Product Images */}
+          {/* Achievements */}
           {formData.productImages.length > 0 && (
             <div id="products-section" className="mb-6">
               <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
@@ -839,7 +839,7 @@ function PersonalCards() {
           {formData.gallery.length > 0 && (
             <div id="gallery-section" className="mb-6">
               <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
-                Other Business Images
+              My images
               </h3>
               <div className="border p-4 rounded-b-lg grid grid-cols-4 gap-4 justify-items-center">
                 {formData.gallery.map((file, index) => (
@@ -1042,7 +1042,7 @@ function PersonalCards() {
         </div>
   
         <div>
-          <label className="block mb-2">Product Images</label>
+          <label className="block mb-2">Achievements</label>
           <input
             type="file"
             accept="image/*"
@@ -1056,7 +1056,7 @@ function PersonalCards() {
         </div>
   
         <div >
-          <label className="block mb-2">Your Other Business Images</label>
+          <label className="block mb-2">Your images</label>
           <input
             type="file"
             accept="image/*"
