@@ -663,7 +663,7 @@ function PersonalCards() {
 
   if (previewMode) {
     return (
-      <div className="p-6 bg-gray-100 mt-20 mt-[5%] flex flex-col justify-center items-center">
+      <div className="p-6 bg-gray-100 mt-20 flex flex-col justify-center items-center">
         <div
           id="preview-content"
           className="bg-white p-6 rounded-lg shadow-md max-w-3xl w-full"

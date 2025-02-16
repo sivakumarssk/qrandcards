@@ -697,7 +697,7 @@ function BusinessCards() {
 
   if (previewMode) {
     return (
-      <div className="p-6 mt-20 bg-gray-100 mt-[5%] flex flex-col justify-center items-center">
+      <div className="p-6 mt-20 bg-gray-100 flex flex-col justify-center items-center">
         <div
           id="preview-content"
           className="bg-white p-6 rounded-lg shadow-md max-w-3xl w-full"
@@ -940,7 +940,7 @@ function BusinessCards() {
               </div>
               <button
                 className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition ml-4"
-                onClick={handleDownloadPDF}
+                onClick={handlePDFPayment}
               >
                 Pay ₹{prices?.dicountpriceBusiness || 185} to Download PDF
               </button>
