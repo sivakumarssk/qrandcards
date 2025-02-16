@@ -99,6 +99,46 @@ const convertToDataURL = async (source) => {
   }
 };
 
+const frameImageWithWhiteBackground = async (
+  dataUrl,
+  frameSize = 100,
+  frameHeight =130,
+  scaleFactor = 40
+) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = dataUrl;
+    img.onload = () => {
+      // Create a canvas with increased pixel density.
+      const canvas = document.createElement("canvas");
+      canvas.width = frameHeight * scaleFactor;
+      canvas.height = frameSize * scaleFactor;
+      const ctx = canvas.getContext("2d");
+      
+      // Scale the context so that drawing operations are in the original frameSize units.
+      ctx.scale(scaleFactor, scaleFactor);
+      
+      // Fill the background with white.
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, frameSize, frameSize);
+      
+      // Calculate the scale for the image to fit within the frame.
+      const scale = Math.min(frameSize / img.width, frameSize / img.height);
+      const width = img.width * scale;
+      const height = img.height * scale;
+      const x = (frameSize - width) / 2;
+      const y = (frameSize - height) / 2;
+      
+      // Draw the image onto the canvas.
+      ctx.drawImage(img, x, y, width, height);
+      
+      // Return a high resolution data URL.
+      resolve(canvas.toDataURL());
+    };
+    img.onerror = (err) => reject(err);
+  });
+};
+
 function Resume() {
   const [formData, setFormData] = useState({
     fullName: "",
@@ -221,7 +261,7 @@ function Resume() {
         alignment: "center",
         fillColor: "#3b82f6",
         color: "#ffffff",
-        margin: [0, 5, 0, 5],
+        margin: [7, 5, 0, 0],
         padding: 5,
       },
       sectionContent: {
@@ -411,13 +451,17 @@ function Resume() {
     // --- Certificates Section ---
     if (formData.certificates.length > 0) {
       const certificateImages = await Promise.all(
-        formData.certificates.map(async (file) => ({
-          image: await getBase64FromFile(file),
-          width: 100,
-          height: 110,
-          alignment: "center",
-          style: "galleryImage",
-        }))
+        formData.certificates.map(async (file) => {
+          const dataUrl = await getBase64FromFile(file);
+          // Create a framed image with a white background (adjust frame size as needed)
+          const framedDataUrl = await frameImageWithWhiteBackground(dataUrl, 100);
+          return {
+            image: framedDataUrl,
+            width: 100,   // Fixed width
+            height: 100,  // Fixed height
+            alignment: "center",
+          };
+        })
       );
       const certRows = [];
       for (let i = 0; i < certificateImages.length; i += 4) {
@@ -451,13 +495,17 @@ function Resume() {
     // --- Gallery Section ---
     if (formData.gallery.length > 0) {
       const galleryImages = await Promise.all(
-        formData.gallery.map(async (file) => ({
-          image: await getBase64FromFile(file),
-          width: 100,
-          height: 110,
-          alignment: "center",
-          style: "galleryImage",
-        }))
+        formData.gallery.map(async (file) => {
+          const dataUrl = await getBase64FromFile(file);
+          // Create a framed image with a white background (adjust frame size as needed)
+          const framedDataUrl = await frameImageWithWhiteBackground(dataUrl, 100);
+          return {
+            image: framedDataUrl,
+            width: 100,   // Fixed width
+            height: 100,  // Fixed height
+            alignment: "center",
+          };
+        })
       );
       const galleryRows = [];
       for (let i = 0; i < galleryImages.length; i += 4) {

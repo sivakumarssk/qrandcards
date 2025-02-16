@@ -30,33 +30,74 @@ const makeImageCircular = async (
   canvas.width = size * scaleFactor;
   canvas.height = size * scaleFactor;
   const ctx = canvas.getContext("2d");
-  
+
   // Scale drawing context to work in "size" units.
   ctx.scale(scaleFactor, scaleFactor);
-  
+
   const centerX = size / 2;
   const centerY = size / 2;
   // Compute inner radius for the image (leaving padding and border).
   const innerRadius = (size - borderWidth - 2 * padding) / 2;
-  
+
   // Draw the border circle.
   ctx.beginPath();
   ctx.arc(centerX, centerY, innerRadius + borderWidth / 2, 0, Math.PI * 2, false);
   ctx.fillStyle = borderColor;
   ctx.fill();
-  
+
   // Clip the inner circle.
   ctx.beginPath();
   ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2, false);
   ctx.clip();
-  
+
   // Draw the image inside the clipped area with padding.
   const img = new Image();
   img.src = dataUrl;
   await new Promise(resolve => { img.onload = resolve; });
   ctx.drawImage(img, padding, padding, size - 2 * padding, size - 2 * padding);
-  
+
   return canvas.toDataURL();
+};
+
+
+const frameImageWithWhiteBackground = async (
+  dataUrl,
+  frameSize = 100,
+  frameHeight =130,
+  scaleFactor = 40
+) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = dataUrl;
+    img.onload = () => {
+      // Create a canvas with increased pixel density.
+      const canvas = document.createElement("canvas");
+      canvas.width = frameHeight * scaleFactor;
+      canvas.height = frameSize * scaleFactor;
+      const ctx = canvas.getContext("2d");
+      
+      // Scale the context so that drawing operations are in the original frameSize units.
+      ctx.scale(scaleFactor, scaleFactor);
+      
+      // Fill the background with white.
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, frameSize, frameSize);
+      
+      // Calculate the scale for the image to fit within the frame.
+      const scale = Math.min(frameSize / img.width, frameSize / img.height);
+      const width = img.width * scale;
+      const height = img.height * scale;
+      const x = (frameSize - width) / 2;
+      const y = (frameSize - height) / 2;
+      
+      // Draw the image onto the canvas.
+      ctx.drawImage(img, x, y, width, height);
+      
+      // Return a high resolution data URL.
+      resolve(canvas.toDataURL());
+    };
+    img.onerror = (err) => reject(err);
+  });
 };
 
 function Invitation() {
@@ -203,7 +244,7 @@ function Invitation() {
         console.error("Error converting background image:", error);
       }
     }
-  
+
     const styles = {
       header: {
         fontSize: 24,
@@ -251,9 +292,9 @@ function Invitation() {
         borderRadius: 10,
       },
     };
-  
+
     const contentDefinition = [];
-  
+
     // --- Profile (Logo) Image as Circular with Padding ---
     if (formData.croppedProfileImage) {
       const profileDataUrl = await convertToDataURL(formData.croppedProfileImage);
@@ -266,7 +307,7 @@ function Invitation() {
         margin: [0, 30, 0, 20],
       });
     }
-  
+
     // --- Name ---
     if (formData.name) {
       contentDefinition.push({
@@ -275,7 +316,7 @@ function Invitation() {
         alignment: "center",
       });
     }
-  
+
     // --- Description ---
     if (formData.description) {
       contentDefinition.push({
@@ -284,7 +325,7 @@ function Invitation() {
         alignment: "center",
       });
     }
-  
+
     // --- Date/Time ---
     if (formData.dob) {
       contentDefinition.push({
@@ -293,12 +334,12 @@ function Invitation() {
         alignment: "center",
       });
     }
-  
+
     // --- Contact Details ---
     const contactDetails = [];
     const whatsappIconDataUrl = await convertToDataURL(whatsappImage);
     const addressIconDataUrl = await convertToDataURL(AddressIcon);
-  
+
     if (formData.phone) {
       contactDetails.push({
         columns: [
@@ -315,7 +356,7 @@ function Invitation() {
         style: "contactItem",
       });
     }
-  
+
     if (formData.venue) {
       contactDetails.push({
         columns: [
@@ -326,7 +367,7 @@ function Invitation() {
         style: "contactItem",
       });
     }
-  
+
     if (formData.address) {
       contactDetails.push({
         columns: [
@@ -343,14 +384,14 @@ function Invitation() {
         style: "contactItem",
       });
     }
-  
+
     if (contactDetails.length > 0) {
       contentDefinition.push({
         stack: contactDetails,
         style: "contactBox",
       });
     }
-  
+
     // --- Regards ---
     if (formData.regards) {
       contentDefinition.push({
@@ -359,20 +400,27 @@ function Invitation() {
         alignment: "center",
       });
     }
-  
+
     // --- Gallery ---
     if (formData.gallery.length > 0) {
       // Process each image into a fixed size with round corners.
+      // In your PDF generation code:
       const galleryImages = await Promise.all(
-        formData.gallery.map(async (file) => ({
-          image: await getBase64FromFile(file),
-          width: 100,
-          height: 110,
-          style: "galleryImage",
-          alignment: "center",
-        }))
+        formData.gallery.map(async (file) => {
+          // Get the base64 string of the original image file
+          const dataUrl = await getBase64FromFile(file);
+          // Create a framed image with a white background (adjust frame size as needed)
+          const framedDataUrl = await frameImageWithWhiteBackground(dataUrl, 100);
+          return {
+            image: framedDataUrl,
+            width: 100,   // Fixed width
+            height: 100,  // Fixed height
+            alignment: "center",
+          };
+        })
       );
-      // Arrange images into rows with 4 columns.
+
+      // Arrange the images into rows (e.g., 4 columns per row)
       const rows = [];
       for (let i = 0; i < galleryImages.length; i += 4) {
         let row = galleryImages.slice(i, i + 4);
@@ -386,9 +434,11 @@ function Invitation() {
           style: "galleryContainer",
         });
       }
+
+      // Add the rows to your content definition
       rows.forEach((r) => contentDefinition.push(r));
     }
-  
+
     // Wrap all content in one table cell for an overall border.
     const fullContent = {
       table: {
@@ -413,7 +463,7 @@ function Invitation() {
         paddingBottom: () => 10,
       },
     };
-  
+
     const documentDefinition = {
       content: [fullContent],
       pageSize: "A4",
@@ -437,23 +487,23 @@ function Invitation() {
       },
       watermark: formData.occasion
         ? {
-            text: formData.occasion,
-            color: "#000000",
-            opacity: 0.1,
-            bold: true,
-            fontSize: 48,
-            angle: 0,
-          }
+          text: formData.occasion,
+          color: "#000000",
+          opacity: 0.1,
+          bold: true,
+          fontSize: 48,
+          angle: 0,
+        }
         : undefined,
     };
-  
+
     const fileName = formData.name
       ? `${formData.name.replace(/\s+/g, "_")}_Invitation.pdf`
       : "Invitation.pdf";
-  
+
     pdfMake.createPdf(documentDefinition).download(fileName);
   };
-  
+
 
   // -------------------- Update Backend Count --------------------
   const updateBioDataCount = async () => {
@@ -530,7 +580,7 @@ function Invitation() {
         {/* Preview Container – PDF will be generated from this view */}
         <div
           id="invitation-card"
-          className="relative bg-white p-6 rounded-lg shadow-md max-w-3xl w-full border"
+          className="relative p-6 rounded-lg shadow-md max-w-3xl w-full border"
           style={{
             overflow: "hidden",
             backgroundImage: selectedBackground ? `url(${selectedBackground})` : "none",
@@ -580,7 +630,7 @@ function Invitation() {
             {formData.dob && (
               <p className="mb-2 text-center">Date/Time: {formData.dob}</p>
             )}
-            <div className="border p-4 rounded my-4 mt-6 bg-white bg-opacity-80">
+            <div className="border p-4 rounded my-4 mt-6 ">
               {formData.phone && (
                 <div className="mb-2 flex items-center">
                   <img
@@ -667,7 +717,7 @@ function Invitation() {
             </div>
             <button
               className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition ml-4"
-              onClick={handle}
+              onClick={handlePDFPayment}
             >
               Pay ₹{prices?.dicountpriceInvitation || 185} to Download PDF
             </button>
@@ -805,9 +855,9 @@ function Invitation() {
         </div>
 
         <div>
-        <p className="text-left pt-2 mb-4">Note: Please Upload Images in 6:9 ratio for Best Quality Cards</p>
+          <p className="text-left pt-2 mb-4">Note: Please Upload Images in 6:9 ratio for Best Quality Cards</p>
         </div>
-        
+
         <div className="mb-4">
           <label className="block mb-2">Referal Code (Optional)</label>
           <input
@@ -827,11 +877,10 @@ function Invitation() {
                   key={index}
                   src={`https://admin.qrandcards.com${bg}`}
                   alt={`Background ${index + 1}`}
-                  className={`w-20 h-20 object-cover rounded cursor-pointer border ${
-                    selectedBackground === `https://admin.qrandcards.com${bg}`
+                  className={`w-20 h-20 object-cover rounded cursor-pointer border ${selectedBackground === `https://admin.qrandcards.com${bg}`
                       ? "border-blue-800"
                       : "border-gray-200"
-                  }`}
+                    }`}
                   onClick={() =>
                     setSelectedBackground(`https://admin.qrandcards.com${bg}`)
                   }

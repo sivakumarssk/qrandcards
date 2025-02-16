@@ -98,6 +98,46 @@ const groupIntoRows = (items, count = 4) => {
   return rows;
 };
 
+const frameImageWithWhiteBackground = async (
+  dataUrl,
+  frameSize = 100,
+  frameHeight =130,
+  scaleFactor = 40
+) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = dataUrl;
+    img.onload = () => {
+      // Create a canvas with increased pixel density.
+      const canvas = document.createElement("canvas");
+      canvas.width = frameHeight * scaleFactor;
+      canvas.height = frameSize * scaleFactor;
+      const ctx = canvas.getContext("2d");
+      
+      // Scale the context so that drawing operations are in the original frameSize units.
+      ctx.scale(scaleFactor, scaleFactor);
+      
+      // Fill the background with white.
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, frameSize, frameSize);
+      
+      // Calculate the scale for the image to fit within the frame.
+      const scale = Math.min(frameSize / img.width, frameSize / img.height);
+      const width = img.width * scale;
+      const height = img.height * scale;
+      const x = (frameSize - width) / 2;
+      const y = (frameSize - height) / 2;
+      
+      // Draw the image onto the canvas.
+      ctx.drawImage(img, x, y, width, height);
+      
+      // Return a high resolution data URL.
+      resolve(canvas.toDataURL());
+    };
+    img.onerror = (err) => reject(err);
+  });
+};
+
 function PersonalCards() {
   const [formData, setFormData] = useState({
     name: "",
@@ -227,13 +267,19 @@ function PersonalCards() {
     let productItems = [];
     if (formData.productImages && formData.productImages.length > 0) {
       productItems = await Promise.all(
-        formData.productImages.map(async (file) => ({
-          image: await getBase64FromFile(file),
-          width: 100,
-          height: 110,
-          alignment: "center",
-        }))
-      );
+        formData.productImages.map(async (file) => {
+          // Get the base64 string of the original image file
+          const dataUrl = await getBase64FromFile(file);
+          // Create a framed image with a white background (adjust frame size as needed)
+          const framedDataUrl = await frameImageWithWhiteBackground(dataUrl, 100);
+          return {
+            image: framedDataUrl,
+            width: 100,   // Fixed width
+            height: 100,  // Fixed height
+            alignment: "center",
+          };
+        }
+      ))
     }
     const productRows = groupIntoRows(productItems, 4);
 
@@ -241,12 +287,18 @@ function PersonalCards() {
     let galleryItems = [];
     if (formData.gallery && formData.gallery.length > 0) {
       galleryItems = await Promise.all(
-        formData.gallery.map(async (file) => ({
-          image: await getBase64FromFile(file),
-          width: 100,
-          height: 110,
-          alignment: "center",
-        }))
+        formData.gallery.map(async (file) => {
+          // Get the base64 string of the original image file
+          const dataUrl = await getBase64FromFile(file);
+          // Create a framed image with a white background (adjust frame size as needed)
+          const framedDataUrl = await frameImageWithWhiteBackground(dataUrl, 100);
+          return {
+            image: framedDataUrl,
+            width: 100,   // Fixed width
+            height: 100,  // Fixed height
+            alignment: "center",
+          };
+        })
       );
     }
     const galleryRows = groupIntoRows(galleryItems, 4);
@@ -276,7 +328,7 @@ function PersonalCards() {
               { text: "WhatsApp: ", color: "black" },
               { text: formData.phone, link: `https://api.whatsapp.com/send?phone=+91${formData.phone}`, color: "blue" }
             ],
-            margin: [5,0,0,5]
+            margin: [5, 0, 0, 5]
           }
         ],
         columnGap: 0,
@@ -292,10 +344,10 @@ function PersonalCards() {
               { text: "Email: ", color: "black" },
               { text: formData.email, link: `mailto:${formData.email}`, color: "blue" }
             ],
-            margin: [0,0,0,5]
+            margin: [0, 5, 0, 5]
           }
         ],
-        columnGap: 0,
+        columnGap: 5,
         margin: [0,0,0,0]
       });
     }
@@ -308,7 +360,7 @@ function PersonalCards() {
               { text: "Address: ", color: "black" },
               { text: formData.address, link: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(formData.address)}`, color: "blue" }
             ],
-            margin: [0,0,0,5]
+            margin: [0, 2, 0, 5]
           }
         ],
         columnGap: 0,
@@ -330,7 +382,7 @@ function PersonalCards() {
                   { text: `${s.platform}: `, color: "black" },
                   { text: s.link, link: s.link, color: "blue" }
                 ],
-                margin: [5,0,0,5]
+                margin: [5,2,0,5]
               }
             ],
             columnGap: 0,
@@ -353,7 +405,7 @@ function PersonalCards() {
                   { text: `${s.platform}: `, color: "black" },
                   { text: s.link, link: s.link, color: "blue" }
                 ],
-                margin: [5,0,0,5]
+                margin: [5,2,0,5]
               }
             ],
             columnGap: 0,
@@ -454,7 +506,7 @@ function PersonalCards() {
           fillColor: "#3b82f6",
           color: "white",
           alignment: "center",
-          margin: [0,5,0,5],
+          margin: [7, 5, 0, 0],
           padding: 5,
         },
         sectionContent: {
