@@ -63,7 +63,7 @@ const makeImageCircular = async (
 const frameImageWithWhiteBackground = async (
   dataUrl,
   frameSize = 100,
-  frameHeight =130,
+  frameHeight = 130,
   scaleFactor = 20
 ) => {
   return new Promise((resolve, reject) => {
@@ -75,24 +75,24 @@ const frameImageWithWhiteBackground = async (
       canvas.width = frameHeight * scaleFactor;
       canvas.height = frameSize * scaleFactor;
       const ctx = canvas.getContext("2d");
-      
+
       // Scale the context so that drawing operations are in the original frameSize units.
       ctx.scale(scaleFactor, scaleFactor);
-      
+
       // Fill the background with white.
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, frameSize, frameSize);
-      
+
       // Calculate the scale for the image to fit within the frame.
       const scale = Math.min(frameSize / img.width, frameSize / img.height);
       const width = img.width * scale;
       const height = img.height * scale;
       const x = (frameSize - width) / 2;
       const y = (frameSize - height) / 2;
-      
+
       // Draw the image onto the canvas.
       ctx.drawImage(img, x, y, width, height);
-      
+
       // Return a high resolution data URL.
       resolve(canvas.toDataURL());
     };
@@ -122,6 +122,7 @@ function Invitation() {
   const [imageSrc, setImageSrc] = useState(null);
   const [showCropModal, setShowCropModal] = useState(false);
   const [prices, setPrices] = useState(null);
+  const [isPdfGenerating, setIsPdfGenerating] = useState(false);
 
   // New states for backgrounds
   const [backgrounds, setBackgrounds] = useState([]);
@@ -236,6 +237,7 @@ function Invitation() {
 
   // -------------------- PDF Generation --------------------
   const handleDownloadPDF = async () => {
+    setIsPdfGenerating(true);
     let bgDataUrl = null;
     if (selectedBackground) {
       try {
@@ -501,9 +503,27 @@ function Invitation() {
       ? `${formData.name.replace(/\s+/g, "_")}_Invitation.pdf`
       : "Invitation.pdf";
 
-    pdfMake.createPdf(documentDefinition).download(fileName);
+      pdfMake.createPdf(documentDefinition).download(fileName);;
+      setIsPdfGenerating(false);
   };
 
+  const handleReferal = async () => {
+    if (formData.referal && formData.referal.trim() !== "") {
+      const userEmail = localStorage.getItem("email");
+      if (userEmail) {
+        try {
+          await axios.post("https://admin.qrandcards.com/api/addreferals", {
+            user: userEmail,
+            referal: formData.referal,
+            type: "Invitation Card",
+          });
+          console.log("Referral posted successfully.");
+        } catch (error) {
+          console.error("Error posting referral:", error);
+        }
+      }
+    }
+  };
 
   // -------------------- Update Backend Count --------------------
   const updateBioDataCount = async () => {
@@ -545,6 +565,7 @@ function Invitation() {
         handler: function (paymentResponse) {
           handleDownloadPDF();
           updateBioDataCount();
+          handleReferal()
           alert("Payment successful! Your PDF will be downloaded.");
         },
         modal: {
@@ -729,6 +750,14 @@ function Invitation() {
           </p>
           <p className="text-center">By Using Our QR Generator</p>
         </div>
+        {isPdfGenerating && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white p-6 rounded shadow-md">
+              <p className="text-lg font-semibold">Please wait, your card is getting ready...</p>
+            </div>
+          </div>
+        )}
+
       </div>
     );
   }
@@ -878,8 +907,8 @@ function Invitation() {
                   src={`https://admin.qrandcards.com${bg}`}
                   alt={`Background ${index + 1}`}
                   className={`w-20 h-20 object-cover rounded cursor-pointer border ${selectedBackground === `https://admin.qrandcards.com${bg}`
-                      ? "border-blue-800"
-                      : "border-gray-200"
+                    ? "border-blue-800"
+                    : "border-gray-200"
                     }`}
                   onClick={() =>
                     setSelectedBackground(`https://admin.qrandcards.com${bg}`)

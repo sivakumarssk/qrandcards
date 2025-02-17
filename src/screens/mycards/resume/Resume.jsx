@@ -102,7 +102,7 @@ const convertToDataURL = async (source) => {
 const frameImageWithWhiteBackground = async (
   dataUrl,
   frameSize = 100,
-  frameHeight =130,
+  frameHeight = 130,
   scaleFactor = 20
 ) => {
   return new Promise((resolve, reject) => {
@@ -114,24 +114,24 @@ const frameImageWithWhiteBackground = async (
       canvas.width = frameHeight * scaleFactor;
       canvas.height = frameSize * scaleFactor;
       const ctx = canvas.getContext("2d");
-      
+
       // Scale the context so that drawing operations are in the original frameSize units.
       ctx.scale(scaleFactor, scaleFactor);
-      
+
       // Fill the background with white.
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, frameSize, frameSize);
-      
+
       // Calculate the scale for the image to fit within the frame.
       const scale = Math.min(frameSize / img.width, frameSize / img.height);
       const width = img.width * scale;
       const height = img.height * scale;
       const x = (frameSize - width) / 2;
       const y = (frameSize - height) / 2;
-      
+
       // Draw the image onto the canvas.
       ctx.drawImage(img, x, y, width, height);
-      
+
       // Return a high resolution data URL.
       resolve(canvas.toDataURL());
     };
@@ -164,6 +164,8 @@ function Resume() {
   const [prices, setPrices] = useState(null);
   const [backgrounds, setBackgrounds] = useState([]);
   const [selectedBackground, setSelectedBackground] = useState(null);
+  const [isPdfGenerating, setIsPdfGenerating] = useState(false);
+
   const navigate = useNavigate();
 
   // -------------------- Fetching Data --------------------
@@ -238,6 +240,7 @@ function Resume() {
 
   // -------------------- PDF Generation --------------------
   const handleDownloadPDF = async () => {
+    setIsPdfGenerating(true);
     let bgDataUrl = null;
     if (selectedBackground) {
       try {
@@ -275,7 +278,7 @@ function Resume() {
         borderRadius: 8
       },
       galleryContainer: {
-        margin: [0, 0, 0, 20],
+        margin: [0, 20, 0, 20],
       },
       // Gallery (and Certificate) images with increased size and rounded corners.
       galleryImage: {
@@ -470,7 +473,8 @@ function Resume() {
         certRows.push({
           columns: row,
           columnGap: 35,
-          margin: [0, 10, 0, 10],
+          margin: [5, 10, 7, 10],
+          style: "galleryContainer",
         });
       }
       contentDefinition.push({
@@ -514,7 +518,8 @@ function Resume() {
         galleryRows.push({
           columns: row,
           columnGap: 35,
-          margin: [0, 10, 0, 10],
+          margin: [5, 10, 7, 10],
+          style: "galleryContainer",
         });
       }
       contentDefinition.push({
@@ -567,7 +572,7 @@ function Resume() {
     const documentDefinition = {
       content: [fullContent],
       pageSize: "A4",
-      pageMargins: [20, 40, 40, 40],
+      pageMargins: [30, 30, 30, 30],
       styles: styles,
       defaultStyle: {
         fontSize: 12,
@@ -587,13 +592,13 @@ function Resume() {
       },
       watermark: formData.occasion
         ? {
-            text: formData.occasion,
-            color: "#000000",
-            opacity: 0.1,
-            bold: true,
-            fontSize: 48,
-            angle: 0,
-          }
+          text: formData.occasion,
+          color: "#000000",
+          opacity: 0.1,
+          bold: true,
+          fontSize: 48,
+          angle: 0,
+        }
         : undefined,
     };
 
@@ -602,7 +607,7 @@ function Resume() {
       : "Resume.pdf";
 
     pdfMake.createPdf(documentDefinition).download(fileName);
-    handleReferal();
+    setIsPdfGenerating(false);
   };
 
   const handleReferal = async () => {
@@ -661,6 +666,7 @@ function Resume() {
         handler: function (paymentResponse) {
           handleDownloadPDF();
           updateResumeCount();
+          handleReferal();
           alert("Payment successful! Your PDF will be downloaded.");
         },
         modal: {
@@ -724,7 +730,7 @@ function Resume() {
             <h2 className="text-xl font-bold text-center">{formData.fullName}</h2>
             <h3 className="text-lg text-center mt-1 mb-2">{formData.dob}</h3>
           </div>
-  
+
           {/* Qualification Section */}
           <div id="about-section" className="mb-6">
             <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
@@ -732,7 +738,7 @@ function Resume() {
             </h3>
             <p className="border p-4 rounded-b-lg">{formData.qualification}</p>
           </div>
-  
+
           {/* Experience Section */}
           <div id="experience-section" className="mb-6">
             <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
@@ -740,7 +746,7 @@ function Resume() {
             </h3>
             <p className="border p-4 rounded-b-lg">{formData.experience}</p>
           </div>
-  
+
           {/* Skills/Hobbies Section */}
           <div id="skills/hobbies-section" className="mb-6">
             <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
@@ -748,7 +754,7 @@ function Resume() {
             </h3>
             <p className="border p-4 rounded-b-lg">{formData.skills}</p>
           </div>
-  
+
           {/* Contact Details Section */}
           <div id="contact-section" className="mb-6">
             <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
@@ -791,7 +797,7 @@ function Resume() {
               )}
             </ul>
           </div>
-  
+
           {/* Certificates Section */}
           {formData.certificates.length > 0 && (
             <div id="products-section" className="mb-6">
@@ -810,7 +816,7 @@ function Resume() {
               </div>
             </div>
           )}
-  
+
           {/* Gallery Section */}
           {formData.gallery.length > 0 && (
             <div id="gallery-section" className="mb-6">
@@ -829,7 +835,7 @@ function Resume() {
               </div>
             </div>
           )}
-  
+
           <div className="flex justify-center items-center">
             <button
               className="bg-red-500 text-white mt-4 py-2 px-4 rounded"
@@ -851,7 +857,7 @@ function Resume() {
               </button>
             </div>
           </div>
-  
+
           <div className="mt-4 mb-4">
             <p className="text-center">
               <span className="font-semibold">Note</span> - you can convert your PDF to QR
@@ -859,151 +865,158 @@ function Resume() {
             <p className="text-center">By Using Our QR Generator</p>
           </div>
         </div>
-        </div>
-      );
-    }
-  
-    return (
-      <div className="p-6 bg-gray-100 min-h-screen mt-[14%] lg:mt-[4%]">
-        <h1 className="text-3xl font-bold mb-6">Create Resume</h1>
-        <form
-          className="bg-white p-6 rounded-lg shadow-md"
-          onSubmit={(e) => {
-            e.preventDefault();
-            setPreviewMode(true);
-          }}
-        >
-          <div className="mb-4">
-            <label className="block mb-2">Profile Image</label>
-            <input type="file" accept="image/*" onChange={handleFileChange} />
-            {formData.croppedProfileImage && (
-              <div className="mt-4">
-                <img
-                  src={formData.croppedProfileImage}
-                  alt="Profile"
-                  className="w-24 h-24 rounded-full border-4 border-gray-300"
-                />
-              </div>
-            )}
-          </div>
-  
-          <div className="mb-4">
-            <label className="block mb-2">Full Name</label>
-            <input type="text" name="fullName" value={formData.fullName} onChange={handleInputChange} className="w-full border p-2 rounded" />
-          </div>
-  
-          <div className="mb-4">
-            <label className="block mb-2">Date of Birth</label>
-            <input type="date" name="dob" value={formData.dob} onChange={handleInputChange} className="w-full border p-2 rounded" />
-          </div>
-  
-          <div className="mb-4">
-            <label className="block mb-2">Qualification</label>
-            <textarea name="qualification" value={formData.qualification} onChange={handleInputChange} className="w-full border p-2 rounded"></textarea>
-          </div>
-  
-          <div className="mb-4">
-            <label className="block mb-2">Experience</label>
-            <textarea name="experience" value={formData.experience} onChange={handleInputChange} className="w-full border p-2 rounded"></textarea>
-          </div>
-  
-          <div className="mb-4">
-            <label className="block mb-2">Skills/Hobbies</label>
-            <textarea name="skills" value={formData.skills} onChange={handleInputChange} className="w-full border p-2 rounded"></textarea>
-          </div>
-  
-          <div className="mb-4">
-            <label className="block mb-2">Whatsapp Number</label>
-            <input type="text" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full border p-2 rounded" />
-          </div>
-  
-          <div className="mb-4">
-            <label className="block mb-2">Email</label>
-            <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full border p-2 rounded" />
-          </div>
-  
-          <div className="mb-4">
-            <label className="block mb-2">Address</label>
-            <input type="text" name="address" value={formData.address} onChange={handleInputChange} className="w-full border p-2 rounded" />
-          </div>
-  
-          <div className="mb-4">
-            <label className="block mb-2">Referal Code (Optional)</label>
-            <input type="number" name="referal" value={formData.referal} onChange={handleInputChange} className="w-full border p-2 rounded" />
-          </div>
-  
-          <div>
-            <label className="block mb-2">Certificates</label>
-            <input type="file" accept="image/*" multiple onChange={(e) => handleMultipleFileChange(e, "certificates")} />
-          </div>
-
-          <div>
-        <p className="text-left pt-2 mb-4">Note: Please Upload Images in 6:9 ratio for Best Quality Cards</p>
-        </div>
-  
-          <div >
-            <label className="block mb-2">Gallery</label>
-            <input type="file" accept="image/*" multiple onChange={(e) => handleMultipleFileChange(e, "gallery")} />
-          </div>
-
-          <div>
-        <p className="text-left pt-2 mb-4">Note: Please Upload Images in 6:9 ratio for Best Quality Cards</p>
-        </div>
-  
-          {backgrounds?.length > 0 && (
-            <div className="mb-4">
-              <label className="block mb-2">Select Background</label>
-              <div className="flex space-x-2 overflow-x-auto">
-                {backgrounds.map((bg, index) => (
-                  <img
-                    key={index}
-                    src={`https://admin.qrandcards.com${bg}`}
-                    alt={`Background ${index + 1}`}
-                    className={`w-20 h-20 object-cover rounded cursor-pointer border ${
-                      selectedBackground === `https://admin.qrandcards.com${bg}`
-                        ? "border-blue-800"
-                        : "border-gray-200"
-                    }`}
-                    onClick={() => setSelectedBackground(`https://admin.qrandcards.com${bg}`)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-  
-          <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded mt-4">
-            Preview
-          </button>
-        </form>
-  
-        {showCropModal && (
-          <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
-            <div className="bg-white p-4 rounded-lg shadow-lg">
-              <h3 className="text-lg font-bold mb-2">Crop Your Image</h3>
-              <div className="relative w-[300px] h-[300px]">
-                <Cropper
-                  image={imageSrc}
-                  crop={crop}
-                  zoom={zoom}
-                  aspect={1}
-                  onCropChange={setCrop}
-                  onZoomChange={setZoom}
-                  onCropComplete={onCropComplete}
-                />
-              </div>
-              <div className="mt-4 flex justify-between">
-                <button className="bg-red-500 text-white px-4 py-2 rounded" onClick={() => setShowCropModal(false)}>
-                  Cancel
-                </button>
-                <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={handleCrop}>
-                  Crop & Save
-                </button>
-              </div>
+        {isPdfGenerating && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white p-6 rounded shadow-md">
+              <p className="text-lg font-semibold">Please wait, your card is getting ready...</p>
             </div>
           </div>
         )}
+
       </div>
     );
   }
-  
-  export default Resume;
+
+  return (
+    <div className="p-6 bg-gray-100 min-h-screen mt-[14%] lg:mt-[4%]">
+      <h1 className="text-3xl font-bold mb-6">Create Resume</h1>
+      <form
+        className="bg-white p-6 rounded-lg shadow-md"
+        onSubmit={(e) => {
+          e.preventDefault();
+          setPreviewMode(true);
+        }}
+      >
+        <div className="mb-4">
+          <label className="block mb-2">Profile Image</label>
+          <input type="file" accept="image/*" onChange={handleFileChange} />
+          {formData.croppedProfileImage && (
+            <div className="mt-4">
+              <img
+                src={formData.croppedProfileImage}
+                alt="Profile"
+                className="w-24 h-24 rounded-full border-4 border-gray-300"
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Full Name</label>
+          <input type="text" name="fullName" value={formData.fullName} onChange={handleInputChange} className="w-full border p-2 rounded" />
+        </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Date of Birth</label>
+          <input type="date" name="dob" value={formData.dob} onChange={handleInputChange} className="w-full border p-2 rounded" />
+        </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Qualification</label>
+          <textarea name="qualification" value={formData.qualification} onChange={handleInputChange} className="w-full border p-2 rounded"></textarea>
+        </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Experience</label>
+          <textarea name="experience" value={formData.experience} onChange={handleInputChange} className="w-full border p-2 rounded"></textarea>
+        </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Skills/Hobbies</label>
+          <textarea name="skills" value={formData.skills} onChange={handleInputChange} className="w-full border p-2 rounded"></textarea>
+        </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Whatsapp Number</label>
+          <input type="text" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full border p-2 rounded" />
+        </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Email</label>
+          <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full border p-2 rounded" />
+        </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Address</label>
+          <input type="text" name="address" value={formData.address} onChange={handleInputChange} className="w-full border p-2 rounded" />
+        </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Referal Code (Optional)</label>
+          <input type="number" name="referal" value={formData.referal} onChange={handleInputChange} className="w-full border p-2 rounded" />
+        </div>
+
+        <div>
+          <label className="block mb-2">Certificates</label>
+          <input type="file" accept="image/*" multiple onChange={(e) => handleMultipleFileChange(e, "certificates")} />
+        </div>
+
+        <div>
+          <p className="text-left pt-2 mb-4">Note: Please Upload Images in 6:9 ratio for Best Quality Cards</p>
+        </div>
+
+        <div >
+          <label className="block mb-2">Gallery</label>
+          <input type="file" accept="image/*" multiple onChange={(e) => handleMultipleFileChange(e, "gallery")} />
+        </div>
+
+        <div>
+          <p className="text-left pt-2 mb-4">Note: Please Upload Images in 6:9 ratio for Best Quality Cards</p>
+        </div>
+
+        {backgrounds?.length > 0 && (
+          <div className="mb-4">
+            <label className="block mb-2">Select Background</label>
+            <div className="flex space-x-2 overflow-x-auto">
+              {backgrounds.map((bg, index) => (
+                <img
+                  key={index}
+                  src={`https://admin.qrandcards.com${bg}`}
+                  alt={`Background ${index + 1}`}
+                  className={`w-20 h-20 object-cover rounded cursor-pointer border ${selectedBackground === `https://admin.qrandcards.com${bg}`
+                    ? "border-blue-800"
+                    : "border-gray-200"
+                    }`}
+                  onClick={() => setSelectedBackground(`https://admin.qrandcards.com${bg}`)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded mt-4">
+          Preview
+        </button>
+      </form>
+
+      {showCropModal && (
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-4 rounded-lg shadow-lg">
+            <h3 className="text-lg font-bold mb-2">Crop Your Image</h3>
+            <div className="relative w-[300px] h-[300px]">
+              <Cropper
+                image={imageSrc}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={onCropComplete}
+              />
+            </div>
+            <div className="mt-4 flex justify-between">
+              <button className="bg-red-500 text-white px-4 py-2 rounded" onClick={() => setShowCropModal(false)}>
+                Cancel
+              </button>
+              <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={handleCrop}>
+                Crop & Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default Resume;

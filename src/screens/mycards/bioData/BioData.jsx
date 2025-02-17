@@ -87,8 +87,9 @@ const groupIntoRows = (items, count = 4) => {
     while (row.length < count) row.push({ text: "" });
     rows.push({
       columns: row,
-      columnGap: 10,
-      margin: [0, 5, 0, 5],
+      columnGap: 35,
+      margin: [5, 10, 7, 10],
+      style: "galleryContainer",
     });
   }
   return rows;
@@ -97,7 +98,7 @@ const groupIntoRows = (items, count = 4) => {
 const frameImageWithWhiteBackground = async (
   dataUrl,
   frameSize = 100,
-  frameHeight =130,
+  frameHeight = 130,
   scaleFactor = 20
 ) => {
   return new Promise((resolve, reject) => {
@@ -109,24 +110,24 @@ const frameImageWithWhiteBackground = async (
       canvas.width = frameHeight * scaleFactor;
       canvas.height = frameSize * scaleFactor;
       const ctx = canvas.getContext("2d");
-      
+
       // Scale the context so that drawing operations are in the original frameSize units.
       ctx.scale(scaleFactor, scaleFactor);
-      
+
       // Fill the background with white.
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, frameSize, frameSize);
-      
+
       // Calculate the scale for the image to fit within the frame.
       const scale = Math.min(frameSize / img.width, frameSize / img.height);
       const width = img.width * scale;
       const height = img.height * scale;
       const x = (frameSize - width) / 2;
       const y = (frameSize - height) / 2;
-      
+
       // Draw the image onto the canvas.
       ctx.drawImage(img, x, y, width, height);
-      
+
       // Return a high resolution data URL.
       resolve(canvas.toDataURL());
     };
@@ -166,6 +167,7 @@ function BioData() {
   const [prices, setPrices] = useState(null);
   const [backgrounds, setBackgrounds] = useState([]);
   const [selectedBackground, setSelectedBackground] = useState(null);
+  const [isPdfGenerating, setIsPdfGenerating] = useState(false);
   const navigate = useNavigate();
 
   // Social icons mapping
@@ -248,6 +250,7 @@ function BioData() {
   // Build a document definition that mimics your Resume component style.
   // Only the value part of contact and social links will be clickable.
   const handleDownloadPDF = async () => {
+    setIsPdfGenerating(true);
     let bgDataUrl = null;
     if (selectedBackground) {
       try {
@@ -290,81 +293,81 @@ function BioData() {
       };
     }
 
-// Build Contact Details with only the value clickable.
-const contactDetails = [];
-if (formData.phone) {
-  contactDetails.push({
-    columns: [
-      { image: await convertToDataURL(whatsappImage), width: 20, height: 20, margin: [0,0,0,0] },
-      {
-        text: [
-          { text: "WhatsApp: ", color: "black" },
-          { text: formData.phone, link: `https://api.whatsapp.com/send?phone=+91${formData.phone}`, color: "blue" }
-        ],
-        margin: [5,0,0,5]
-      }
-    ],
-    columnGap: 5,
-    margin: [0,0,0,0]
-  });
-}
-if (formData.email) {
-  contactDetails.push({
-    columns: [
-      { image: await convertToDataURL(EmailIcon), width: 20, height: 20, margin: [0,0,0,0] },
-      {
-        text: [
-          { text: "Email: ", color: "black" },
-          { text: formData.email, link: `mailto:${formData.email}`, color: "blue" }
-        ],
-        margin: [0,0,0,5]
-      }
-    ],
-    columnGap: 5,
-    margin: [0,0,0,0]
-  });
-}
-if (formData.address) {
-  contactDetails.push({
-    columns: [
-      { image: await convertToDataURL(AddressIcon), width: 20, height: 20, margin: [0,0,0,0] },
-      {
-        text: [
-          { text: "Address: ", color: "black" },
-          { text: formData.address, link: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(formData.address)}`, color: "blue" }
-        ],
-        margin: [0,0,0,5]
-      }
-    ],
-    columnGap: 5,
-    margin: [0,0,0,0]
-  });
-}
-
-// Build Social Links with only the value clickable.
-const socialItems = await Promise.all(
-  formData.socialLinks
-    .filter((s) => s.link)
-    .map(async (s) => {
-      const iconDataUrl = await convertToDataURL(
-        s.platform === "Facebook" ? FacebookIcon : InstagramIcon
-      );
-      return {
+    // Build Contact Details with only the value clickable.
+    const contactDetails = [];
+    if (formData.phone) {
+      contactDetails.push({
         columns: [
-          { image: iconDataUrl, width: 20, height: 20, margin: [0,0,0,0] },
+          { image: await convertToDataURL(whatsappImage), width: 20, height: 20, margin: [0, 0, 0, 0] },
           {
             text: [
-              { text: `${s.platform}: `, color: "black" },
-              { text: s.link, link: s.link, color: "blue" }
+              { text: "WhatsApp: ", color: "black" },
+              { text: formData.phone, link: `https://api.whatsapp.com/send?phone=+91${formData.phone}`, color: "blue" }
             ],
-            margin: [0,0,0,5]
+            margin: [0, 0, 0, 5]
           }
         ],
         columnGap: 5,
-        margin: [0,0,0,0]
-      };
-    })
-);
+        margin: [0, 0, 0, 0]
+      });
+    }
+    if (formData.email) {
+      contactDetails.push({
+        columns: [
+          { image: await convertToDataURL(EmailIcon), width: 20, height: 20, margin: [0, 0, 0, 0] },
+          {
+            text: [
+              { text: "Email: ", color: "black" },
+              { text: formData.email, link: `mailto:${formData.email}`, color: "blue" }
+            ],
+            margin: [0, 0, 0, 5]
+          }
+        ],
+        columnGap: 5,
+        margin: [0, 0, 0, 0]
+      });
+    }
+    if (formData.address) {
+      contactDetails.push({
+        columns: [
+          { image: await convertToDataURL(AddressIcon), width: 20, height: 20, margin: [0, 0, 0, 0] },
+          {
+            text: [
+              { text: "Address: ", color: "black" },
+              { text: formData.address, link: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(formData.address)}`, color: "blue" }
+            ],
+            margin: [0, 0, 0, 5]
+          }
+        ],
+        columnGap: 5,
+        margin: [0, 0, 0, 0]
+      });
+    }
+
+    // Build Social Links with only the value clickable.
+    const socialItems = await Promise.all(
+      formData.socialLinks
+        .filter((s) => s.link)
+        .map(async (s) => {
+          const iconDataUrl = await convertToDataURL(
+            s.platform === "Facebook" ? FacebookIcon : InstagramIcon
+          );
+          return {
+            columns: [
+              { image: iconDataUrl, width: 20, height: 20, margin: [0, 0, 0, 0] },
+              {
+                text: [
+                  { text: `${s.platform}: `, color: "black" },
+                  { text: s.link, link: s.link, color: "blue" }
+                ],
+                margin: [0, 0, 0, 5]
+              }
+            ],
+            columnGap: 5,
+            margin: [0, 0, 0, 0]
+          };
+        })
+    );
 
     const docDefinition = {
       content: [
@@ -453,7 +456,8 @@ const socialItems = await Promise.all(
             ],
           },
           layout: "lightHorizontalLines",
-          margin: [0, 10, 0, 10],
+          padding: [10, 0, 0, 10],
+          margin: [10, 0, 0, 10],
         },
       ].filter(Boolean),
       styles: {
@@ -482,8 +486,11 @@ const socialItems = await Promise.all(
           alignment: "left",
           margin: [5, 5, 5, 5],
         },
+        galleryContainer: {
+          margin: [0, 20, 0, 20],
+        },
       },
-      pageMargins: [40, 40, 40, 40],
+      pageMargins: [30, 30, 30, 30],
     };
 
     // Wrap content in an outer container table of fixed width and center it.
@@ -516,7 +523,7 @@ const socialItems = await Promise.all(
     const finalDocDefinition = {
       content: [fullContainer],
       pageSize: "A4",
-      pageMargins: [20, 40, 40, 40],
+      pageMargins: [30, 30, 30, 30],
       styles: docDefinition.styles,
       defaultStyle: {
         fontSize: 12,
@@ -541,7 +548,7 @@ const socialItems = await Promise.all(
       : "BioData.pdf";
 
     pdfMake.createPdf(finalDocDefinition).download(fileName);
-    handleReferal();
+    setIsPdfGenerating(false);
   };
 
   const handleReferal = async () => {
@@ -600,6 +607,7 @@ const socialItems = await Promise.all(
         handler: function (paymentResponse) {
           handleDownloadPDF();
           updateBioDataCount();
+          handleReferal();
           alert("Payment successful! Your PDF will be downloaded.");
         },
         modal: {
@@ -663,7 +671,7 @@ const socialItems = await Promise.all(
             <h2 className="text-xl font-bold text-center">{formData.name}</h2>
             <h3 className="text-lg text-center mt-1 mb-2">{formData.dob}</h3>
           </div>
-  
+
           {/* Education Section */}
           <div id="education-section" className="mb-6">
             <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
@@ -671,21 +679,21 @@ const socialItems = await Promise.all(
             </h3>
             <p className="border p-4 rounded-b-lg">{formData.education}</p>
           </div>
-  
+
           {/* About Me Section */}
           <div id="about-section" className="mb-6">
             <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
               About me
             </h3>
             <p className="border p-4 rounded-b-lg">
-              {formData.profession && (<><span className="font-bold">Profession: </span>{formData.profession}<br/></>)}
-              {formData.dob && (<><span className="font-bold">Date, time, place of birth: </span>{formData.dob}<br/></>)}
-              {formData.height && (<><span className="font-bold">Height: </span>{formData.height}<br/></>)}
-              {formData.nativeplace && (<><span className="font-bold">Native place: </span>{formData.nativeplace}<br/></>)}
+              {formData.profession && (<><span className="font-bold">Profession: </span>{formData.profession}<br /></>)}
+              {formData.dob && (<><span className="font-bold">Date, time, place of birth: </span>{formData.dob}<br /></>)}
+              {formData.height && (<><span className="font-bold">Height: </span>{formData.height}<br /></>)}
+              {formData.nativeplace && (<><span className="font-bold">Native place: </span>{formData.nativeplace}<br /></>)}
               {formData.caste && (<><span className="font-bold">Caste / sub caste: </span>{formData.caste}</>)}
             </p>
           </div>
-  
+
           {/* Family Details Section */}
           <div id="family-section" className="mb-6">
             <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
@@ -693,7 +701,7 @@ const socialItems = await Promise.all(
             </h3>
             <p className="border p-4 rounded-b-lg">{formData.familydetails}</p>
           </div>
-  
+
           {/* Hobbies Section */}
           <div id="hobbies-section" className="mb-6">
             <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
@@ -701,7 +709,7 @@ const socialItems = await Promise.all(
             </h3>
             <p className="border p-4 rounded-b-lg">{formData.hobbies}</p>
           </div>
-  
+
           {/* Contact Details Section */}
           <div id="contact-section" className="mb-6">
             <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
@@ -747,7 +755,7 @@ const socialItems = await Promise.all(
               )}
             </ul>
           </div>
-  
+
           {/* Social Links Section */}
           {formData.socialLinks.some((link) => link.link) && (
             <div id="social-links-section" className="mb-6">
@@ -779,7 +787,7 @@ const socialItems = await Promise.all(
               </ul>
             </div>
           )}
-  
+
           {/* Gallery Section */}
           {formData.gallery.length > 0 && (
             <div id="gallery-section" className="mb-6">
@@ -798,7 +806,7 @@ const socialItems = await Promise.all(
               </div>
             </div>
           )}
-  
+
           <div className="flex justify-center items-center">
             <button
               className="bg-red-500 text-white mt-4 py-2 px-4 rounded"
@@ -820,16 +828,24 @@ const socialItems = await Promise.all(
               </button>
             </div>
           </div>
-  
+
           <div className="mt-4 mb-4">
             <p className="text-center"><span className="font-semibold">Note</span> - you can convert your PDF to QR</p>
             <p className="text-center">By Using Our QR Generator</p>
           </div>
         </div>
+        {isPdfGenerating && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white p-6 rounded shadow-md">
+              <p className="text-lg font-semibold">Please wait, your card is getting ready...</p>
+            </div>
+          </div>
+        )}
+
       </div>
     );
   }
-  
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen mt-[14%] lg:mt-[4%]">
       <h1 className="text-3xl font-bold mb-6">Create Bio Data</h1>
@@ -853,7 +869,7 @@ const socialItems = await Promise.all(
             </div>
           )}
         </div>
-  
+
         <div className="mb-4">
           <label className="block mb-2">Name</label>
           <input
@@ -864,7 +880,7 @@ const socialItems = await Promise.all(
             className="w-full border p-2 rounded"
           />
         </div>
-  
+
         <div className="mb-4">
           <label className="block mb-2">Education</label>
           <textarea
@@ -874,7 +890,7 @@ const socialItems = await Promise.all(
             className="w-full border p-2 rounded"
           ></textarea>
         </div>
-  
+
         <div className="mb-4">
           <label className="block mb-2">Profession</label>
           <input
@@ -885,8 +901,8 @@ const socialItems = await Promise.all(
             className="w-full border p-2 rounded"
           />
         </div>
-  
-           <div className="mb-4">
+
+        <div className="mb-4">
           <label className="block mb-2">Date, time, place of birth</label>
           <input
             type="text"
@@ -896,7 +912,7 @@ const socialItems = await Promise.all(
             className="w-full border p-2 rounded"
           />
         </div>
-  
+
         <div className="mb-4">
           <label className="block mb-2">Height</label>
           <input
@@ -907,7 +923,7 @@ const socialItems = await Promise.all(
             className="w-full border p-2 rounded"
           />
         </div>
-  
+
         <div className="mb-4">
           <label className="block mb-2">Native Place</label>
           <input
@@ -918,7 +934,7 @@ const socialItems = await Promise.all(
             className="w-full border p-2 rounded"
           />
         </div>
-  
+
         <div className="mb-4">
           <label className="block mb-2">Caste / Sub Caste</label>
           <input
@@ -929,7 +945,7 @@ const socialItems = await Promise.all(
             className="w-full border p-2 rounded"
           />
         </div>
-  
+
         <div className="mb-4">
           <label className="block mb-2">Family Details</label>
           <textarea
@@ -939,7 +955,7 @@ const socialItems = await Promise.all(
             className="w-full border p-2 rounded"
           ></textarea>
         </div>
-        
+
         <div className="mb-4">
           <label className="block mb-2">Activities/ hobbies</label>
           <textarea
@@ -979,7 +995,7 @@ const socialItems = await Promise.all(
             className="w-full border p-2 rounded"
           />
         </div>
-  
+
         <div className="mb-4">
           <label className="block mb-2">Referal Code (Optional)</label>
           <input
@@ -990,7 +1006,7 @@ const socialItems = await Promise.all(
             className="w-full border p-2 rounded"
           />
         </div>
-  
+
         <div className="mb-4">
           <label className="block mb-2">Social Links</label>
           {formData.socialLinks.map((link, index) => (
@@ -1013,14 +1029,14 @@ const socialItems = await Promise.all(
             </div>
           ))}
         </div>
-  
+
         <div>
           <label className="block mb-2">YOUR IMAGES</label>
           <input type="file" accept="image/*" multiple onChange={(e) => handleMultipleFileChange(e, "gallery")} />
         </div>
-  
+
         <div>
-        <p className="text-left pt-2 mb-4">Note: Please Upload Images in 6:9 ratio for Best Quality Cards</p>
+          <p className="text-left pt-2 mb-4">Note: Please Upload Images in 6:9 ratio for Best Quality Cards</p>
         </div>
 
         {backgrounds?.length > 0 && (
@@ -1032,23 +1048,22 @@ const socialItems = await Promise.all(
                   key={index}
                   src={`https://admin.qrandcards.com${bg}`}
                   alt={`Background ${index + 1}`}
-                  className={`w-20 h-20 object-cover rounded cursor-pointer border ${
-                    selectedBackground === `https://admin.qrandcards.com${bg}`
-                      ? "border-blue-800"
-                      : "border-gray-200"
-                  }`}
+                  className={`w-20 h-20 object-cover rounded cursor-pointer border ${selectedBackground === `https://admin.qrandcards.com${bg}`
+                    ? "border-blue-800"
+                    : "border-gray-200"
+                    }`}
                   onClick={() => setSelectedBackground(`https://admin.qrandcards.com${bg}`)}
                 />
               ))}
             </div>
           </div>
         )}
-  
+
         <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded mt-4">
           Preview
         </button>
       </form>
-  
+
       {showCropModal && (
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-4 rounded-lg shadow-lg">

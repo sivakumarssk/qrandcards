@@ -92,7 +92,8 @@ const groupIntoRows = (items, count = 4) => {
     rows.push({
       columns: row,
       columnGap: 35,
-      margin: [0, 5, 0, 5],
+      margin: [5, 10, 7, 10],
+      style: "galleryContainer",
     });
   }
   return rows;
@@ -101,7 +102,7 @@ const groupIntoRows = (items, count = 4) => {
 const frameImageWithWhiteBackground = async (
   dataUrl,
   frameSize = 100,
-  frameHeight =130,
+  frameHeight = 130,
   scaleFactor = 20
 ) => {
   return new Promise((resolve, reject) => {
@@ -113,24 +114,24 @@ const frameImageWithWhiteBackground = async (
       canvas.width = frameHeight * scaleFactor;
       canvas.height = frameSize * scaleFactor;
       const ctx = canvas.getContext("2d");
-      
+
       // Scale the context so that drawing operations are in the original frameSize units.
       ctx.scale(scaleFactor, scaleFactor);
-      
+
       // Fill the background with white.
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, frameSize, frameSize);
-      
+
       // Calculate the scale for the image to fit within the frame.
       const scale = Math.min(frameSize / img.width, frameSize / img.height);
       const width = img.width * scale;
       const height = img.height * scale;
       const x = (frameSize - width) / 2;
       const y = (frameSize - height) / 2;
-      
+
       // Draw the image onto the canvas.
       ctx.drawImage(img, x, y, width, height);
-      
+
       // Return a high resolution data URL.
       resolve(canvas.toDataURL());
     };
@@ -170,6 +171,8 @@ function PersonalCards() {
   const [prices, setPrices] = useState(null);
   const [backgrounds, setBackgrounds] = useState([]);
   const [selectedBackground, setSelectedBackground] = useState(null);
+  const [isPdfGenerating, setIsPdfGenerating] = useState(false);
+
   const navigate = useNavigate();
 
   // Mapping for icons.
@@ -254,8 +257,9 @@ function PersonalCards() {
 
   // -------------------- PDF Generation with pdfMake --------------------
   const handleDownloadPDF = async () => {
-  // Load and apply background image (if selected)
-  let bgDataUrl = null;
+    setIsPdfGenerating(true);
+    // Load and apply background image (if selected)
+    let bgDataUrl = null;
     if (selectedBackground) {
       try {
         bgDataUrl = await getBase64FromUrl(selectedBackground);
@@ -279,7 +283,7 @@ function PersonalCards() {
             alignment: "center",
           };
         }
-      ))
+        ))
     }
     const productRows = groupIntoRows(productItems, 4);
 
@@ -322,23 +326,23 @@ function PersonalCards() {
     if (formData.phone) {
       contactDetails.push({
         columns: [
-          { image: await convertToDataURL(whatsappImage), width: 20, height: 20, margin: [0,0,0,0] },
+          { image: await convertToDataURL(whatsappImage), width: 20, height: 20, margin: [0, 0, 0, 0] },
           {
             text: [
               { text: "WhatsApp: ", color: "black" },
               { text: formData.phone, link: `https://api.whatsapp.com/send?phone=+91${formData.phone}`, color: "blue" }
             ],
-            margin: [5, 0, 0, 5]
+            margin: [0, 0, 0, 5]
           }
         ],
-        columnGap: 0,
-        margin: [0,0,0,0]
+        columnGap: 5,
+        margin: [0, 0, 0, 0]
       });
     }
     if (formData.email) {
       contactDetails.push({
         columns: [
-          { image: await convertToDataURL(EmailIcon), width: 20, height: 20, margin: [0,0,0,0] },
+          { image: await convertToDataURL(EmailIcon), width: 20, height: 20, margin: [0, 0, 0, 0] },
           {
             text: [
               { text: "Email: ", color: "black" },
@@ -348,13 +352,13 @@ function PersonalCards() {
           }
         ],
         columnGap: 5,
-        margin: [0,0,0,0]
+        margin: [0, 0, 0, 0]
       });
     }
     if (formData.address) {
       contactDetails.push({
         columns: [
-          { image: await convertToDataURL(AddressIcon), width: 20, height: 20, margin: [0,0,0,0] },
+          { image: await convertToDataURL(AddressIcon), width: 20, height: 20, margin: [0, 0, 0, 0] },
           {
             text: [
               { text: "Address: ", color: "black" },
@@ -364,7 +368,7 @@ function PersonalCards() {
           }
         ],
         columnGap: 0,
-        margin: [0,0,0,0]
+        margin: [0, 0, 0, 0]
       });
     }
 
@@ -376,17 +380,17 @@ function PersonalCards() {
           const iconDataUrl = await convertToDataURL(socialIcons[s.platform]);
           return {
             columns: [
-              { image: iconDataUrl, width: 20, height: 20, margin: [0,0,0,0] },
+              { image: iconDataUrl, width: 20, height: 20, margin: [0, 0, 0, 0] },
               {
                 text: [
                   { text: `${s.platform}: `, color: "black" },
                   { text: s.link, link: s.link, color: "blue" }
                 ],
-                margin: [5,2,0,5]
+                margin: [5, 2, 0, 5]
               }
             ],
             columnGap: 0,
-            margin: [0,0,0,0]
+            margin: [0, 0, 0, 0]
           };
         })
     );
@@ -399,17 +403,17 @@ function PersonalCards() {
           const iconDataUrl = await convertToDataURL(upiIcons[s.platform]);
           return {
             columns: [
-              { image: iconDataUrl, width: 20, height: 20, margin: [0,0,0,0] },
+              { image: iconDataUrl, width: 20, height: 20, margin: [0, 0, 0, 0] },
               {
                 text: [
                   { text: `${s.platform}: `, color: "black" },
                   { text: s.link, link: s.link, color: "blue" }
                 ],
-                margin: [5,2,0,5]
+                margin: [5, 2, 0, 5]
               }
             ],
             columnGap: 0,
-            margin: [0,0,0,0]
+            margin: [0, 0, 0, 0]
           };
         })
     );
@@ -430,7 +434,7 @@ function PersonalCards() {
             ],
           },
           layout: "lightHorizontalLines",
-          margin: [0,10,0,10],
+          margin: [0, 10, 0, 10],
         },
         {
           table: {
@@ -441,7 +445,7 @@ function PersonalCards() {
             ],
           },
           layout: "lightHorizontalLines",
-          margin: [0,10,0,10],
+          margin: [0, 10, 0, 10],
         },
         {
           table: {
@@ -452,7 +456,7 @@ function PersonalCards() {
             ],
           },
           layout: "lightHorizontalLines",
-          margin: [0,10,0,10],
+          margin: [0, 10, 0, 10],
         },
         upiItems.length > 0 && {
           table: {
@@ -463,7 +467,7 @@ function PersonalCards() {
             ],
           },
           layout: "lightHorizontalLines",
-          margin: [0,10,0,10],
+          margin: [0, 10, 0, 10],
         },
         productItems && productItems.length > 0 && {
           table: {
@@ -474,7 +478,7 @@ function PersonalCards() {
             ],
           },
           layout: "lightHorizontalLines",
-          margin: [0,10,0,10],
+          margin: [0, 10, 0, 10],
         },
         galleryItems && galleryItems.length > 0 && {
           table: {
@@ -485,7 +489,7 @@ function PersonalCards() {
             ],
           },
           layout: "lightHorizontalLines",
-          margin: [0,10,0,10],
+          margin: [0, 10, 0, 10],
         },
       ].filter(Boolean),
       styles: {
@@ -493,12 +497,12 @@ function PersonalCards() {
           fontSize: 24,
           bold: true,
           alignment: "center",
-          margin: [0,10,0,10],
+          margin: [0, 10, 0, 10],
         },
         subheader: {
           fontSize: 16,
           alignment: "center",
-          margin: [0,5,0,10],
+          margin: [0, 5, 0, 10],
         },
         sectionTitle: {
           fontSize: 18,
@@ -512,10 +516,13 @@ function PersonalCards() {
         sectionContent: {
           fontSize: 14,
           alignment: "left",
-          margin: [5,5,5,5],
+          margin: [5, 5, 5, 5],
+        },
+        galleryContainer: {
+          margin: [0, 20, 0, 20],
         },
       },
-      pageMargins: [40, 40, 40, 40],
+      pageMargins: [30, 30, 30, 30],
     };
 
     // Wrap content in an outer container table of fixed width and center it.
@@ -528,7 +535,7 @@ function PersonalCards() {
           [
             {
               stack: docDefinition.content,
-              margin: [0,0,0,0],
+              margin: [0, 0, 0, 0],
             },
           ],
         ],
@@ -548,7 +555,7 @@ function PersonalCards() {
     const finalDocDefinition = {
       content: [fullContainer],
       pageSize: "A4",
-      pageMargins: [20, 40, 40, 40],
+      pageMargins: [30, 30, 30, 30],
       styles: docDefinition.styles,
       defaultStyle: {
         fontSize: 12,
@@ -573,7 +580,7 @@ function PersonalCards() {
       : "PersonalCard.pdf";
 
     pdfMake.createPdf(finalDocDefinition).download(fileName);
-    handleReferal();
+    setIsPdfGenerating(false);
   };
 
   const handleReferal = async () => {
@@ -697,7 +704,7 @@ function PersonalCards() {
             <h2 className="text-xl font-bold text-center">{formData.hashtag}</h2>
             <p className="text-center text-gray-700 mb-4 pb-4">{formData.description}</p>
           </div>
-  
+
           {/* About Section */}
           <div id="about-section" className="mb-6">
             <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
@@ -705,7 +712,7 @@ function PersonalCards() {
             </h3>
             <p className="border p-4 rounded-b-lg">{formData.about}</p>
           </div>
-  
+
           {/* Contact Details */}
           <div id="contact-section" className="mb-6">
             <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
@@ -751,7 +758,7 @@ function PersonalCards() {
               )}
             </ul>
           </div>
-  
+
           {/* Social Links */}
           {formData.socialLinks.some((link) => link.link) && (
             <div id="social-links-section" className="mb-6">
@@ -783,7 +790,7 @@ function PersonalCards() {
               </ul>
             </div>
           )}
-  
+
           {/* UPI Links */}
           {formData.upiLinks.some((link) => link.link) && (
             <div id="upi-links-section" className="mb-6">
@@ -815,7 +822,7 @@ function PersonalCards() {
               </ul>
             </div>
           )}
-  
+
           {/* Achievements */}
           {formData.productImages.length > 0 && (
             <div id="products-section" className="mb-6">
@@ -834,12 +841,12 @@ function PersonalCards() {
               </div>
             </div>
           )}
-  
+
           {/* Gallery */}
           {formData.gallery.length > 0 && (
             <div id="gallery-section" className="mb-6">
               <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
-              My images
+                My images
               </h3>
               <div className="border p-4 rounded-b-lg grid grid-cols-4 gap-4 justify-items-center">
                 {formData.gallery.map((file, index) => (
@@ -854,7 +861,7 @@ function PersonalCards() {
             </div>
           )}
         </div>
-  
+
         <div className="flex justify-center items-center">
           <button
             className="bg-red-500 text-white mt-4 py-2 px-4 rounded"
@@ -876,15 +883,23 @@ function PersonalCards() {
             </button>
           </div>
         </div>
-  
+
         <div className="mt-4 mb-4">
           <p className="text-center"><span className="font-semibold">Note</span> - you can convert your PDF to QR</p>
           <p className="text-center">By Using Our QR Generator</p>
         </div>
+        {isPdfGenerating && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white p-6 rounded shadow-md">
+              <p className="text-lg font-semibold">Please wait, your card is getting ready...</p>
+            </div>
+          </div>
+        )}
+
       </div>
     );
   }
-  
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen mt-[14%] lg:mt-[4%]">
       <h1 className="text-3xl font-bold mb-6">Create Personal Visiting Card</h1>
@@ -908,7 +923,7 @@ function PersonalCards() {
             </div>
           )}
         </div>
-  
+
         <div className="mb-4">
           <label className="block mb-2">Name</label>
           <input
@@ -919,7 +934,7 @@ function PersonalCards() {
             className="w-full border p-2 rounded"
           />
         </div>
-  
+
         <div className="mb-4">
           <label className="block mb-2">Profession</label>
           <input
@@ -930,7 +945,7 @@ function PersonalCards() {
             className="w-full border p-2 rounded"
           />
         </div>
-  
+
         <div className="mb-4">
           <label className="block mb-2">Description</label>
           <textarea
@@ -940,7 +955,7 @@ function PersonalCards() {
             className="w-full border p-2 rounded"
           ></textarea>
         </div>
-  
+
         <div className="mb-4">
           <label className="block mb-2">About Yourself</label>
           <textarea
@@ -950,7 +965,7 @@ function PersonalCards() {
             className="w-full border p-2 rounded"
           ></textarea>
         </div>
-  
+
         <div className="mb-4">
           <label className="block mb-2">Whatsapp Number</label>
           <input
@@ -961,7 +976,7 @@ function PersonalCards() {
             className="w-full border p-2 rounded"
           />
         </div>
-  
+
         <div className="mb-4">
           <label className="block mb-2">Email Address</label>
           <input
@@ -972,7 +987,7 @@ function PersonalCards() {
             className="w-full border p-2 rounded"
           />
         </div>
-  
+
         <div className="mb-4">
           <label className="block mb-2">Location</label>
           <input
@@ -983,7 +998,7 @@ function PersonalCards() {
             className="w-full border p-2 rounded"
           />
         </div>
-  
+
         <div className="mb-4">
           <label className="block mb-2">Referal Code (Optional)</label>
           <input
@@ -994,7 +1009,7 @@ function PersonalCards() {
             className="w-full border p-2 rounded"
           />
         </div>
-  
+
         <div className="mb-4">
           <label className="block mb-2">Social Links</label>
           {formData.socialLinks.map((link, index) => (
@@ -1017,7 +1032,7 @@ function PersonalCards() {
             </div>
           ))}
         </div>
-  
+
         <div className="mb-4">
           <label className="block mb-2">UPI Links</label>
           {formData.upiLinks.map((link, index) => (
@@ -1040,7 +1055,7 @@ function PersonalCards() {
             </div>
           ))}
         </div>
-  
+
         <div>
           <label className="block mb-2">Achievements</label>
           <input
@@ -1052,9 +1067,9 @@ function PersonalCards() {
         </div>
 
         <div>
-        <p className="text-left pt-2 mb-4">Note: Please Upload Images in 6:9 ratio for Best Quality Cards</p>
+          <p className="text-left pt-2 mb-4">Note: Please Upload Images in 6:9 ratio for Best Quality Cards</p>
         </div>
-  
+
         <div >
           <label className="block mb-2">Your images</label>
           <input
@@ -1066,9 +1081,9 @@ function PersonalCards() {
         </div>
 
         <div>
-        <p className="text-left pt-2 mb-4">Note: Please Upload Images in 6:9 ratio for Best Quality Cards</p>
+          <p className="text-left pt-2 mb-4">Note: Please Upload Images in 6:9 ratio for Best Quality Cards</p>
         </div>
-  
+
         {backgrounds?.length > 0 && (
           <div className="mb-4">
             <label className="block mb-2">Select Background</label>
@@ -1078,23 +1093,22 @@ function PersonalCards() {
                   key={index}
                   src={`https://admin.qrandcards.com${bg}`}
                   alt={`Background ${index + 1}`}
-                  className={`w-20 h-20 object-cover rounded cursor-pointer border ${
-                    selectedBackground === `https://admin.qrandcards.com${bg}`
+                  className={`w-20 h-20 object-cover rounded cursor-pointer border ${selectedBackground === `https://admin.qrandcards.com${bg}`
                       ? "border-blue-800"
                       : "border-gray-200"
-                  }`}
+                    }`}
                   onClick={() => setSelectedBackground(`https://admin.qrandcards.com${bg}`)}
                 />
               ))}
             </div>
           </div>
         )}
-  
+
         <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded mt-4">
           Preview
         </button>
       </form>
-  
+
       {showCropModal && (
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-4 rounded-lg shadow-lg">

@@ -8,7 +8,7 @@ const QRForm = ({ activeType, onSubmit }) => {
   const [imageFile, setImageFile] = useState(null);
   const [pdfFile, setPdfFile] = useState(null);
   const navigate = useNavigate();
-  const [loading,setLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     setFormData({});
@@ -142,27 +142,27 @@ const QRForm = ({ activeType, onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if(loading){
+    if (loading) {
       return;
-    } 
-    if(activeType ==='image'){
-      if(!imageFile){
+    }
+    if (activeType === 'image') {
+      if (!imageFile) {
         alert(`Please select a ${activeType} file to upload.`);
         return
       }
-      if(!formData.url){
+      if (!formData.url) {
         alert(`Please upload ${activeType} upload.`);
         return
       }
     }
 
-    if(activeType ==='pdf'){
-      if(!pdfFile){
+    if (activeType === 'pdf') {
+      if (!pdfFile) {
         alert(`Please select a ${activeType} file to upload.`);
         return
       }
 
-      if(!formData.url){
+      if (!formData.url) {
         alert(`Please upload ${activeType} file.`);
         return
       }
@@ -175,8 +175,8 @@ const QRForm = ({ activeType, onSubmit }) => {
     }
 
     if (validateForm()) {
-      console.log(formData,'formData');
-      
+      console.log(formData, 'formData');
+
       onSubmit(formData);
     }
   };
@@ -541,15 +541,19 @@ const QRForm = ({ activeType, onSubmit }) => {
         return (
           <div className="mb-4">
             <label className="block text-gray-700 font-medium mb-1">Upload Image</label>
-            <input type="file" onChange={handleImageChange} accept="image/*" 
-            className="mb-2 max-w-[180px]" /><br/>
+            <input type="file" onChange={handleImageChange} accept="image/*"
+              className="mb-2 max-w-[180px]" /><br />
+             <div >
             <button
               type="button"
               onClick={() => handleFileUpload(imageFile, "Image")}
-              className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-blue-500 transition"
+              className="bg-green-600  text-white py-2 px-4 rounded-lg hover:bg-blue-500 transition"
             >
               Upload Image
             </button>
+            <p className="text-sm text-gray-600 mt-2 text-center">
+              {loading ? 'Uploding Please Wait...' :''}</p>
+              </div> 
             {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
           </div>
         )
@@ -558,8 +562,8 @@ const QRForm = ({ activeType, onSubmit }) => {
         return (
           <div className="mb-4">
             <label className="block text-gray-700 font-medium mb-1">Upload PDF</label>
-            <input type="file" onChange={handlePdfChange} accept="application/pdf" 
-            className="mb-2 max-w-[180px]" /><br/>
+            <input type="file" onChange={handlePdfChange} accept="application/pdf"
+              className="mb-2 max-w-[180px]" /><br />
             <button
               type="button"
               onClick={() => handleFileUpload(pdfFile, "PDF")}
@@ -567,6 +571,8 @@ const QRForm = ({ activeType, onSubmit }) => {
             >
               Upload PDF
             </button>
+            <p className="text-sm text-gray-600 mt-2 text-center">
+              {loading ? 'Uploding Please Wait...' :''}</p>
             {errors.pdf && <p className="text-red-500 text-sm mt-1">{errors.pdf}</p>}
           </div>
         )
@@ -586,6 +592,10 @@ const QRForm = ({ activeType, onSubmit }) => {
       >
         Generate QR Code
       </button>
+      <p className="text-sm text-gray-600 mt-2 text-center">
+        After generating the QR code, please scroll up to view it.
+      </p>
+
     </form>
   );
 };
