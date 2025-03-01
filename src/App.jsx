@@ -15,6 +15,7 @@ import BusinessCards from './screens/mycards/businesscards/BusinessCards'
 import Resume from './screens/mycards/resume/Resume'
 import BioData from './screens/mycards/bioData/BioData'
 import Invitation from './screens/mycards/invitation/Invitation'
+import Property from './screens/mycards/property/Property'
 
 function App() {
 
@@ -34,6 +35,7 @@ function App() {
       <Route path='/mycards/resume' element={<Resume/>}/>
       <Route path='/mycards/bioData' element={<BioData/>}/>
       <Route path='/mycards/invitation' element={<Invitation/>}/>
+      <Route path='/mycards/property' element={<Property/>}/>
       <Route path='/policy/termsandconditions' element={<TermsAndConditions/>}/>
       <Route path='/policy/privacy' element={<PrivacyPolicy/>}/>
       <Route path='/policy/refund' element={<RefundPolicy/>}/>

@@ -144,6 +144,14 @@ function Navbar() {
                   Invitation Cards
                 </NavLink>
               </li>
+              <li>
+                <NavLink
+                  to="/mycards/property"
+                  className="block px-4 py-2 text-sm hover:bg-blue-100 transition"
+                >
+                  Property Cards
+                </NavLink>
+              </li>
             </ul>
           </div>
           {/* <NavLink
@@ -312,6 +320,14 @@ function Navbar() {
                   className="block px-4 py-2 text-sm hover:bg-blue-100 transition"
                 >
                   Invitation Cards
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/mycards/property"
+                  className="block px-4 py-2 text-sm hover:bg-blue-100 transition"
+                >
+                  Property Cards
                 </NavLink>
               </li>
             </ul>
