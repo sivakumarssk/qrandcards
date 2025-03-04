@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import pesrnalcards from "../../assets/corousel/pesrnalcards.png";
+import pesrnalcards from "../../assets/qrimages/personal.jpg";
 import { useNavigate } from "react-router-dom";
 
 function CardsAbout() {
@@ -20,7 +20,7 @@ function CardsAbout() {
             <img
               src={pesrnalcards}
               alt="Personal Cards"
-              className="w-full rounded-lg shadow-lg"
+              className="w-full rounded-lg shadow-lg  h-[400px]"
             />
           </div>
 

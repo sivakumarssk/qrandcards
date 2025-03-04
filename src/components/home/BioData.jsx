@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import bioData from "../../assets/corousel/bioData.png";
+import bioData from "../../assets/qrimages/bioData.jpg";
 import { useNavigate } from "react-router-dom";
 
 function BioData() {
@@ -33,11 +33,11 @@ function BioData() {
           </div>
 
           {/* Image Frames */}
-          <div data-aos="fade-left" className="flex space-x-4">
+          <div data-aos="fade-left" className="flex  space-x-4">
             <img
               src={bioData}
               alt="Personal Cards"
-              className="w-full rounded-lg shadow-lg"
+              className="w-full rounded-lg shadow-lg  h-[400px]"
             />
           </div>
 

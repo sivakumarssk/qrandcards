@@ -459,7 +459,7 @@ const upiIcons = {
           table: {
             widths: ["*"],
             body: [
-              [{ text: "Contact Details", style: "sectionTitle" }],
+              [{ text: "CONTACT DETAILS", style: "sectionTitle" }],
               [{ stack: contactDetails, style: "sectionContent" }],
             ],
           },
@@ -926,7 +926,7 @@ const upiIcons = {
               </div>
               <button
                 className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition ml-4"
-                onClick={handleDownloadPDF}
+                onClick={handlePDFPayment}
               >
                 Pay ₹{prices?.dicountpriceProperty || 185} to Download PDF
               </button>
@@ -987,14 +987,19 @@ const upiIcons = {
 
         <div className="mb-4">
           <label className="block mb-2">Title</label>
-          <input
-            type="text"
-            name="title"
-            value={formData.title}
-            placeholder="Eg: owner,builder,partner,legal heir,company,agreement holder,agent,others"
-            onChange={handleInputChange}
-            className="w-full border p-2 rounded"
-          />
+          <select name="title"
+            value={formData.title} onChange={handleInputChange}
+            className="w-full border p-2 rounded" >
+            <option value=''>Select Title</option>
+            <option value="owner">owner</option>
+            <option value="builder">builder</option>
+            <option value="partner">partner</option>
+            <option value="legal heir">legal heir</option>
+            <option value="company">company</option>
+            <option value="agreement holder">agreement holder</option>
+            <option value="agent">agent</option>
+            <option value="others">others</option>
+          </select>
         </div>
 
         <div className="mb-4">
@@ -1011,14 +1016,24 @@ const upiIcons = {
 
         <div className="mb-4">
           <label className="block mb-2">Category</label>
-          <input
-            type="text"
-            name="category"
-            value={formData.category}
-            placeholder="agricultural land,dry land,resi-open plot,resi-independent house,resi-flat,resi-villa,comm-open plot,comm-building,comm-shutter,comm-shed,office-space,warehouse,other category"
-            onChange={handleInputChange}
-            className="w-full border p-2 rounded"
-          />
+          <select value={formData.category}
+            className="w-full border p-2 rounded" name="category"
+            onChange={handleInputChange}>
+            <option value=''>Select Category</option>
+            <option value="resi-open plot">resi-open plot</option>
+            <option value="resi-independent house">resi-independent house</option>
+            <option value="resi-flat">resi-flat</option>
+            <option value="resi-villa">resi-villa</option>
+            <option value="comm-open plot">comm-open plot</option>
+            <option value="comm-building">comm-building</option>
+            <option value="comm-shutter">comm-shutter</option>
+            <option value="comm-shed">comm-shed</option>
+            <option value="office-space">office-space</option>
+            <option value="warehouse">warehouse</option>
+            <option value="agricultural land">agricultural land</option>
+            <option value="dry land">dry land</option>
+            <option value="other category">other category</option>
+          </select>
         </div>
 
         <div className="mb-4">
@@ -1082,6 +1097,7 @@ const upiIcons = {
             name="address"
             value={formData.address}
             onChange={handleInputChange}
+            placeholder="Link"
             className="w-full border p-2 rounded"
           />
         </div>

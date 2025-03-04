@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import bussinesscards from "../../assets/corousel/bussinesscards.png";
+import bussinesscards from "../../assets/qrimages/bussiness.jpg";
 import { useNavigate } from "react-router-dom";
 
 function BussinessCards() {
@@ -38,7 +38,7 @@ function BussinessCards() {
             <img
               src={bussinesscards}
               alt="Personal Cards"
-              className="w-full rounded-lg shadow-lg"
+              className="w-full rounded-lg shadow-lg h-[400px]"
             />
           </div> 
 

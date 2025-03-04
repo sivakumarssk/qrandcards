@@ -20,6 +20,7 @@ import BussinessCards from "../../components/home/BussinessCards";
 import Resume from "../../components/home/Resume";
 import BioData from "../../components/home/BioData";
 import InvitationHome from "../../components/home/InvitationHome";
+import Property from "../../components/home/Property";
 
 function Home() {
   React.useEffect(() => {
@@ -49,6 +50,7 @@ function Home() {
       <Resume/>
       <BioData/>
       <InvitationHome/>
+      <Property/>
 
       <Testimonials/>
 

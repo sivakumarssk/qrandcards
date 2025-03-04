@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import invitationImage from "../../assets/corousel/invitation.png";
+import invitationImage from "../../assets/qrimages/invitation.jpg";
 import { useNavigate } from "react-router-dom";
 
 function InvitationHome() {
@@ -19,7 +19,7 @@ function InvitationHome() {
           <img
             src={invitationImage}
             alt="Elegant Invitation Cards"
-            className="w-full rounded-lg shadow-lg"
+            className="w-full rounded-lg shadow-lg  h-[400px]"
           />
         </div>
 

@@ -459,8 +459,8 @@ function BusinessCards() {
               [{ text: "About Us", style: "sectionTitle" }],
               [{
                 text:
-                  `${formData.hashtag ? "My Name: " + formData.hashtag + "\n" : ""}` +
-                  `${formData.designation ? "My Designation: " + formData.designation + "\n" : ""}` +
+                  `${formData.hashtag ? "Name: " + formData.hashtag + "\n" : ""}` +
+                  `${formData.designation ? "Designation: " + formData.designation + "\n" : ""}` +
                   `${formData.about ? formData.about : ""}`,
                 style: "sectionContent",
               }],
