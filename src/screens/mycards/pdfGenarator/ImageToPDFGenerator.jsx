@@ -7,6 +7,7 @@ pdfMake.vfs = pdfFonts.vfs;
 const ImagePDFGenerator = () => {
   const [images, setImages] = useState([]);
   const [activeMode, setActiveMode] = useState(null);
+  const [cameraFacingMode, setCameraFacingMode] = useState("environment");
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
@@ -15,7 +16,7 @@ const ImagePDFGenerator = () => {
     if (activeMode === "camera") {
       const startCamera = async () => {
         try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+          const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: cameraFacingMode } });
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
             videoRef.current.play();
@@ -31,7 +32,11 @@ const ImagePDFGenerator = () => {
         }
       };
     }
-  }, [activeMode]);
+  }, [activeMode, cameraFacingMode]);
+
+  const switchCamera = () => {
+    setCameraFacingMode((prevMode) => (prevMode === "environment" ? "user" : "environment"));
+  };
 
   const captureImage = () => {
     if (videoRef.current && canvasRef.current) {
@@ -65,21 +70,19 @@ const ImagePDFGenerator = () => {
     }
     setIsPdfGenerating(true);
     await new Promise((resolve) => setTimeout(resolve, 500));
-    const content = images.flatMap((img, index) => [
-      {
-        image: img,
-        width: 400,
-        alignment: "center",
-        margin: [0, 221]
-      },
-      index < images.length - 1 ? { text: "", pageBreak: "after" } : null
-    ].filter(Boolean));
+    const content = images.map((img, index) => ({
+      image: img,
+      fit: [500, 700],
+      alignment: "center",
+      margin: [0, 50],
+      pageBreak: index < images.length - 1 ? "after" : ""
+    }));
     pdfMake.createPdf({ pageSize: "A4", pageMargins: [0, 0, 0, 0], content }).download("Images.pdf");
     setIsPdfGenerating(false);
   };
 
   return (
-    <div className="min-h-screen mt-[15%] lg:mt-[5%] flex flex-col items-center justify-center bg-gray-200 p-4">
+    <div className="min-h-screen mt-[16%] lg:mt-[5%] flex flex-col items-center justify-center bg-gray-200 p-4">
       <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">Image to PDF Generator</h1>
       <div className="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg">
         <div className="flex justify-center space-x-4 mb-6">
@@ -93,6 +96,7 @@ const ImagePDFGenerator = () => {
             <div className="relative">
               <video ref={videoRef} className="w-full h-64 rounded shadow-md bg-black" autoPlay playsInline muted />
               <button onClick={captureImage} className="absolute bottom-3 left-1/2 transform -translate-x-1/2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full">Capture</button>
+              <button onClick={switchCamera} className="absolute top-3 right-3 bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded">Switch Camera</button>
             </div>
           </div>
         )}
