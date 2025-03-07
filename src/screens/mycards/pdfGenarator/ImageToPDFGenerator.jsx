@@ -15,7 +15,7 @@ const ImagePDFGenerator = () => {
     if (activeMode === "camera") {
       const startCamera = async () => {
         try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
             videoRef.current.play();
@@ -65,13 +65,15 @@ const ImagePDFGenerator = () => {
     }
     setIsPdfGenerating(true);
     await new Promise((resolve) => setTimeout(resolve, 500));
-    const content = images.map((img, index) => ({
-      image: img,
-      width: 400,
-      alignment: "center",
-      margin: [0, 221],
-      pageBreak: index < images.length - 1 ? "after" : ""
-    }));
+    const content = images.flatMap((img, index) => [
+      {
+        image: img,
+        width: 400,
+        alignment: "center",
+        margin: [0, 221]
+      },
+      index < images.length - 1 ? { text: "", pageBreak: "after" } : null
+    ].filter(Boolean));
     pdfMake.createPdf({ pageSize: "A4", pageMargins: [0, 0, 0, 0], content }).download("Images.pdf");
     setIsPdfGenerating(false);
   };
