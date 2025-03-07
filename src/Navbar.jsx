@@ -78,7 +78,7 @@ function Navbar() {
             About
           </NavLink>
           <NavLink
-            to="/qr-generator"
+            to="/PDFGenerator"
             className={({ isActive }) =>
               isActive
                 ? `${activeClassName} hover:text-blue-300 transition`
@@ -87,8 +87,9 @@ function Navbar() {
             data-aos="fade-down"
             data-aos-delay="400"
           >
-            QR Generator
+           PDF Generator
           </NavLink>
+          
           <div className="relative group" data-aos="fade-down"
             data-aos-delay="400">
             {/* Main Menu Item */}
@@ -103,14 +104,6 @@ function Navbar() {
 
             {/* Submenu */}
             <ul className="absolute hidden w-[150px] group-hover:flex flex-col bg-white shadow-lg rounded-lg py-2 top-full left-0">
-            <li>
-                <NavLink
-                  to="/mycards/PDFGenerator"
-                  className="block px-4 py-2 text-sm hover:bg-blue-100 transition"
-                >
-                  PDF Generator
-                </NavLink>
-              </li>
 
               <li>
                 <NavLink
@@ -278,6 +271,20 @@ function Navbar() {
             QR Generator
           </NavLink>
 
+          <NavLink
+            to="/PDFGenerator"
+            onClick={() => setIsMenuOpen(false)}
+            className={({ isActive }) =>
+              isActive
+                ? `${activeClassName} hover:text-blue-300 transition block py-2 px-4`
+                : "hover:text-blue-300 transition block py-2 px-4"
+            }
+            data-aos="fade-up"
+            data-aos-delay="200"
+          >
+             PDF Generator
+          </NavLink>
+
           <div className="relative" data-aos="fade-up"
             data-aos-delay="400">
             <button
@@ -287,15 +294,7 @@ function Navbar() {
               My Cards
             </button>
             <ul className="pl-4">
-            <li>
-                <NavLink
-                  to="/mycards/PDFGenerator"
-                  className="block py-2 px-4 text-sm hover:bg-blue-100 transition"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                 PDF Generator
-                </NavLink>
-              </li>
+            
               <li>
                 <NavLink
                   to="/mycards/personal"
@@ -336,6 +335,7 @@ function Navbar() {
                 <NavLink
                   to="/mycards/invitation"
                   className="block px-4 py-2 text-sm hover:bg-blue-100 transition"
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   Invitation Cards
                 </NavLink>
@@ -344,6 +344,7 @@ function Navbar() {
                 <NavLink
                   to="/mycards/property"
                   className="block px-4 py-2 text-sm hover:bg-blue-100 transition"
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   Property Cards
                 </NavLink>

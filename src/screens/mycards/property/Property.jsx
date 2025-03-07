@@ -8,8 +8,8 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import AddressIcon from "../../../assets/socialmedia/address.png";
 import whatsappImage from "../../../assets/qrimages/whatsapp.png";
 import EmailIcon from "../../../assets/socialmedia/email.png";
-import FacebookIcon from "../../../assets/socialmedia/facebook.png";
-import InstagramIcon from "../../../assets/socialmedia/instagram.png";
+import WebsiteIcon from "../../../assets/qrimages/web-link.png";
+import VideoIcon from "../../../assets/qrimages/video.png";
 import PhonePayIcon from "../../../assets/socialmedia/phonepay.png";
 import GooglePayIcon from "../../../assets/socialmedia/gpay.png";
 
@@ -157,8 +157,8 @@ function Property() {
       { platform: "Google Pay", link: "" },
     ],
     socialLinks: [
-      { platform: "Facebook", link: "" },
-      { platform: "Instagram", link: "" },
+      { platform: "Website", link: "" },
+      { platform: "Video Link", link: "" },
     ],
     property: [],
     documents: [],
@@ -178,10 +178,10 @@ function Property() {
   const navigate = useNavigate();
 
   // Social icons mapping
-  const socialIcons = {
-    Facebook: FacebookIcon,
-    Instagram: InstagramIcon,
-  };
+  // const socialIcons = {
+  //   Facebook: FacebookIcon,
+  //   Instagram: InstagramIcon,
+  // };
 const upiIcons = {
     "Phone Pay": PhonePayIcon,
     "Google Pay": GooglePayIcon,
@@ -379,7 +379,7 @@ const upiIcons = {
         .filter((s) => s.link)
         .map(async (s) => {
           const iconDataUrl = await convertToDataURL(
-            s.platform === "Facebook" ? FacebookIcon : InstagramIcon
+            s.platform === "Website" ? WebsiteIcon : VideoIcon
           );
           return {
             columns: [
@@ -853,7 +853,7 @@ const upiIcons = {
                     link.link && (
                       <li key={index}>
                         <img
-                          src={link.platform === "Facebook" ? FacebookIcon : InstagramIcon}
+                          src={link.platform === "Website" ? WebsiteIcon : VideoIcon}
                           alt={link.platform}
                           className="inline w-5 h-5 mr-2"
                         />

@@ -21,6 +21,7 @@ import Resume from "../../components/home/Resume";
 import BioData from "../../components/home/BioData";
 import InvitationHome from "../../components/home/InvitationHome";
 import Property from "../../components/home/Property";
+import PdfGen from "../../components/home/PdfGen";
 
 function Home() {
   React.useEffect(() => {
@@ -42,6 +43,9 @@ function Home() {
       <QrAbout/>
 
       <QRTypeSection/>
+
+      <PdfGen/>
+
 
       <CardsAbout/>
 

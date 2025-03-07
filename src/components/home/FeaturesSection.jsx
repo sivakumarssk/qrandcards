@@ -44,16 +44,16 @@ function FeaturesSection() {
           </p>
         </div>
 
-        {/* <div
+        <div
           className="bg-white p-6 rounded-lg shadow-lg text-center"
           data-aos="fade-up"
           data-aos-delay="300"
         >
-          <h3 className="text-xl font-bold">Highly Customizable</h3>
+          <h3 className="text-xl font-bold">Genarate PDF for Free</h3>
           <p className="mt-2 text-gray-600">
-            Create and customize QR codes to match your brand colors & logo.
+            Generate high-quality PDFs effortlessly, completely free. Customize and download your documents in just a few clicks.
           </p>
-        </div> */}
+        </div>
 
         {/* <div
           className="bg-white p-6 rounded-lg shadow-lg text-center"

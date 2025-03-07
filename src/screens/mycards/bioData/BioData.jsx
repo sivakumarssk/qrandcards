@@ -792,7 +792,7 @@ function BioData() {
           {formData.gallery.length > 0 && (
             <div id="gallery-section" className="mb-6">
               <h3 className="bg-blue-500 text-center text-white py-2 px-4 rounded-t-lg w-full">
-                YOUR IMAGES
+                IMAGES
               </h3>
               <div className="border p-4 rounded-b-lg grid grid-cols-4 gap-4 justify-items-center">
                 {formData.gallery.map((file, index) => (
@@ -1031,7 +1031,7 @@ function BioData() {
         </div>
 
         <div>
-          <label className="block mb-2">YOUR IMAGES</label>
+          <label className="block mb-2"> IMAGES</label>
           <input type="file" accept="image/*" multiple onChange={(e) => handleMultipleFileChange(e, "gallery")} />
         </div>
 
@@ -1067,7 +1067,7 @@ function BioData() {
       {showCropModal && (
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-4 rounded-lg shadow-lg">
-            <h3 className="text-lg font-bold mb-2">Crop Your Image</h3>
+            <h3 className="text-lg font-bold mb-2">Crop Image</h3>
             <div className="relative w-[300px] h-[300px]">
               <Cropper
                 image={imageSrc}

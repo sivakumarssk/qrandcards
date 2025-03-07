@@ -37,7 +37,7 @@ function App() {
       <Route path='/mycards/bioData' element={<BioData/>}/>
       <Route path='/mycards/invitation' element={<Invitation/>}/>
       <Route path='/mycards/property' element={<Property/>}/>
-      <Route path='/mycards/PDFGenerator' element={<ImageToPDFGenerator/>}/>
+      <Route path='/PDFGenerator' element={<ImageToPDFGenerator/>}/>
       <Route path='/policy/termsandconditions' element={<TermsAndConditions/>}/>
       <Route path='/policy/privacy' element={<PrivacyPolicy/>}/>
       <Route path='/policy/refund' element={<RefundPolicy/>}/>

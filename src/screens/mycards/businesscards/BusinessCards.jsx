@@ -746,14 +746,14 @@ function BusinessCards() {
             <p className="border p-4 rounded-b-lg">
               {formData.hashtag && (
                 <>
-                  <span className="font-bold">My Name: </span>
+                  <span className="font-bold">Name: </span>
                   {formData.hashtag}
                   <br />
                 </>
               )}
               {formData.designation && (
                 <>
-                  <span className="font-bold">My Designation: </span>
+                  <span className="font-bold">Designation: </span>
                   {formData.designation}
                   <br />
                 </>
